@@ -28,7 +28,7 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
 
   const [nav, setNav] = useState(false);
 
-  const [username, setUsername] = useState();
+  const [username, setUsername] = useState(user?.username);
   const [userPhoto, setUserPhoto] = useState("");
   const [userPhone, setUserPhone] = useState("");
   const [userAddress, setUserAddress] = useState("");
@@ -50,7 +50,7 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          user_id: userId,
+          user_id: user?.user_id,
         }),
       }
     )
@@ -67,9 +67,9 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
 
   useEffect(() => {
     pickUser();
-    setUserId(user?.user_id);
-    setUsername(user?.username);
-  }, [userPhone, userAddress, userId]);
+   //setUserId(user?.user_id);
+    //setUsername(user?.username);
+  }, []);
 
   return (
     <>

@@ -10,6 +10,7 @@ import {
 } from "react";
 
 interface Restaurant {
+    restaurantData : any;
   map: any;
   id: number;
   name: string;
@@ -18,14 +19,10 @@ interface Restaurant {
   logo: string;
 }
 
-export default function RestaurantItem({
-  filteredDataSource,
-}: {
-  filteredDataSource: Restaurant;
-}) {
+export default function RestaurantItem({restaurantData}:Restaurant) {
   return (
     <>
-      {filteredDataSource.map((item: Restaurant) => (
+      {restaurantData.map((item: Restaurant) => (
         <div className="rounded-xl relative" key={item.id}>
           {/* Overlay */}
           <div className="absolute w-full h-full bg-black/50 rounded-xl h2-white">

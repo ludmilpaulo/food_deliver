@@ -23,15 +23,16 @@ import RestaurantItem from "@/components/RestaurantItem";
 
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
-import Navbar from "@/components/NavBar";
+
 import { selectTotalItems, selectTotalPrice } from "@/redux/slices/basketSlice";
+import Navbar from "@/components/Navbar";
 
 interface Restaurant {
-  id: number;
-  name: string;
-  phone: number;
-  address: string;
-  logo: string;
+  id?: number;
+  name?: string;
+  phone?: number;
+  address?: string;
+  logo?: string;
 }
 
 export default function HomeScreen() {
@@ -43,9 +44,7 @@ export default function HomeScreen() {
 
   const [restaurantData, setRestaurantData] = useState<Restaurant[]>([]);
   const [search, setSearch] = useState("");
-  const [filteredDataSource, setFilteredDataSource] = useState<Restaurant[]>(
-    []
-  );
+  const [filteredDataSource, setFilteredDataSource] = useState<Restaurant[]>([]);
   const [masterDataSource, setMasterDataSource] = useState<Restaurant[]>([]);
 
   const [loading, setLoading] = useState(false);
@@ -109,7 +108,7 @@ export default function HomeScreen() {
         <div className="max-w-[1640px] mx-auto p-4 py-12 grid md:grid-cols-3 gap-6">
           {/* Card  */}
 
-          <RestaurantItem filteredDataSource={filteredDataSource} />
+          <RestaurantItem restaurantData={masterDataSource} map={undefined} id={0} name={""} phone={0} address={""} logo={""} />
          
         </div>
       </div>

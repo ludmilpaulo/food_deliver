@@ -6,8 +6,8 @@ import Link from "next/link";
 
 function JoinScreen() {
   return (
-    <div className="h-full bg-bg_image bg-cover w-full py-16 px-4">
-      <div className="flex flex-col items-center justify-center">
+    <div className="h-full bg-bg_image bg-cover w-full py-16 px-4 sm:max-h-full md:max-h-full sm:max-w-full md:max-w-full">
+      <div className="flex flex-col items-center justify-center sm:max-h-full md:max-h-full sm:max-w-full md:max-hwfull ml-9 mr-8 mt-8 mb-8">
       <Link
         href={{
           pathname: "/LoginScreenUser",
@@ -20,7 +20,7 @@ function JoinScreen() {
               rotate: [0, 30, 60, 240, 360],
             }}
           >
-            <Image src={logo} className="object-none object-center" alt={""} />
+            <Image src={logo}  alt={""} />
             <motion.h1
               animate={{ x: [50, 150, 50], opacity: 1, scale: 1 }}
               transition={{
@@ -30,7 +30,7 @@ function JoinScreen() {
               }}
               initial={{ opacity: 0, scale: 0.5 }}
               whileHover={{ scale: 1.2 }}
-              className="text-center"
+              className="text-center justify-center sm:max-h-full md:max-h-full"
             >
               <p>SD Kudya: Entrega de alimentos</p>
               <p>

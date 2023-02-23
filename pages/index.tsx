@@ -5,6 +5,7 @@ import styles from '@/styles/Home.module.css'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useDispatch, useSelector } from "react-redux";
+import { selectUser } from '@/redux/slices/authSlice'
 
 const inter = Inter({ subsets: ['latin'] })
 

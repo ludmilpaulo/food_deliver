@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import logo from "../assets/logo.png";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/slices/authSlice";
-import { useForm, SubmitHandler } from "react-hook-form";
+
 import { useRouter } from "next/router";
 import Link from "next/link";
 

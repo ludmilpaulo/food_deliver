@@ -6,7 +6,8 @@ import Link from "next/link";
 
 function JoinScreen() {
   return (
-    <div className="bg-bg_image bg-cover bg-center bg-no-repeat">
+    <div className="h-full bg-bg_image bg-cover w-full py-16 px-4">
+      <div className="flex flex-col items-center justify-center">
       <Link
         href={{
           pathname: "/LoginScreenUser",
@@ -49,6 +50,7 @@ function JoinScreen() {
           </div>
         </div>
       </Link>
+    </div>
     </div>
   );
 }

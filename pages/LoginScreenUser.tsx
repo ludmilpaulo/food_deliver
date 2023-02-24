@@ -42,7 +42,7 @@ const LoginScreenUser = () => {
 
       if (res.status === 200) {
         dispatch(loginUser(resJson));
-        alert("User logged in now you can Added Movies to Favorite list");
+        alert("Você se conectou com sucesso Agora você pode saborear sua refeição");
         router.push("/HomeScreen");
       } else {
         alert(Object.values(resJson));

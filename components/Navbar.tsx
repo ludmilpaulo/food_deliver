@@ -133,11 +133,12 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
           </h2>
           <nav>
             <ul className="flex flex-col p-4 h2-gray-800">
+              <Link href={"/OrderScreen"}>
               <li className="h2-xl py-4 flex">
                 <TbTruckDelivery 
-                 onClick={()=>onLogout()} 
                 size={25} className="mr-4" /> Pedidos
               </li>
+              </Link>
               <li className="h2-xl py-4 flex">
                 <MdFavorite size={25} className="mr-4" /> Favoritos
               </li>
@@ -156,17 +157,19 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
               <li className="h2-xl py-4 flex">
                 <FaUserFriends size={25} className="mr-4" /> Invite Friends
               </li>
-              <Link href="/">
-        <a onClick={onLogout}>
-          
+
+         
+              <a href={"/"} onClick={onLogout} >
               <li
              
                className="h2-xl py-4 flex">
                 <RiLogoutBoxLine
-                  onClick={onLogout} 
+                 
                 size={25} className="mr-4" /> Sair
-              </li></a>
-              </Link>
+              </li>
+              </a>
+          
+          
             </ul>
           </nav>
         </div>

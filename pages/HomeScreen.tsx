@@ -51,8 +51,7 @@ export default function HomeScreen() {
   const [nav, setNav] = useState(false);
 
   const getRestaurant = async () => {
-    try {
-      fetch("https://www.sunshinedeliver.com/api/customer/restaurants/")
+    try {fetch("https://www.sunshinedeliver.com/api/customer/restaurants/")
         .then((response) => response.json())
         .then((responseJson) => {
           setRestaurantData(responseJson.restaurants);

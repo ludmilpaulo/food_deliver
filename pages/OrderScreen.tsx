@@ -1,12 +1,23 @@
 import React from 'react'
-import { useLoadScript, GoogleMap } from '@react-google-maps/api';
+import { useLoadScript, GoogleMap, Polygon, Marker } from '@react-google-maps/api';
 import type { NextPage } from 'next';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from '../redux/slices/authSlice';
+import Navbar from '@/components/Navbar';
+import { selectTotalItems, selectTotalPrice } from '@/redux/slices/basketSlice';
 
 
-type Props = {}
+type Props = {
+    latitude?: number;
+    longitude?: number; 
+    altitude: number;
+    heading: number; 
+    altitudeAccuracy: number; 
+    speed: number;
+    accuracy: number;
+    center?: google.maps.LatLng | google.maps.LatLngLiteral | undefined;
+}
 
 interface LatLon {
     latitude: number;
@@ -22,8 +33,12 @@ const OrderScreen = (props: Props) => {
     const dispatch = useDispatch();
 
   const user = useSelector(selectUser);
+
+  const totalPrice = useSelector(selectTotalPrice);
+  const getAllItems = useSelector(selectTotalItems);
+  
     const [coordinates, setCoordinates] = useState({});
-    const [ driverLocation, setDriverLocation ] = useState<LatLon[]>();
+    const [ driverLocation, setDriverLocation ] = useState<LatLon>();
     const [userId, setUserId] = useState<any>(user?.user_id);
 
     const getDriverLocation = async () => {
@@ -51,8 +66,9 @@ const OrderScreen = (props: Props) => {
       }
 
     useEffect(() => {
+        getDriverLocation();
         // get the users current location on intial login
-    
+        console.log("driver location==>", driverLocation?.latitude)
         navigator.geolocation.getCurrentPosition(
           ({ coords: { latitude, longitude } }) => {
             console.log({ latitude, longitude });
@@ -82,6 +98,17 @@ const OrderScreen = (props: Props) => {
       googleMapsApiKey: "AIzaSyBBkDvVVuQBVSMOt8wQoc_7E-2bvDh2-nw" as string,
       libraries: libraries as any,
     });
+
+    const containerStyle = {
+        width: '400px',
+        height: '400px'
+      };
+      
+      const center = {
+        lat: driverLocation?.latitude,
+        lng: driverLocation?.longitude
+      };
+
   
     if (!isLoaded) {
       return <p>Loading...</p>;
@@ -90,7 +117,15 @@ const OrderScreen = (props: Props) => {
 
   return (
     <div>
-        <GoogleMap/>
+         <Navbar total={totalPrice} count={getAllItems.length} />
+        <GoogleMap
+         mapContainerStyle={containerStyle}
+       // center={driverLocation}
+        zoom={10}
+        >
+   
+
+        </GoogleMap>
         
         </div>
   )

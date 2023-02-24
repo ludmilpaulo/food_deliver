@@ -139,9 +139,12 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
                 size={25} className="mr-4" /> Pedidos
               </li>
               </Link>
+
+              <Link href={"/OrderHistory"}>
               <li className="h2-xl py-4 flex">
                 <MdFavorite size={25} className="mr-4" /> Favoritos
               </li>
+              </Link>
               <li className="h2-xl py-4 flex">
                 <FaWallet size={25} className="mr-4" /> Carteira
               </li>

@@ -7,6 +7,7 @@ import {
   AiFillTag,
 } from "react-icons/ai";
 import { BsFillCartFill, BsFillSaveFill } from "react-icons/bs";
+import { RiLogoutBoxLine} from "react-icons/ri"
 import { TbTruckDelivery } from "react-icons/tb";
 import { FaUserFriends, FaWallet } from "react-icons/fa";
 import { MdFavorite, MdHelp } from "react-icons/md";
@@ -63,6 +64,16 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
       .catch((error) => {
         // console.error(error);
       });
+  };
+
+  const onLogout = async () => {
+    try {
+      dispatch(logoutUser());
+      // await AsyncStorage.removeItem("authUser");
+      // Updates.reloadAsync();
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   useEffect(() => {
@@ -123,7 +134,9 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
           <nav>
             <ul className="flex flex-col p-4 h2-gray-800">
               <li className="h2-xl py-4 flex">
-                <TbTruckDelivery size={25} className="mr-4" /> Pedidos
+                <TbTruckDelivery 
+                 onClick={()=>onLogout()} 
+                size={25} className="mr-4" /> Pedidos
               </li>
               <li className="h2-xl py-4 flex">
                 <MdFavorite size={25} className="mr-4" /> Favoritos
@@ -143,6 +156,17 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
               <li className="h2-xl py-4 flex">
                 <FaUserFriends size={25} className="mr-4" /> Invite Friends
               </li>
+              <Link href="/">
+        <a onClick={onLogout}>
+          
+              <li
+             
+               className="h2-xl py-4 flex">
+                <RiLogoutBoxLine
+                  onClick={onLogout} 
+                size={25} className="mr-4" /> Sair
+              </li></a>
+              </Link>
             </ul>
           </nav>
         </div>

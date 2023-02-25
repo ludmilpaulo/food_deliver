@@ -84,7 +84,7 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
 
   return (
     <>
-      <div className="max-w-[1640px] mx-auto flex justify-between items-center p-4">
+      <div className="max-w-[1640px] bg-bg_image bg-cover bg-center bg-no-repeat mx-auto flex justify-between items-center p-4">
         {/* Left side */}
         <div className="flex items-center">
           <div onClick={() => setNav(!nav)} className="cursor-pointer">

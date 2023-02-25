@@ -8,6 +8,7 @@ import Navbar from '@/components/Navbar';
 import { selectTotalItems, selectTotalPrice } from '@/redux/slices/basketSlice';
 
 
+
 type Props = {
     latitude?: number;
     longitude?: number; 

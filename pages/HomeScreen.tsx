@@ -17,6 +17,7 @@ import { BsFillCartFill, BsFillSaveFill } from "react-icons/bs";
 import { TbTruckDelivery } from "react-icons/tb";
 import { FaUserFriends, FaWallet } from "react-icons/fa";
 import { MdFavorite, MdHelp } from "react-icons/md";
+import { FiSearch } from "react-icons/fi";
 import background from "../assets/bg.png";
 import RestaurantItem from "@/components/RestaurantItem";
 
@@ -41,9 +42,8 @@ export default function HomeScreen() {
 
   const totalPrice = useSelector(selectTotalPrice);
   const getAllItems = useSelector(selectTotalItems);
-
+  const [search, setSearch] = useState('');
   const [restaurantData, setRestaurantData] = useState<Restaurant[]>([]);
-  const [search, setSearch] = useState("");
   const [filteredDataSource, setFilteredDataSource] = useState<Restaurant[]>([]);
   const [masterDataSource, setMasterDataSource] = useState<Restaurant[]>([]);
 
@@ -73,10 +73,12 @@ export default function HomeScreen() {
 
   useEffect(() => {
     getRestaurant();
-  }, [restaurantData]);
+  }, []);
 
   ///******************************Procurar************************* */
   const searchFilterFunction = (text: any) => {
+
+    console.log("text captured", text)
     // Check if searched text is not blank
     if (text) {
       // Inserted text is not blank
@@ -84,7 +86,7 @@ export default function HomeScreen() {
       const newData = masterDataSource.filter(function (item) {
         // Applying filter for the inserted text in search bar
         const itemData = item.name ? item.name.toUpperCase() : "".toUpperCase();
-        const textData = text.toUpperCase();
+        const textData = text.toString().toUpperCase();
         return itemData.indexOf(textData) > -1;
       });
       setFilteredDataSource(newData);
@@ -102,12 +104,32 @@ export default function HomeScreen() {
       <div className="bg-bg_image bg-cover bg-center bg-no-repeat h-screen md:h-screen">
       <Navbar total={totalPrice} count={getAllItems.length} />
         <Hero  />
-       
+        <div className="container mx-auto relative">
+                 
+            <div className="mt-4 pb-4 flex space-x-3 border-b border-gray-800 dark:border-gray-700">
+                <div>
+                <FiSearch />
+                </div>
+                <input 
+                value={search}
+                onChange={(text) => searchFilterFunction(text.target.value)}
+                type="text" placeholder="Pesquisar restaurantes" className="focus:outline-none bg-transparent text-sm text-gray-600" />
+            </div>
+        </div>
+     
 
-        <div className="max-w-[1640px] mx-auto p-4 py-12 grid md:grid-cols-3 gap-6">
+        <div className="max-w-[1640px] mx-auto p-4 py-12 grid md:grid-cols-3 gap-6"
+        >
+
+
+        
+         
+       
+      
+  
           {/* Card  */}
 
-          <RestaurantItem restaurantData={masterDataSource} map={undefined} id={0} name={""} phone={0} address={""} logo={""} />
+          <RestaurantItem restaurantData={filteredDataSource} map={undefined} id={0} name={""} phone={0} address={""} logo={""} />
          
         </div>
       </div>

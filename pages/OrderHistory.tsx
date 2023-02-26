@@ -69,14 +69,14 @@ const OrderHistory = () => {
 
         <div className="bg-bg_image 2xl:container 2xl:mx-auto py-14 px-4 md:px-6 xl:px-20">
              
-            <div className="flex flex-col xl:flex-row justify-center items-center space-y-10 xl:space-y-0 xl:space-x-8">
+            <div className="flex flex-col xl:flex-col justify-center items-center space-y-10 xl:space-y-0 xl:space-x-8">
             {data.map((order) =>(
 
                         
 
                 <div key={order?.id} className="flex justify-center flex-col items-start w-full lg:w-9/12 xl:w-full ">
                    
-                    <h3 className="text-3xl xl:text-4xl font-semibold leading-7 xl:leading-9 w-full  md:text-left text-gray-800">{order?.restaurant?.name}</h3>
+                    <h3 className="text-3xl xl:text-4xl font-semibold leading-7 xl:leading-9 w-full  md:text-left text-gray-800">Restaurant  {order?.restaurant?.name}</h3>
                     <p className="text-base leading-none mt-4 text-gray-800">
                         Telefone <span className="font-semibold"> {order?.restaurant?.phone}</span>
                     </p>
@@ -157,7 +157,7 @@ const OrderHistory = () => {
                         <div className="flex justify-start items-start flex-col md:flex-row  w-full md:w-auto space-y-8 md:space-y-0 md:space-x-14 xl:space-x-8  lg:w-full">
                           
                             <div className="flex jusitfy-start items-start flex-col space-y-2">
-                                <p className="text-base font-semibold leading-4  text-gray-800">Endereço do Envio</p>
+                                <p className="text-base font-semibold leading-4  text-gray-800">Endereço da Entrega</p>
                                 <p className="text-sm leading-5 text-gray-600">{order.address}</p>
                             </div>
                         
@@ -175,6 +175,7 @@ const OrderHistory = () => {
                                 <p className="text-base font-semibold leading-4 text-gray-800">Total</p>
                                 <p className="text-base font-semibold leading-4 text-gray-600">{order.total} Kz</p>
                             </div>
+                            <hr/>
                           
                         </div>
                     </div>

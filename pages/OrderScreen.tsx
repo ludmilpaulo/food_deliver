@@ -121,11 +121,11 @@ const OrderScreen = (props: Props) => {
          <Navbar total={totalPrice} count={getAllItems.length} />
         <GoogleMap
          mapContainerStyle={containerStyle}
-       // center={driverLocation}
+        center={center}
         zoom={10}
         >
    
-
+   <Marker position={{ lat: 48.00, lng: -122.00}} />
         </GoogleMap>
         
         </div>

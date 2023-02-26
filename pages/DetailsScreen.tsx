@@ -66,20 +66,20 @@ function DetailsScreen() {
       <Navbar total={totalPrice} count={getAllItems.length} />
       <div className="max-w-[1640px] m-auto px-4 py-12 bg-bg_image bg-cover bg-center bg-no-repeat h-screen md:h-screen">
         <h1 className="text-[#004AAD] font-bold text-4xl text-center">
-          Top Rated Menu Items
+        Itens de menu mais votados
         </h1>
 
         {/* Filter Row */}
         <div className="flex flex-col lg:flex-row justify-between">
           {/* Fliter Type */}
           <div>
-            <p className="font-bold text-gray-700">Filter Type</p>
+            <p className="font-bold text-gray-700">Tipo de filtro</p>
             <div className="flex justfiy-between flex-wrap">
               <button
                 onClick={fetchMeals}
                 className="m-1 border-[#004AAD] text-orange-600 hover:bg-[#004AAD] hover:text-white"
               >
-                All
+                Todos
               </button>
 
               {foods.map((item, index) => (

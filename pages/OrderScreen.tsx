@@ -39,7 +39,7 @@ const OrderScreen = (props: Props) => {
   const getAllItems = useSelector(selectTotalItems);
   
     const [coordinates, setCoordinates] = useState({});
-    const [ driverLocation, setDriverLocation ] = useState<LatLon>();
+    const [ driverLocation, setDriverLocation ] = useState<any>();
     const [userId, setUserId] = useState<any>(user?.user_id);
 
     const getDriverLocation = async () => {

@@ -36,6 +36,7 @@ const SignupScreen = () => {
         body: JSON.stringify({
           username: username,
           password: password,
+          password2: password,
         }),
       });
       let resJson = await res.json();

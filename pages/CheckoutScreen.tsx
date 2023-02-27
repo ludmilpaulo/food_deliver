@@ -54,15 +54,16 @@ const onPressBuy = async () => {
   };
 
   const completeOrder = async () => {
+    
     let tokenvalue = user?.token;
 
-    // if (restaurantId == )
+  
 
-    if (userAddress == null) {
+  if (!userAddress) {
       alert("Por favor Preencha o Endereço de Entrega");
     } else {
       let response = await fetch(
-        "https://webhook.site/f3877b1a-5831-48c6-a5f5-e10576341a4d",
+        "https://www.sunshinedeliver.com/api/customer/order/add/",
         {
           //mode: "no-cors",
           method: "POST",
@@ -86,17 +87,16 @@ const onPressBuy = async () => {
           setTimeout(() => {
             setLoadingOrder(false);
             dispatch(updateBusket([]));
-           // navigation.navigate("SuccessScreen");
+          //  navigation.navigate("SuccessScreen");
           }, 2000);
         })
         .catch((error) => {
           alert("Selecione Comida apenas de um restaurante");
-          //navigate("CartScreen");
+         // navigation.navigate("CartScreen");
           console.log(error);
         });
     }
   };
-
 
 
     return (

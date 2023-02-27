@@ -8,6 +8,11 @@ import { logoutUser, selectUser } from "../redux/slices/authSlice";
 
 import Link from "next/link";
 
+interface Button{
+  text: string
+  onClick?: () => void
+}
+
 interface Meals {
   foods : any;
   meals: any;
@@ -25,7 +30,7 @@ interface Meals {
   handleRemove?: () => void;
 }
 
-const CartItem = () => {
+const CartItem = ({ text, onClick }: Button) => {
   const all = useSelector(selectCartItems);
 
   const user = useSelector(selectUser);
@@ -60,10 +65,9 @@ const CartItem = () => {
   }, [userPhone, userAddress, userId]);
 
 
+  
 
-
-
-  const handleRemove = ({id, resName , resImage} : Meals) => {
+  const handleRemove = (id: any, resName: any, resImage: any) => {
     const resIndex = allCartItems.findIndex((item: { resName: any; }) => item.resName === resName);
 
     if (resIndex >= 0) {
@@ -97,7 +101,9 @@ const CartItem = () => {
             </p>
           </div>
         )}
-        {allCartItems?.map((item: { resName: boolean | React.Key | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | null | undefined; foods: any[]; }) => (
+        {allCartItems?.map((item: {
+          resImage(id: any, resName: boolean | React.Key | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | null | undefined, resImage: any): void; resName: boolean | React.Key | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | null | undefined; foods: any[]; 
+}) => (
           <>
             <div
         
@@ -117,7 +123,9 @@ const CartItem = () => {
                   <p className="text-lg md:text-xl font-semibold leading-6 xl:leading-5 text-gray-800">
                   Carrinho do cliente
                   </p>
-                  {item?.foods?.map((food: { image: string | undefined; name: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | null | undefined; short_description: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | React.ReactPortal | null | undefined; price: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | null | undefined; quantity: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | React.ReactPortal | null | undefined; }) => (
+                  {item?.foods?.map((food: {
+                    id(id: any, resName: boolean | React.Key | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | null | undefined, resImage: any): void; image: string | undefined; name: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | null | undefined; short_description: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | React.ReactPortal | null | undefined; price: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | null | undefined; quantity: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | React.ReactPortal | null | undefined; 
+}) => (
                     <div className="mt-4 md:mt-6 flex  flex-col md:flex-row justify-start items-start md:items-center md:space-x-6 xl:space-x-8 w-full ">
                       <div className="pb-4 md:pb-8 w-full md:w-40">
                         <img
@@ -152,9 +160,9 @@ const CartItem = () => {
                             </span>
                           </p>
                 
-                          <FiMinusCircle
-                          onClick={ handleRemove } 
-                           className="bg-indigo-500 opacity-100 ..."> Remover</FiMinusCircle>
+                          <button
+                          onClick={() => handleRemove(food?.id, item.resName, item.resImage)}
+                           className="bg-indigo-500 opacity-100 ..."> Remover</button>
                          
                           <p className="text-base xl:text-lg leading-6 text-gray-800">
                            Quantidade = {food.quantity}{" "}

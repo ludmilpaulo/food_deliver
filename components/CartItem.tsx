@@ -7,6 +7,23 @@ import { logoutUser, selectUser } from "../redux/slices/authSlice";
 
 import Link from "next/link";
 
+interface Meals {
+  foods : any;
+  meals: any;
+  food: any;
+  resImage: string;
+  resName: string;
+  resId: number;
+  category: string;
+  id: number;
+  image: string;
+  name: string;
+  price: number;
+  quantity: number;
+  short_description: string;
+  handleRemove?: () => void;
+}
+
 const CartItem = () => {
   const all = useSelector(selectCartItems);
 
@@ -78,7 +95,7 @@ const CartItem = () => {
     return false;
   };
 
-  const handleRemove = (id: any, resName: any, resImage: any) => {
+  const handleRemove = (id:Meals, resName :Meals, resImage : Meals) => {
     const resIndex = allCartItems.findIndex((item: { resName: any; }) => item.resName === resName);
 
     if (resIndex >= 0) {
@@ -157,7 +174,7 @@ const CartItem = () => {
                             </p>
                           </div>
                         </div>
-
+                     
                         <div className="flex justify-between space-x-8 items-start w-full">
                           <p className="text-base xl:text-lg leading-6">
                             {food.price} Kz{" "}
@@ -166,8 +183,13 @@ const CartItem = () => {
                               {food.price} Kz
                             </span>
                           </p>
+                          <a href="javascript:void(0)" onClick={ handleRemove } >
+                          <button
+                        
+                           className="bg-indigo-500 opacity-100 ..."> Remover</button>
+                           </a>
                           <p className="text-base xl:text-lg leading-6 text-gray-800">
-                            {food.quantity}{" "}
+                           Quantidade = {food.quantity}{" "}
                           </p>
                           <p className="text-base xl:text-lg font-semibold leading-6 text-gray-800">
                             {food.price} Kz

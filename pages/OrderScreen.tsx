@@ -38,7 +38,7 @@ const OrderScreen = (props: Props) => {
   const totalPrice = useSelector(selectTotalPrice);
   const getAllItems = useSelector(selectTotalItems);
   
-    const [coordinates, setCoordinates] = useState({});
+    const [coordinates, setCoordinates] = useState<any>({});
     const [ driverLocation, setDriverLocation ] = useState<any>();
     const [userId, setUserId] = useState<any>(user?.user_id);
 
@@ -121,8 +121,8 @@ const OrderScreen = (props: Props) => {
          <Navbar total={totalPrice} count={getAllItems.length} />
         <GoogleMap
          mapContainerStyle={containerStyle}
-        center={center}
-        zoom={10}
+         center={coordinates}
+         zoom={10}
         >
    
    <Marker position={{ lat: 48.00, lng: -122.00}} />

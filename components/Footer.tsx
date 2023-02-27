@@ -5,13 +5,8 @@ function Footer() {
   return (
     <>
       <div className=" bg-bg_image pb-12">
-        <div className="mx-auto container pt-20 lg:pt-72 flex flex-col items-center justify-center">
-          <div>
-
-
-          <Image className="w-32 h32" src={logo}  alt={""} />
-
-          </div>
+        <div className="mx-auto container pt-20 lg:pt-72 flex flex-col items-center justify-center ">
+        
           <div className="text-black flex flex-col md:items-center f-f-l pt-3">
           
             <div className="md:flex items-center mt-5 md:mt-10 text-base text-color f-f-l">
@@ -20,22 +15,7 @@ function Footer() {
               </h2>
            
             </div>
-            <div className="my-6 text-base text-color f-f-l">
-              <ul className="md:flex items-center">
-                <li className=" md:mr-6 cursor-pointer pt-4 lg:py-0">About</li>
-                <li className=" md:mr-6 cursor-pointer pt-4 lg:py-0">
-                  Features
-                </li>
-                <li className=" md:mr-6 cursor-pointer pt-4 lg:py-0">
-                  Pricing
-                </li>
-                <li className=" md:mr-6 cursor-pointer pt-4 lg:py-0">
-                Carreiras
-                </li>
-                <li className=" md:mr-6 cursor-pointer pt-4 lg:py-0">Ajuda</li>
-                <li className="cursor-pointer pt-4 lg:py-0">Política de Privacidade</li>
-              </ul>
-            </div>
+        
             <div className="text-sm text-color mb-10 f-f-l">
               <p> © 2023. All rights reserved</p>
             </div>

@@ -35,8 +35,9 @@ const SignupScreen = () => {
         },
         body: JSON.stringify({
           username: username,
+          email : email,
           password: password,
-          password2: password,
+          password2: password
         }),
       });
       let resJson = await res.json();
@@ -44,7 +45,7 @@ const SignupScreen = () => {
 
       if (res.status === 200) {
         dispatch(loginUser(resJson));
-        alert("User logged in now you can Added Movies to Favorite list");
+        alert("Você se conectou com sucesso Agora você pode saborear sua refeição");
         router.push("/HomeScreen");
       } else {
         alert(Object.values(resJson));

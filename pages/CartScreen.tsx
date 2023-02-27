@@ -41,8 +41,8 @@ const CartSreen = () => {
        <Navbar total={totalPrice} count={getAllItems.length} />
     
 
-      <div className="flex-1">
-        <CartItem />
+      <div className="flex-1 bg-bg_image h-screen ">
+        <CartItem text={""} />
       </div>
     </div>
   );

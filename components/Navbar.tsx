@@ -90,13 +90,11 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
           <div onClick={() => setNav(!nav)} className="cursor-pointer">
             <AiOutlineMenu size={30} />
           </div>
+      
           <h1 className="h2-2xl sm:h2-3xl lg:h2-4xl px-2">
             {username} <span className="font-bold"></span>
           </h1>
-          <div className="hidden lg:flex items-center bg-gray-200 rounded-full p-1 h2-[14px]">
-            <p className="bg-black h2-white rounded-full p-2">Delivery</p>
-            <p className="p-2">Pickup</p>
-          </div>
+      
         </div>
 
         {/* Cart button */}
@@ -128,9 +126,11 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
             size={30}
             className="absolute right-4 top-4 cursor-pointer"
           />
+              <Link href={"/"}>
           <h2 className="h2-2xl p-4">
             SD <span className="font-bold">Kudya</span>
           </h2>
+          </Link>
           <nav>
             <ul className="flex flex-col p-4 h2-gray-800">
               <Link href={"/OrderScreen"}>

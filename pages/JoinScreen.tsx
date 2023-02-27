@@ -1,12 +1,12 @@
 import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import logo from "../assets/logo.png";
+import logo from "../assets/nome.gif";
 import Link from "next/link";
 
 function JoinScreen() {
   return (
-    <div className="h-full bg-bg_image bg-cover w-full py-16 px-4 sm:max-h-full md:max-h-full sm:max-w-full md:max-w-full">
+    <div className="h-full bg-white bg-cover w-full py-16 px-4 sm:max-h-full md:max-h-full sm:max-w-full md:max-w-full">
       <div className="flex flex-col items-center justify-center sm:max-h-full md:max-h-full sm:max-w-full md:max-hwfull ml-9 mr-8 mt-8 mb-8">
       <Link
         href={{

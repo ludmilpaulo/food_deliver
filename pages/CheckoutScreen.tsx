@@ -1,7 +1,7 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { selectCartItems, selectTotalItems, selectTotalPrice, updateBusket } from "../redux/slices/basketSlice";
@@ -23,15 +23,81 @@ export default function CheckoutScreen() {
   const [userAddress, setUserAddress] = useState("");
   const [userId, setUserId] = useState<any>();
 
-    const [dropdown1, setDropdown1] = useState(false);
-    const [dropdown2, setDropdown2] = useState(false);
-    const [dropdown3, setDropdown3] = useState(false);
-    const [changeText1, setChangeText1] = useState("City");
+  const [loading, setLoading] = useState(true);
 
-    const HandleText1 = (e: React.SetStateAction<string>) => {
-        setChangeText1(e);
-        setDropdown1(false);
-    };
+  const [loadingOrder, setLoadingOrder] = useState(false);
+
+
+ 
+  const tags = Object.keys(allCartItems).reduce((result, key) => {
+    return result.concat(allCartItems[key].foods);
+  }, []);
+
+  let newA = tags.map(({ id, quantity }) => {
+    return { meal_id: id, quantity };
+  });
+
+  let resId = allCartItems.map(({ resId } : { resId : any }) => {
+    return `${resId}`.toString();
+  });
+  let restaurantId = resId.toString();
+
+
+
+const onPressBuy = async () => {
+    setLoading(true);
+
+    // Success;
+    completeOrder();
+
+    setLoading(false);
+  };
+
+  const completeOrder = async () => {
+    let tokenvalue = user?.token;
+
+    // if (restaurantId == )
+
+    if (userAddress == null) {
+      alert("Por favor Preencha o Endereço de Entrega");
+    } else {
+      let response = await fetch(
+        "https://webhook.site/f3877b1a-5831-48c6-a5f5-e10576341a4d",
+        {
+          //mode: "no-cors",
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            access_token: tokenvalue,
+            restaurant_id: restaurantId,
+            address: userAddress,
+            order_details: newA,
+          }),
+        }
+      )
+        .then((response) => response.json())
+        .then((responseJson) => {
+          alert(responseJson.status);
+          //alert(responseJson.error);
+          console.log("Response", responseJson);
+          setTimeout(() => {
+            setLoadingOrder(false);
+            dispatch(updateBusket([]));
+           // navigation.navigate("SuccessScreen");
+          }, 2000);
+        })
+        .catch((error) => {
+          alert("Selecione Comida apenas de um restaurante");
+          //navigate("CartScreen");
+          console.log(error);
+        });
+    }
+  };
+
+
 
     return (
         <>
@@ -53,20 +119,19 @@ export default function CheckoutScreen() {
                             <p className="text-xl font-semibold leading-5 text-gray-800">Detalhes da Entrega</p>
                         </div>
                         <div className="mt-8 flex flex-col justify-start items-start w-full space-y-8 ">
-                            <input className="px-2 focus:outline-none focus:ring-2 focus:ring-gray-500 border-b border-gray-200 leading-4 text-base placeholder-gray-600 py-4 w-full" type="text" placeholder="First Name" />
-                            <input className="px-2 focus:outline-none focus:ring-2 focus:ring-gray-500 border-b border-gray-200 leading-4 text-base placeholder-gray-600 py-4 w-full" type="text" placeholder="Last Name" />
-                            <input className="px-2 focus:outline-none focus:ring-2 focus:ring-gray-500 border-b border-gray-200 leading-4 text-base placeholder-gray-600 py-4 w-full" type="text" placeholder="Address" />
-                            <input className="px-2 focus:outline-none focus:ring-2 focus:ring-gray-500 border-b border-gray-200 leading-4 text-base placeholder-gray-600 py-4 w-full" type="text" placeholder="Address (line 02)" />
+                            
+                            <input 
+                            value={userAddress}
+                            onChange={(e) => setUserAddress(e.target.value)}
+
+                            className="px-2 focus:outline-none focus:ring-2 focus:ring-gray-500 border-b border-gray-200 leading-4 text-base placeholder-gray-600 py-4 w-full" type="text" placeholder="Por favor, adicione o endereço de entrega" />
+                    
                         
-                            <div className="flex justify-between flex-col sm:flex-row w-full items-start space-y-8 sm:space-y-0 sm:space-x-8">
-                             
-                                <div className="w-full">
-                                    <input className="focus:outline-none focus:ring-2 focus:ring-gray-500 px-2 border-b border-gray-200 leading-4 text-base placeholder-gray-600 pt-4 pb-3   w-full" type="text" placeholder="Zip Code" />
-                                </div>
-                            </div>
-                            <input className="focus:outline-none focus:ring-2 focus:ring-gray-500 px-2 border-b border-gray-200 leading-4 text-base placeholder-gray-600 py-4   w-full" type="text" placeholder="Phone Number" />
+                       
                         </div>
-                        <button className="focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 mt-8 text-base font-medium focus:ring-2 focus:ring-ocus:ring-gray-800 leading-4 hover:bg-black py-4 w-full md:w-4/12 lg:w-full text-white bg-gray-800">Proceed to payment</button>
+                        <button 
+                        onClick={onPressBuy}
+                        className="focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 mt-8 text-base font-medium focus:ring-ocus:ring-gray-800 leading-4 hover:bg-black py-4 w-full md:w-4/12 lg:w-full text-white bg-gray-800">Proceed to payment</button>
                         
                     </div>
                     {allCartItems?.map(() =>(

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { selectCartItems, selectTotalItems, selectTotalPrice, updateBusket } from "../redux/slices/basketSlice";
+import { FiMinusCircle, FiPlusCircle } from "react-icons/fi";
 import { logoutUser, selectUser } from "../redux/slices/authSlice";
 
 import Link from "next/link";
@@ -38,7 +39,6 @@ const CartItem = () => {
   const [userId, setUserId] = useState<any>();
 
   const customer_avatar = `${userPhoto}`;
-  const customer_image = `${url}${customer_avatar}`;
 
   console.log("resposan", userId);
 
@@ -47,31 +47,8 @@ const CartItem = () => {
   const dispatch = useDispatch();
 
   const totalPrice = useSelector(selectTotalPrice);
-  const getAllItems = useSelector(selectTotalItems);
 
   const pickUser = async () => {
-    let response = await fetch(
-      "https://www.sunshinedeliver.com/api/customer/profile/",
-      {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user_id: userId,
-        }),
-      }
-    )
-      .then((response) => response.json())
-      .then((responseJson) => {
-        setUserPhone(responseJson.customer_detais.phone);
-        setUserAddress(responseJson.customer_detais.address);
-        setUserPhoto(responseJson.customer_detais.avatar);
-      })
-      .catch((error) => {
-        // console.error(error);
-      });
   };
 
   useEffect(() => {
@@ -83,19 +60,10 @@ const CartItem = () => {
   }, [userPhone, userAddress, userId]);
 
 
-  const match = (id: any, resName: any) => {
-    const resIndex = allCartItems.findIndex((item: { resName: any; }) => item.resName === resName);
-    if (resIndex >= 0) {
-      const menuIndex = allCartItems[resIndex].foods.findIndex(
-        (item: { id: any; }) => item.id === id
-      );
-      if (menuIndex >= 0) return true;
-      return false;
-    }
-    return false;
-  };
 
-  const handleRemove = (id:Meals, resName :Meals, resImage : Meals) => {
+
+
+  const handleRemove = ({id, resName , resImage} : Meals) => {
     const resIndex = allCartItems.findIndex((item: { resName: any; }) => item.resName === resName);
 
     if (resIndex >= 0) {
@@ -183,11 +151,11 @@ const CartItem = () => {
                               {food.price} Kz
                             </span>
                           </p>
-                          <a href="javascript:void(0)" onClick={ handleRemove } >
-                          <button
-                        
-                           className="bg-indigo-500 opacity-100 ..."> Remover</button>
-                           </a>
+                
+                          <FiMinusCircle
+                          onClick={ handleRemove } 
+                           className="bg-indigo-500 opacity-100 ..."> Remover</FiMinusCircle>
+                         
                           <p className="text-base xl:text-lg leading-6 text-gray-800">
                            Quantidade = {food.quantity}{" "}
                           </p>

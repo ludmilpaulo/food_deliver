@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectCartItems, selectTotalItems, selectTotalPrice, updateBusket } from "../redux/slices/basketSlice";
 import { FiMinusCircle, FiPlusCircle } from "react-icons/fi";
 import { logoutUser, selectUser } from "../redux/slices/authSlice";
+import router from "next/router";
 
 
 
@@ -87,6 +88,7 @@ const onPressBuy = async () => {
           setTimeout(() => {
             setLoadingOrder(false);
             dispatch(updateBusket([]));
+            router.push("/SuccessScreen");
           //  navigation.navigate("SuccessScreen");
           }, 2000);
         })

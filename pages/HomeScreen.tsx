@@ -27,6 +27,8 @@ import Hero from "@/components/Hero";
 
 import { selectTotalItems, selectTotalPrice } from "@/redux/slices/basketSlice";
 import Navbar from "@/components/Navbar";
+import useFetch from "./api/useFetch";
+import { useMemo } from 'react';
 
 interface Restaurant {
   id?: number;
@@ -36,47 +38,44 @@ interface Restaurant {
   logo?: string;
 }
 
-export default function HomeScreen() {
+export async function getServerSideProps() {
+  const res = await fetch("https://www.sunshinedeliver.com/api/customer/restaurants/")
+  const data = await res.json();
+
+
+  return{
+    props :{
+
+      restaurantData : data.restaurants
+    }
+  }
+  
+}
+
+export default function HomeScreen({restaurantData}:any) {
+
+ 
+
+ 
+
   const router = useRouter();
   const user = useSelector(selectUser);
 
   const totalPrice = useSelector(selectTotalPrice);
   const getAllItems = useSelector(selectTotalItems);
   const [search, setSearch] = useState('');
-  const [restaurantData, setRestaurantData] = useState<Restaurant[]>([]);
-  const [filteredDataSource, setFilteredDataSource] = useState<Restaurant[]>([]);
-  const [masterDataSource, setMasterDataSource] = useState<Restaurant[]>([]);
+ 
+  const [filteredDataSource, setFilteredDataSource] =useState<Restaurant[]>(restaurantData);
+  const [masterDataSource, setMasterDataSource] = useState<Restaurant[]>(restaurantData);
 
   const [loading, setLoading] = useState(false);
   const [nav, setNav] = useState(false);
 
-  const getRestaurant = async () => {
-    try {fetch("https://www.sunshinedeliver.com/api/customer/restaurants/")
-        .then((response) => response.json())
-        .then((responseJson) => {
-          setRestaurantData(responseJson.restaurants);
-          setFilteredDataSource(responseJson.restaurants);
-          setMasterDataSource(responseJson.restaurants);
-        })
-        .catch(function (error) {
-          console.log(
-            "There has been a problem with your fetch operation: " +
-              error.message
-          );
-          // ADD THIS THROW error
-          throw error;
-        });
-    } catch (e) {
-      alert(e);
-    }
-  };
 
-  useEffect(() => {
-    getRestaurant();
-  }, []);
 
   ///******************************Procurar************************* */
   const searchFilterFunction = (text: any) => {
+  
 
     console.log("text captured", text)
     // Check if searched text is not blank

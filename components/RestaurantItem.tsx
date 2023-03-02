@@ -11,7 +11,7 @@ import {
 
 interface Restaurant {
     restaurantData : any;
-  map: any;
+ // map: any;
   id: number;
   name: string;
   phone: number;

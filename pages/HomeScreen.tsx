@@ -27,10 +27,11 @@ import Hero from "@/components/Hero";
 
 import { selectTotalItems, selectTotalPrice } from "@/redux/slices/basketSlice";
 import Navbar from "@/components/Navbar";
-import useFetch from "./api/useFetch";
+
 import { useMemo } from 'react';
 
-interface Restaurant {
+export type Restaurant = {
+  restaurantData :any;
   id?: number;
   name?: string;
   phone?: number;
@@ -46,13 +47,13 @@ export async function getServerSideProps() {
   return{
     props :{
 
-      restaurantData : data.restaurants
+      restaurantData : data?.restaurants
     }
   }
   
 }
 
-export default function HomeScreen({restaurantData}:any) {
+export default function HomeScreen({restaurantData}:Restaurant) {
 
  
 

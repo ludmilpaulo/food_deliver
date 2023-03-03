@@ -10,8 +10,8 @@ import {
 } from "react";
 
 interface Restaurant {
-    restaurantData : any;
- // map: any;
+  restaurantData : any;
+  map: any;
   id: number;
   name: string;
   phone: number;

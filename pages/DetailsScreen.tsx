@@ -53,6 +53,12 @@ function DetailsScreen() {
       });
   };
 
+  const result = Array.from(new Set(data.map(item => {
+    return item.category;
+  })));
+
+ 
+  
   const filterType = (category: string) => {
     setFoods(
       foods.filter((item) => {
@@ -82,14 +88,17 @@ function DetailsScreen() {
                 Todos
               </button>
 
-              {foods.map((item, index) => (
+              {Array.from(new Set(data.map(item => (
                 <button
                   onClick={() => filterType(item.category)}
                   className="m-1 border-[#004AAD] text-orange-600 hover:bg-[#004AAD] hover:text-white"
                 >
-                  {item.category}
+                  {item.category} 
                 </button>
-              ))}
+              )
+              
+            ))) }
+           
             </div>
           </div>
         </div>

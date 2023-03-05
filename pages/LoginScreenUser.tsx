@@ -42,7 +42,9 @@ const LoginScreenUser = () => {
 
       if (res.status === 200) {
         dispatch(loginUser(resJson));
-        alert("Você se conectou com sucesso Agora você pode saborear sua refeição");
+        alert(
+          "Você se conectou com sucesso Agora você pode saborear sua refeição"
+        );
         router.push("/HomeScreen");
       } else {
         alert(Object.values(resJson));
@@ -71,18 +73,18 @@ const LoginScreenUser = () => {
             Faça login na sua conta
           </p>
           <Link href={"/SignupScreen"}>
-          <p className="text-sm mt-4 font-medium leading-none text-gray-500">
-            Não tem uma conta?{" "}
-            <span
-              tabIndex={0}
-              role="link"
-              aria-label="Sign up here"
-              className="text-sm font-medium leading-none underline text-gray-800 cursor-pointer"
-            >
-              {" "}
-              Assine aqui
-            </span>
-          </p>
+            <p className="text-sm mt-4 font-medium leading-none text-gray-500">
+              Não tem uma conta?{" "}
+              <span
+                tabIndex={0}
+                role="link"
+                aria-label="Sign up here"
+                className="text-sm font-medium leading-none underline text-gray-800 cursor-pointer"
+              >
+                {" "}
+                Assine aqui
+              </span>
+            </p>
           </Link>
 
           <div>
@@ -103,7 +105,6 @@ const LoginScreenUser = () => {
                 type="password"
                 className="bg-gray-200 border rounded focus:outline-none text-xs font-medium leading-none text-gray-800 py-3 w-full pl-3 mt-2"
               />
-           
             </div>
           </div>
           <div className="mt-8">

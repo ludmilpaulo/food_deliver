@@ -10,7 +10,7 @@ import {
 } from "react";
 
 interface Restaurant {
-  restaurantData : any;
+  restaurantData: any;
   map: any;
   id: number;
   name: string;
@@ -19,7 +19,7 @@ interface Restaurant {
   logo: string;
 }
 
-export default function RestaurantItem({restaurantData}:Restaurant) {
+export default function RestaurantItem({ restaurantData }: Restaurant) {
   return (
     <>
       {restaurantData.map((item: Restaurant) => (

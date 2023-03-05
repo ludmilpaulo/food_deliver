@@ -35,9 +35,9 @@ const SignupScreen = () => {
         },
         body: JSON.stringify({
           username: username,
-          email : email,
+          email: email,
           password: password,
-          password2: password
+          password2: password,
         }),
       });
       let resJson = await res.json();
@@ -45,7 +45,9 @@ const SignupScreen = () => {
 
       if (res.status === 200) {
         dispatch(loginUser(resJson));
-        alert("Você se conectou com sucesso Agora você pode saborear sua refeição");
+        alert(
+          "Você se conectou com sucesso Agora você pode saborear sua refeição"
+        );
         router.push("/HomeScreen");
       } else {
         alert(Object.values(resJson));
@@ -74,19 +76,19 @@ const SignupScreen = () => {
             Inscreva-se Para ter uma Conta
           </p>
           <Link href={"/LoginScreenUser"}>
-          <p className="text-sm mt-4 font-medium leading-none text-gray-500">
-          Se você tem uma conta?{" "}
-            <span
-              tabIndex={0}
-              role="link"
-              aria-label="Sign up here"
-              className="text-sm font-medium leading-none underline text-gray-800 cursor-pointer"
-            >
-              {" "}
-              Entre aqui
-            </span>
-          </p>
-</Link>
+            <p className="text-sm mt-4 font-medium leading-none text-gray-500">
+              Se você tem uma conta?{" "}
+              <span
+                tabIndex={0}
+                role="link"
+                aria-label="Sign up here"
+                className="text-sm font-medium leading-none underline text-gray-800 cursor-pointer"
+              >
+                {" "}
+                Entre aqui
+              </span>
+            </p>
+          </Link>
           <div>
             <input
               placeholder="Nome do Usuario"
@@ -107,7 +109,6 @@ const SignupScreen = () => {
             />
           </div>
 
-
           <div className="mt-6  w-full">
             <div className="relative flex items-center justify-center">
               <input
@@ -117,7 +118,6 @@ const SignupScreen = () => {
                 type="password"
                 className="bg-gray-200 border rounded focus:outline-none text-xs font-medium leading-none text-gray-800 py-3 w-full pl-3 mt-2"
               />
-             
             </div>
           </div>
           <div className="mt-8">

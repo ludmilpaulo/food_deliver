@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import MenuItem from "@/components/MenuItem";
 
-
-
 import {
   selectTotalItems,
   selectTotalPrice,
@@ -27,11 +25,11 @@ function DetailsScreen() {
   const [foods, setFoods] = useState<Meals[]>([]);
   const [data, setData] = useState<Meals[]>([]);
 
-  let res_ID: any = restaurantId || '';
+  let res_ID: any = restaurantId || "";
 
-  let res_NAME : any = name ?? '';
+  let res_NAME: any = name ?? "";
 
-  let res_Image : any = image_url || '';
+  let res_Image: any = image_url || "";
 
   const totalPrice = useSelector(selectTotalPrice);
   const getAllItems = useSelector(selectTotalItems);
@@ -53,12 +51,14 @@ function DetailsScreen() {
       });
   };
 
-  const result = Array.from(new Set(data.map(item => {
-    return item.category;
-  })));
+  const result = Array.from(
+    new Set(
+      data.map((item) => {
+        return item.category;
+      })
+    )
+  );
 
- 
-  
   const filterType = (category: string) => {
     setFoods(
       foods.filter((item) => {
@@ -72,7 +72,7 @@ function DetailsScreen() {
       <Navbar total={totalPrice} count={getAllItems.length} />
       <div className="max-w-[1640px] m-auto px-4 py-12 bg-bg_image bg-cover bg-center bg-no-repeat h-screen md:h-screen">
         <h1 className="text-[#004AAD] font-bold text-4xl text-center">
-        Menu do Restaurante {name}
+          Menu do Restaurante {name}
         </h1>
 
         {/* Filter Row */}
@@ -88,17 +88,18 @@ function DetailsScreen() {
                 Todos
               </button>
 
-              {Array.from(new Set(data.map(item => (
-                <button
-                  onClick={() => filterType(item.category)}
-                  className="m-1 border-[#004AAD] text-orange-600 hover:bg-[#004AAD] hover:text-white"
-                >
-                  {item.category} 
-                </button>
-              )
-              
-            ))) }
-           
+              {Array.from(
+                new Set(
+                  data.map((item) => (
+                    <button
+                      onClick={() => filterType(item.category)}
+                      className="m-1 border-[#004AAD] text-orange-600 hover:bg-[#004AAD] hover:text-white"
+                    >
+                      {item.category}
+                    </button>
+                  ))
+                )
+              )}
             </div>
           </div>
         </div>
@@ -112,7 +113,16 @@ function DetailsScreen() {
                 foods={foods}
                 food={food}
                 resName={res_NAME}
-                resImage={res_Image} meals={undefined} category={food.category} id={0} image={""} name={""} price={0} quantity={0} short_description={""}              />
+                resImage={res_Image}
+                meals={undefined}
+                category={food.category}
+                id={0}
+                image={""}
+                name={""}
+                price={0}
+                quantity={0}
+                short_description={""}
+              />
             );
           })}
         </div>

@@ -7,7 +7,7 @@ import {
   AiFillTag,
 } from "react-icons/ai";
 import { BsFillCartFill, BsFillSaveFill } from "react-icons/bs";
-import { RiLogoutBoxLine} from "react-icons/ri"
+import { RiLogoutBoxLine } from "react-icons/ri";
 import { TbTruckDelivery } from "react-icons/tb";
 import { FaUserFriends, FaWallet } from "react-icons/fa";
 import { MdFavorite, MdHelp } from "react-icons/md";
@@ -15,7 +15,6 @@ import { MdFavorite, MdHelp } from "react-icons/md";
 import { logoutUser, selectUser } from "../redux/slices/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { selectTotalItems, selectTotalPrice } from "@/redux/slices/basketSlice";
-
 
 const Navbar = ({ total, count }: { total: any; count: any }) => {
   const user = useSelector(selectUser);
@@ -34,7 +33,6 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
   const [userPhone, setUserPhone] = useState("");
   const [userAddress, setUserAddress] = useState("");
   const [userId, setUserId] = useState<any>();
-
 
   const customer_avatar = `${userPhoto}`;
   const customer_image = `${url}${customer_avatar}`;
@@ -78,7 +76,7 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
 
   useEffect(() => {
     pickUser();
-   //setUserId(user?.user_id);
+    //setUserId(user?.user_id);
     //setUsername(user?.username);
   }, []);
 
@@ -90,11 +88,10 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
           <div onClick={() => setNav(!nav)} className="cursor-pointer">
             <AiOutlineMenu size={30} />
           </div>
-      
+
           <h1 className="h2-2xl sm:h2-3xl lg:h2-4xl px-2">
             {username} <span className="font-bold"></span>
           </h1>
-      
         </div>
 
         {/* Cart button */}
@@ -126,24 +123,23 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
             size={30}
             className="absolute right-4 top-4 cursor-pointer"
           />
-              <Link href={"/"}>
-          <h2 className="h2-2xl p-4">
-            SD <span className="font-bold">Kudya</span>
-          </h2>
+          <Link href={"/"}>
+            <h2 className="h2-2xl p-4">
+              SD <span className="font-bold">Kudya</span>
+            </h2>
           </Link>
           <nav>
             <ul className="flex flex-col p-4 h2-gray-800">
               <Link href={"/OrderScreen"}>
-              <li className="h2-xl py-4 flex">
-                <TbTruckDelivery 
-                size={25} className="mr-4" /> Pedidos
-              </li>
+                <li className="h2-xl py-4 flex">
+                  <TbTruckDelivery size={25} className="mr-4" /> Pedidos
+                </li>
               </Link>
 
               <Link href={"/OrderHistory"}>
-              <li className="h2-xl py-4 flex">
-                <MdFavorite size={25} className="mr-4" /> Favoritos
-              </li>
+                <li className="h2-xl py-4 flex">
+                  <MdFavorite size={25} className="mr-4" /> Favoritos
+                </li>
               </Link>
               <li className="h2-xl py-4 flex">
                 <FaWallet size={25} className="mr-4" /> Carteira
@@ -161,18 +157,11 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
                 <FaUserFriends size={25} className="mr-4" /> Invite Friends
               </li>
 
-         
-              <a href={"/"} onClick={onLogout} >
-              <li
-             
-               className="h2-xl py-4 flex">
-                <RiLogoutBoxLine
-                 
-                size={25} className="mr-4" /> Sair
-              </li>
+              <a href={"/"} onClick={onLogout}>
+                <li className="h2-xl py-4 flex">
+                  <RiLogoutBoxLine size={25} className="mr-4" /> Sair
+                </li>
               </a>
-          
-          
             </ul>
           </nav>
         </div>

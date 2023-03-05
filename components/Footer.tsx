@@ -6,18 +6,15 @@ function Footer() {
     <>
       <div className=" bg-bg_image pb-12">
         <div className="mx-auto container pt-20 lg:pt-72 flex flex-col items-center justify-center ">
-        
           <div className="text-black flex flex-col md:items-center f-f-l pt-3">
-          
             <div className="md:flex items-center mt-5 md:mt-10 text-base text-color f-f-l">
               <h2 className=" md:mr-6 pb-4 md:py-0 cursor-pointer">
                 Baixe Agora
               </h2>
-           
             </div>
-        
+
             <div className="text-sm text-color mb-10 f-f-l">
-              <p> © 2023. All rights reserved</p>
+              <p> © {new Date().getFullYear()} All rights reserved</p>
             </div>
           </div>
           <div className="w-9/12  h-0.5 bg-gray-100 rounded-full" />

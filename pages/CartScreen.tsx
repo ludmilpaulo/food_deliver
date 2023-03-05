@@ -13,20 +13,20 @@ import { selectCartItems, updateBusket } from "../redux/slices/basketSlice";
 import Navbar from "@/components/Navbar";
 
 interface Meals {
-    foods : any;
-    meals: any;
-    food: any;
-    resImage: string;
-    resName: string;
-    resId: number;
-    category: string;
-    id: number;
-    image: string;
-    name: string;
-    price: number;
-    quantity: number;
-    short_description: string;
-  }
+  foods: any;
+  meals: any;
+  food: any;
+  resImage: string;
+  resName: string;
+  resId: number;
+  category: string;
+  id: number;
+  image: string;
+  name: string;
+  price: number;
+  quantity: number;
+  short_description: string;
+}
 
 const CartSreen = () => {
   const totalPrice = useSelector(selectTotalPrice);
@@ -38,8 +38,7 @@ const CartSreen = () => {
 
   return (
     <div className="flex-1 bg-cover w-full h-full bg-no-repeat bg-bg_image">
-       <Navbar total={totalPrice} count={getAllItems.length} />
-    
+      <Navbar total={totalPrice} count={getAllItems.length} />
 
       <div className="flex-1 bg-bg_image h-screen ">
         <CartItem text={""} />

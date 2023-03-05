@@ -2,20 +2,20 @@ import { createSlice } from "@reduxjs/toolkit";
 import { getAllCartFoods, getTotalCartItemPrice } from "utils/helpers";
 
 interface Meals {
-    foods : any;
-    meals: any;
-    food: any;
-    resImage: string;
-    resName: string;
-    resId: number;
-    category: string;
-    id: number;
-    image: string;
-    name: string;
-    price: number;
-    quantity: number;
-    short_description: string;
-  }
+  foods: any;
+  meals: any;
+  food: any;
+  resImage: string;
+  resName: string;
+  resId: number;
+  category: string;
+  id: number;
+  image: string;
+  name: string;
+  price: number;
+  quantity: number;
+  short_description: string;
+}
 
 const initialState = {
   items: [],

@@ -1,13 +1,13 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from '@next/font/google'
-import styles from '@/styles/Home.module.css'
-import { useEffect } from 'react'
-import { useRouter } from 'next/router'
+import Head from "next/head";
+import Image from "next/image";
+import { Inter } from "@next/font/google";
+import styles from "@/styles/Home.module.css";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-import { selectUser } from '@/redux/slices/authSlice'
+import { selectUser } from "@/redux/slices/authSlice";
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   const router = useRouter();
@@ -17,14 +17,9 @@ export default function Home() {
     console.log("user==>>", user);
     if (user == null) {
       router.push("/JoinScreen");
-    }else{
+    } else {
       router.push("/HomeScreen");
-
     }
   }, []);
-  return (
-    <>
-     
-    </>
-  )
+  return <></>;
 }

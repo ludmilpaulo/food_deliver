@@ -35,12 +35,12 @@ function DetailsScreen() {
   const getAllItems = useSelector(selectTotalItems);
 
   useEffect(() => {
-    console.log("loga", restaurantId);
+   
     fetchMeals();
   }, []);
 
   const fetchMeals = () => {
-    fetch(`https://www.sunshinedeliver.com/api/customer/meals/${restaurantId}/`)
+    fetch(`https://www.sunshinedeliver.com/api/customer/meals/${res_ID}/`)
       .then((response) => response.json())
       .then((responseJson) => {
         setFoods(responseJson.meals);

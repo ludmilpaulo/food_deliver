@@ -55,6 +55,8 @@ export default function CheckoutScreen() {
   const completeOrder = async () => {
     let tokenvalue = user?.token;
 
+    console.log(tokenvalue, "valor do token")
+
     if (!userAddress) {
       alert("Por favor Preencha o Endereço de Entrega");
     } else {
@@ -68,7 +70,7 @@ export default function CheckoutScreen() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            access_token: tokenvalue,
+            access_token: user?.token,
             restaurant_id: restaurantId,
             address: userAddress,
             order_details: newA,
@@ -89,7 +91,8 @@ export default function CheckoutScreen() {
         })
         .catch((error) => {
           alert("Selecione Comida apenas de um restaurante");
-          // navigation.navigate("CartScreen");
+          dispatch(updateBusket([]));
+          router.push("/");
           console.log(error);
         });
     }

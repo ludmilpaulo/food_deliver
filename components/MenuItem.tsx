@@ -9,7 +9,7 @@ interface Meals {
   food: any;
   resImage: string;
   resName: string;
-  resId: number;
+  resId?: any;
   category: string;
   id: number;
   image: string;
@@ -62,6 +62,7 @@ const MenuItem = ({ resId, food, resName, resImage, foods }: Meals) => {
   }
 
   useEffect(() => {
+    console.log(resId, "restid")
     setTheQuantity();
     //  setFoods(food);
   }, []);
@@ -88,7 +89,7 @@ const MenuItem = ({ resId, food, resName, resImage, foods }: Meals) => {
       );
       const foodItem = foods[indexFromFood];
       foodItem.quantity = qty;
-      console.log("entrou", foodItem);
+   
 
       if (resIndex >= 0) {
         const menuIndex = cartItems[resIndex].foods.findIndex(
@@ -148,7 +149,7 @@ const MenuItem = ({ resId, food, resName, resImage, foods }: Meals) => {
         oldfoods.splice(menuIndex, 1);
         oldArrays.splice(resIndex, 1);
         let newArray = oldfoods.length
-          ? [...oldArrays, { foods: oldfoods, resName, resImage }]
+          ? [...oldArrays, { foods: oldfoods, resName, resImage, resId}]
           : oldArrays;
         dispatch(updateBusket(newArray));
       }

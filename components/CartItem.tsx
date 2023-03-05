@@ -50,7 +50,6 @@ const CartItem = ({ text, onClick }: Button) => {
 
   const customer_avatar = `${userPhoto}`;
 
-  console.log("resposan", userId);
 
   let allCartItems = all;
 
@@ -61,7 +60,7 @@ const CartItem = ({ text, onClick }: Button) => {
   const pickUser = async () => {};
 
   useEffect(() => {
-    console.log("Usuario==>>", user);
+    
     pickUser();
     setUserId(user?.user_id);
     setUsername(user?.username);
@@ -260,7 +259,7 @@ const CartItem = ({ text, onClick }: Button) => {
                               </button>
 
                               <p className="text-base xl:text-lg leading-6 text-gray-800">
-                                Quantidade = {food.quantity}{" "}
+                                Quantidade = {food.quantity}
                               </p>
                               <p className="text-base xl:text-lg font-semibold leading-6 text-gray-800">
                                 {food.price} Kz

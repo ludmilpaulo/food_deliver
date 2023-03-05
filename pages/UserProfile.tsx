@@ -30,12 +30,7 @@ const UserProfile = () => {
 
   const [Type, setType] = useState("");
 
-  const uploadToClient = (e: { target: { files: any[] } }) => {
-    let file = e.target.files[0]
-    setImage(e.target.files[0])
-    console.log(e.target.files, "primeiro");
-    //console.log(e.target.files[0], "segundo");
-  };
+
 
   const userUpdate = async () => {
     let tokenvalue = user?.token;
@@ -113,8 +108,8 @@ const UserProfile = () => {
                 className="bg-gray-200 border rounded focus:outline-none text-xs font-medium leading-none text-gray-800 py-3 w-full pl-3 mt-2"
                 type="file"
                 name="myImage"
-                onChange={(e)=>uploadToClient(e)}
-               // value={image}
+                onChange={(e)=>setImage(e.target.value)}
+                value={image}
               />
             </div>
 

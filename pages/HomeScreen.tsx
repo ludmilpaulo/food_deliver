@@ -28,6 +28,7 @@ import { selectTotalItems, selectTotalPrice } from "@/redux/slices/basketSlice";
 import Navbar from "@/components/Navbar";
 
 import { useMemo } from "react";
+import Header from "@/components/Header";
 
 export type Restaurant = {
   restaurantData: any;
@@ -92,6 +93,7 @@ export default function HomeScreen({ restaurantData }: Restaurant) {
 
   return (
     <>
+    <Header />
       <div className="bg-bg_image bg-cover bg-center bg-no-repeat h-screen md:h-screen">
         <Navbar total={totalPrice} count={getAllItems.length} />
         <Hero />

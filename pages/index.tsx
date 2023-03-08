@@ -13,13 +13,17 @@ export default function Home() {
   const router = useRouter();
   const user = useSelector(selectUser);
 
+  if (user == null) {
+    router.push("/JoinScreen");
+  }
+   else {
+    router.push("/HomeScreen");
+  }
+
   useEffect(() => {
-    console.log("user==>>", user);
-    if (user == null) {
-      router.push("/JoinScreen");
-    } else {
-      router.push("/HomeScreen");
-    }
+   
+   
   }, []);
-  return <></>;
+  return <>
+  </>;
 }

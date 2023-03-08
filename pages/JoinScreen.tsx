@@ -3,10 +3,13 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import logo from "../assets/nome.gif";
 import Link from "next/link";
+import Header from "@/components/Header";
 
 function JoinScreen() {
   return (
-    <div className="h-full bg-bg_image bg-cover w-full py-16 px-4 sm:max-h-full md:max-h-full sm:max-w-full md:max-w-full">
+    <>
+    <Header />
+    <div className="h-full bg-white bg-cover w-full py-16 px-4 sm:max-h-full md:max-h-full sm:max-w-full md:max-w-full">
       <div className="flex flex-col items-center justify-center sm:max-h-full md:max-h-full sm:max-w-full md:max-hwfull ml-9 mr-8 mt-8 mb-8">
         <Link
           href={{
@@ -19,8 +22,10 @@ function JoinScreen() {
                 scale: [1, 1, 1, 1, 1],
                 rotate: [0, 30, 60, 240, 360],
               }}
+           
             >
-              <Image src={logo} alt={""} />
+              <Image
+               src={logo} alt={""} />
               <motion.h1
                 animate={{ x: [50, 150, 50], opacity: 1, scale: 1 }}
                 transition={{
@@ -52,6 +57,7 @@ function JoinScreen() {
         </Link>
       </div>
     </div>
+    </>
   );
 }
 

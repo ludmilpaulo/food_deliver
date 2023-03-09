@@ -12,6 +12,7 @@ import { FiMinusCircle, FiPlusCircle } from "react-icons/fi";
 import { logoutUser, selectUser } from "../redux/slices/authSlice";
 
 import Link from "next/link";
+import { timeStamp } from "console";
 
 interface Button {
   text: string;
@@ -98,7 +99,7 @@ const CartItem = ({ text, onClick }: Button) => {
               Nenhum item do carrinho!
             </h1>
             <p className="text-base font-medium leading-6 text-gray-600">
-              21st Mart 2021 at 10:34 PM
+            {new Date().getFullYear()}
             </p>
           </div>
         )}
@@ -137,7 +138,7 @@ const CartItem = ({ text, onClick }: Button) => {
                   {item.resName}
                 </h1>
                 <p className="text-base font-medium leading-6 text-gray-600">
-                  21st Mart 2021 at 10:34 PM
+                {new Date().toISOString()}
                 </p>
               </div>
               <div className="mt-10 flex flex-col xl:flex-row jusitfy-center items-stretch  w-full xl:space-x-8 space-y-4 md:space-y-6 xl:space-y-0">

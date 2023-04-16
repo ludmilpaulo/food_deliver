@@ -5,6 +5,10 @@ import styles from "@/styles/Home.module.css";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser, logoutUser, selectUser } from "../redux/slices/authSlice";
+import withAuth from '../components/ProtectedPage';
+
+
+
 
 import React, { useState, useEffect } from "react";
 import {
@@ -52,7 +56,8 @@ export async function getServerSideProps() {
   };
 }
 
-export default function HomeScreen({ restaurantData }: Restaurant) {
+
+const HomeScreen = ({ restaurantData }: Restaurant)=> {
   const router = useRouter();
   const user = useSelector(selectUser);
 
@@ -94,11 +99,11 @@ export default function HomeScreen({ restaurantData }: Restaurant) {
   return (
     <>
     <Header />
-      <div className="bg-bg_image bg-cover bg-center bg-no-repeat h-screen md:h-screen">
+      <div className="h-screen bg-center bg-no-repeat bg-cover bg-bg_image md:h-screen">
         <Navbar total={totalPrice} count={getAllItems.length} />
         <Hero />
-        <div className="container mx-auto relative">
-          <div className="mt-4 pb-4 flex space-x-3 border-b border-gray-800 dark:border-gray-700">
+        <div className="container relative mx-auto">
+          <div className="flex pb-4 mt-4 space-x-3 border-b border-gray-800 dark:border-gray-700">
             <div>
               <FiSearch />
             </div>
@@ -107,7 +112,7 @@ export default function HomeScreen({ restaurantData }: Restaurant) {
               onChange={(text) => searchFilterFunction(text.target.value)}
               type="text"
               placeholder="Pesquisar restaurantes"
-              className="focus:outline-none bg-transparent text-sm text-gray-600"
+              className="text-sm text-gray-600 bg-transparent focus:outline-none"
             />
           </div>
         </div>
@@ -130,3 +135,5 @@ export default function HomeScreen({ restaurantData }: Restaurant) {
     </>
   );
 }
+
+export default withAuth(HomeScreen);

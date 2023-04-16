@@ -15,3 +15,9 @@ const nextConfig = {
 //module.exports = withImages();
 
 module.exports = nextConfig;
+
+module.exports = {
+  env: {
+    GOOGLE_MAPS_API_KEY: 'AIzaSyBBkDvVVuQBVSMOt8wQoc_7E-2bvDh2-nw',
+  },
+};

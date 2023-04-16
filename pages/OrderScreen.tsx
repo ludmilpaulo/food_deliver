@@ -11,6 +11,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "../redux/slices/authSlice";
 import Navbar from "@/components/Navbar";
 import { selectTotalItems, selectTotalPrice } from "@/redux/slices/basketSlice";
+import Map from '../components/Map';
+import GoogleMapReact from "google-map-react";
 
 type Props = {
   latitude?: number;
@@ -34,6 +36,16 @@ interface LatLon {
 }
 
 const OrderScreen = (props: Props) => {
+
+  const defaultProps = {
+    center: {
+      lat: 37.7749,
+      lng: -122.4194
+    },
+    zoom: 11
+  };
+
+
   const dispatch = useDispatch();
 
   const user = useSelector(selectUser);
@@ -113,16 +125,25 @@ const OrderScreen = (props: Props) => {
   }
 
   return (
-    <div>
+    <>
       <Navbar total={totalPrice} count={getAllItems.length} />
+
+
+     <div style={{ height: '1000px', width: '1000%' }}>
+  
+       
+
+
       <GoogleMap
         mapContainerStyle={containerStyle}
         center={coordinates}
         zoom={10}
+        //style={{ height: '1000px', width: '1000%' }}
       >
-        <Marker position={{ lat: 48.0, lng: -122.0 }} />
+        <Marker position={coordinates} />
       </GoogleMap>
-    </div>
+      </div>
+    </>
   );
 };
 

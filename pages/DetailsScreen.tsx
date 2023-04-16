@@ -8,6 +8,7 @@ import {
 } from "../redux/slices/basketSlice";
 import { useSelector } from "react-redux";
 import Navbar from "@/components/Navbar";
+import withAuth from '../components/ProtectedPage';
 
 interface Meals {
   category?: any;
@@ -68,7 +69,7 @@ function DetailsScreen() {
   };
 
   return (
-    <div className="bg-bg_image bg-cover bg-center bg-no-repeat h-screen md:h-screen">
+    <div className="h-screen bg-center bg-no-repeat bg-cover bg-bg_image md:h-screen">
       <Navbar total={totalPrice} count={getAllItems.length} />
       <div className="max-w-[1640px] m-auto px-4 py-12 bg-bg_image bg-cover bg-center bg-no-repeat h-screen md:h-screen">
         <h1 className="text-[#004AAD] font-bold text-4xl text-center">
@@ -76,11 +77,11 @@ function DetailsScreen() {
         </h1>
 
         {/* Filter Row */}
-        <div className="flex flex-col lg:flex-row justify-between">
+        <div className="flex flex-col justify-between lg:flex-row">
           {/* Fliter Type */}
           <div>
             <p className="font-bold text-gray-700">Tipo de filtro</p>
-            <div className="flex justfiy-between flex-wrap">
+            <div className="flex flex-wrap justfiy-between">
               <button
                 onClick={fetchMeals}
                 className="m-1 border-[#004AAD] text-orange-600 hover:bg-[#004AAD] hover:text-white"
@@ -91,6 +92,7 @@ function DetailsScreen() {
               {Array.from(
                 new Set(
                   data.map((item) => (
+                    // eslint-disable-next-line react/jsx-key
                     <button
                       onClick={() => filterType(item.category)}
                       className="m-1 border-[#004AAD] text-orange-600 hover:bg-[#004AAD] hover:text-white"
@@ -104,7 +106,7 @@ function DetailsScreen() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-12 bg-bg_image bg-cover bg-center bg-no-repeat h-screen md:h-screen">
+        <div className="grid h-screen grid-cols-1 gap-10 mt-12 bg-center bg-no-repeat bg-cover md:grid-cols-2 lg:grid-cols-3 bg-bg_image md:h-screen">
           {foods?.map((food) => {
             return (
               <MenuItem
@@ -131,4 +133,4 @@ function DetailsScreen() {
   );
 }
 
-export default DetailsScreen;
+export default withAuth(DetailsScreen);

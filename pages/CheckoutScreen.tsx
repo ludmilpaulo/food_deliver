@@ -14,6 +14,12 @@ import { FiMinusCircle, FiPlusCircle } from "react-icons/fi";
 import { logoutUser, selectUser } from "../redux/slices/authSlice";
 import router from "next/router";
 
+interface CartItem {
+  id: string; // or number, or whatever the id actually is
+  // ...other properties
+}
+
+
 export default function CheckoutScreen() {
   const dispatch = useDispatch();
 
@@ -102,18 +108,18 @@ export default function CheckoutScreen() {
     <>
       <div className="overflow-y-hidden">
         <Navbar total={""} count={""} />
-        <div className="flex justify-center items-center 2xl:container 2xl:mx-auto lg:py-16 md:py-12 py-9 px-4 md:px-6 lg:px-20 xl:px-44 ">
-          <div className="flex w-full sm:w-9/12 lg:w-full flex-col lg:flex-row justify-center items-center lg:space-x-10 2xl:space-x-36 space-y-12 lg:space-y-0">
-            <div className="flex w-full  flex-col justify-start items-start">
+        <div className="flex items-center justify-center px-4 2xl:container 2xl:mx-auto lg:py-16 md:py-12 py-9 md:px-6 lg:px-20 xl:px-44 ">
+          <div className="flex flex-col items-center justify-center w-full space-y-12 sm:w-9/12 lg:w-full lg:flex-row lg:space-x-10 2xl:space-x-36 lg:space-y-0">
+            <div className="flex flex-col items-start justify-start w-full">
               <div>
-                <p className="text-3xl lg:text-4xl font-semibold leading-7 lg:leading-9 text-gray-800">
+                <p className="text-3xl font-semibold leading-7 text-gray-800 lg:text-4xl lg:leading-9">
                   Confira
                 </p>
               </div>
               <div className="mt-2">
                 <Link
                   href={"/CartScreen"}
-                  className="text-base leading-4 underline  hover:text-gray-800 text-gray-600"
+                  className="text-base leading-4 text-gray-600 underline hover:text-gray-800"
                 >
                   De volta à minha bandeja
                 </Link>
@@ -123,31 +129,31 @@ export default function CheckoutScreen() {
                   Detalhes da Entrega
                 </p>
               </div>
-              <div className="mt-8 flex flex-col justify-start items-start w-full space-y-8 ">
+              <div className="flex flex-col items-start justify-start w-full mt-8 space-y-8 ">
                 <input
                   value={userAddress}
                   onChange={(e) => setUserAddress(e.target.value)}
-                  className="px-2 focus:outline-none focus:ring-2 focus:ring-gray-500 border-b border-gray-200 leading-4 text-base placeholder-gray-600 py-4 w-full"
+                  className="w-full px-2 py-4 text-base leading-4 placeholder-gray-600 border-b border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
                   type="text"
                   placeholder="Por favor, adicione o endereço de entrega"
                 />
               </div>
               <button
                 onClick={onPressBuy}
-                className="focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 mt-8 text-base font-medium focus:ring-ocus:ring-gray-800 leading-4 hover:bg-black py-4 w-full md:w-4/12 lg:w-full text-white bg-gray-800"
+                className="w-full py-4 mt-8 text-base font-medium leading-4 text-white bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-ocus:ring-gray-800 hover:bg-black md:w-4/12 lg:w-full"
               >
                 Proceed to payment
               </button>
             </div>
-            {allCartItems?.map(() => (
-              <div className="flex flex-col justify-start items-start bg-gray-50 w-full p-6 md:p-14">
+            {allCartItems?.map((item: CartItem, index: number) => (
+              <div key={item.id} className="flex flex-col items-start justify-start w-full p-6 bg-gray-50 md:p-14">
                 <div>
                   <h1 className="text-2xl font-semibold leading-6 text-gray-800">
                     Resumo do Pedido
                   </h1>
                 </div>
-                <div className="flex mt-7 flex-col items-end w-full space-y-6">
-                  <div className="flex justify-between w-full items-center">
+                <div className="flex flex-col items-end w-full space-y-6 mt-7">
+                  <div className="flex items-center justify-between w-full">
                     <p className="text-lg leading-4 text-gray-600">
                       Total items
                     </p>
@@ -156,7 +162,7 @@ export default function CheckoutScreen() {
                     </p>
                   </div>
 
-                  <div className="flex justify-between w-full items-center">
+                  <div className="flex items-center justify-between w-full">
                     <p className="text-lg leading-4 text-gray-600">
                       Sub total{" "}
                     </p>
@@ -165,7 +171,7 @@ export default function CheckoutScreen() {
                     </p>
                   </div>
                 </div>
-                <div className="flex justify-between w-full items-center mt-32">
+                <div className="flex items-center justify-between w-full mt-32">
                   <p className="text-xl font-semibold leading-4 text-gray-800">
                     Estimated Total{" "}
                   </p>

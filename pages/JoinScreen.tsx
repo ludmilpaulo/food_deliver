@@ -11,9 +11,9 @@ function JoinScreen() {
   return (
     <>
     <Nav />
-  
+    <div className="w-screen h-64 sm:h-64 md:h-64 lg:h-64 xl:h-64 2xl:h-64">
        <Barner />
-          
+      </div>    
     </>
   );
 }

@@ -37,7 +37,7 @@ const Banner = () => {
         <Image
           src={images[currentSlide]}
           alt={`Slide ${currentSlide + 1}`}
-          className='object-cover w-full h-64'
+          className='object-cover w-full h-full'
           width={300}
           height={300}
           unoptimized={true} // To bypass domain check for external images

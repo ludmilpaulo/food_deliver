@@ -29,7 +29,7 @@ import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
 
 import { selectTotalItems, selectTotalPrice } from "@/redux/slices/basketSlice";
-import Navbar from "@/components/Navbar";
+import Nav from "@/components/Nav";
 
 import { useMemo } from "react";
 import Header from "@/components/Header";
@@ -100,7 +100,7 @@ const HomeScreen = ({ restaurantData }: Restaurant)=> {
     <>
     <Header />
       <div className="h-screen bg-center bg-no-repeat bg-cover bg-bg_image md:h-screen">
-        <Navbar total={totalPrice} count={getAllItems.length} />
+        <Nav total={totalPrice} count={getAllItems.length} />
         <Hero />
         <div className="container relative mx-auto">
           <div className="flex pb-4 mt-4 space-x-3 border-b border-gray-800 dark:border-gray-700">

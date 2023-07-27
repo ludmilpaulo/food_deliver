@@ -32,18 +32,20 @@ const Banner = () => {
   }, [images]);
 
   return (
+
     <div className='relative'>
       {images.length > 0 && (
         <Image
           src={images[currentSlide]}
           alt={`Slide ${currentSlide + 1}`}
-          className='object-cover w-full h-full'
+          className='object-cover w-full h-[400px]'
           width={300}
           height={300}
           unoptimized={true} // To bypass domain check for external images
         />
       )}
     </div>
+   
   );
 };
 

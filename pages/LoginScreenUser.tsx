@@ -55,31 +55,27 @@ const LoginScreenUser = () => {
   };
 
   return (
-    <div className="h-screen bg-bg_image bg-cover w-full py-16 px-4">
+    <div className="w-full h-screen px-4 py-16 bg-cover bg-bg_image">
       <div className="flex flex-col items-center justify-center">
         <motion.div
           animate={{
             scale: [1, 1, 1, 1, 1],
             rotate: [0, 30, 60, 240, 360],
           }}
-          className="bg-white shadow rounded lg:w-1/3  md:w-1/2 w-full p-10 mt-16"
+          className="w-full p-10 mt-16 bg-white rounded shadow lg:w-1/3 md:w-1/2"
         >
-          <p
-            tabIndex={0}
-            role="heading"
-            aria-label="Login to your account"
-            className="text-2xl font-extrabold leading-6 text-gray-800"
-          >
-            Faça login na sua conta
-          </p>
+         <p className="text-2xl font-extrabold leading-6 text-gray-800">
+  Faça login na sua conta
+</p>
+
           <Link href={"/SignupScreen"}>
-            <p className="text-sm mt-4 font-medium leading-none text-gray-500">
+            <p className="mt-4 text-sm font-medium leading-none text-gray-500">
               Não tem uma conta?{" "}
               <span
                 tabIndex={0}
                 role="link"
                 aria-label="Sign up here"
-                className="text-sm font-medium leading-none underline text-gray-800 cursor-pointer"
+                className="text-sm font-medium leading-none text-gray-800 underline cursor-pointer"
               >
                 {" "}
                 Assine aqui
@@ -93,17 +89,17 @@ const LoginScreenUser = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               type="text"
-              className="bg-gray-200 border rounded focus:outline-none text-xs font-medium leading-none text-gray-800 py-3 w-full pl-3 mt-2"
+              className="w-full py-3 pl-3 mt-2 text-xs font-medium leading-none text-gray-800 bg-gray-200 border rounded focus:outline-none"
             />
           </div>
-          <div className="mt-6  w-full">
+          <div className="w-full mt-6">
             <div className="relative flex items-center justify-center">
               <input
                 value={password}
                 placeholder="Enter your password"
                 onChange={(e) => setPassword(e.target.value)}
                 type="password"
-                className="bg-gray-200 border rounded focus:outline-none text-xs font-medium leading-none text-gray-800 py-3 w-full pl-3 mt-2"
+                className="w-full py-3 pl-3 mt-2 text-xs font-medium leading-none text-gray-800 bg-gray-200 border rounded focus:outline-none"
               />
             </div>
           </div>
@@ -113,7 +109,7 @@ const LoginScreenUser = () => {
               role="button"
               type="submit"
               aria-label="entrar na minha conta"
-              className="focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 text-sm font-semibold leading-none text-white focus:outline-none bg-indigo-700 border rounded hover:bg-indigo-600 py-4 w-full"
+              className="w-full py-4 text-sm font-semibold leading-none text-white bg-indigo-700 border rounded focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 focus:outline-none hover:bg-indigo-600"
             >
               Entrar na Minha Conta
             </button>

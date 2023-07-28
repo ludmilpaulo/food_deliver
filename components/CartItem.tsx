@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
+import Image from 'next/image';
 
 import {
   selectCartItems,
@@ -61,11 +62,10 @@ const CartItem = ({ text, onClick }: Button) => {
   const pickUser = async () => {};
 
   useEffect(() => {
-    
     pickUser();
     setUserId(user?.user_id);
     setUsername(user?.username);
-  }, [userPhone, userAddress, userId]);
+  }, [user]); // Run this useEffect when `user` changes
 
   const handleRemove = (id: any, resName: any, resImage: any) => {
     const resIndex = allCartItems.findIndex(
@@ -91,10 +91,10 @@ const CartItem = ({ text, onClick }: Button) => {
 
   return (
     <>
-      <div className="py-14 px-4 md:px-6 2xl:px-20 2xl:container 2xl:mx-auto">
+      <div className="px-4 py-14 md:px-6 2xl:px-20 2xl:container 2xl:mx-auto">
         {!!!allCartItems?.length && (
-          <div className="flex justify-start item-start space-y-2 flex-col ">
-            <h1 className="text-3xl lg:text-4xl font-semibold leading-7 lg:leading-9  text-gray-800">
+          <div className="flex flex-col justify-start space-y-2 item-start ">
+            <h1 className="text-3xl font-semibold leading-7 text-gray-800 lg:text-4xl lg:leading-9">
               {" "}
               Nenhum item do carrinho!
             </h1>
@@ -103,37 +103,15 @@ const CartItem = ({ text, onClick }: Button) => {
             </p>
           </div>
         )}
-        {allCartItems?.map(
-          (item: {
-            resImage(
-              id: any,
-              resName:
-                | boolean
-                | React.Key
-                | React.ReactElement<
-                    any,
-                    string | React.JSXElementConstructor<any>
-                  >
-                | React.ReactFragment
-                | null
-                | undefined,
-              resImage: any
-            ): void;
-            resName:
-              | boolean
-              | React.Key
-              | React.ReactElement<
-                  any,
-                  string | React.JSXElementConstructor<any>
-                >
-              | React.ReactFragment
-              | null
-              | undefined;
-            foods: any[];
-          }) => (
+      {allCartItems?.map(
+  (item: {
+    resImage: (id: any, resName: string, resImage: any) => void;
+    resName: string;
+    foods: any[];
+  }, index: number) => (
             <>
-              <div className="flex justify-start item-start space-y-2 flex-col ">
-                <h1 className="text-3xl lg:text-4xl font-semibold leading-7 lg:leading-9  text-gray-800">
+              <div key={index} className="flex flex-col justify-start space-y-2 item-start ">
+                <h1 className="text-3xl font-semibold leading-7 text-gray-800 lg:text-4xl lg:leading-9">
                   {" "}
                   {item.resName}
                 </h1>
@@ -141,10 +119,10 @@ const CartItem = ({ text, onClick }: Button) => {
                 {new Date().toISOString()}
                 </p>
               </div>
-              <div className="mt-10 flex flex-col xl:flex-row jusitfy-center items-stretch  w-full xl:space-x-8 space-y-4 md:space-y-6 xl:space-y-0">
-                <div className="flex flex-col justify-start items-start w-full space-y-4 md:space-y-6 xl:space-y-8">
-                  <div className="flex flex-col justify-start items-start bg-gray-50 px-4 py-4 md:py-6 md:p-6 xl:p-8 w-full">
-                    <p className="text-lg md:text-xl font-semibold leading-6 xl:leading-5 text-gray-800">
+              <div className="flex flex-col items-stretch w-full mt-10 space-y-4 xl:flex-row jusitfy-center xl:space-x-8 md:space-y-6 xl:space-y-0">
+                <div className="flex flex-col items-start justify-start w-full space-y-4 md:space-y-6 xl:space-y-8">
+                  <div className="flex flex-col items-start justify-start w-full px-4 py-4 bg-gray-50 md:py-6 md:p-6 xl:p-8">
+                    <p className="text-lg font-semibold leading-6 text-gray-800 md:text-xl xl:leading-5">
                       Carrinho do cliente
                     </p>
                     {item?.foods?.map(
@@ -211,33 +189,39 @@ const CartItem = ({ text, onClick }: Button) => {
                           | null
                           | undefined;
                       }) => (
-                        <div className="mt-4 md:mt-6 flex  flex-col md:flex-row justify-start items-start md:items-center md:space-x-6 xl:space-x-8 w-full ">
-                          <div className="pb-4 md:pb-8 w-full md:w-40">
-                            <img
-                              className="w-full hidden md:block"
-                              src={food.image}
-                              alt=""
-                            />
-                            <img
-                              className="w-full md:hidden"
-                              src={food.image}
-                              alt=""
-                            />
+                        // eslint-disable-next-line react/jsx-key
+                        <div className="flex flex-col items-start justify-start w-full mt-4 md:mt-6 md:flex-row md:items-center md:space-x-6 xl:space-x-8 ">
+                          <div className="w-full pb-4 md:pb-8 md:w-40">
+                         
+                          <Image 
+  className="hidden w-full md:block"
+  src={food.image || 'default-image-path.jpg'}
+  alt=""
+/>
+
+<Image 
+  className="w-full md:hidden"
+  src={food.image || 'default-image-path.jpg'}
+  alt=""
+/>
+
+                                                        
+    
                           </div>
-                          <div className="border-b border-gray-200 md:flex-row flex-col flex justify-between items-start w-full  pb-8 space-y-4 md:space-y-0">
-                            <div className="w-full flex flex-col justify-start items-start space-y-8">
-                              <h3 className="text-xl xl:text-2xl font-semibold leading-6 text-gray-800">
+                          <div className="flex flex-col items-start justify-between w-full pb-8 space-y-4 border-b border-gray-200 md:flex-row md:space-y-0">
+                            <div className="flex flex-col items-start justify-start w-full space-y-8">
+                              <h3 className="text-xl font-semibold leading-6 text-gray-800 xl:text-2xl">
                                 {food.name}
                               </h3>
-                              <div className="flex justify-start items-start flex-col space-y-2">
+                              <div className="flex flex-col items-start justify-start space-y-2">
                                 <p className="text-sm leading-none text-gray-800">
                                   {food.short_description}
                                 </p>
                               </div>
                             </div>
 
-                            <div className="flex justify-between space-x-8 items-start w-full">
-                              <p className="text-base xl:text-lg leading-6">
+                            <div className="flex items-start justify-between w-full space-x-8">
+                              <p className="text-base leading-6 xl:text-lg">
                                 {food.price} Kz{" "}
                                 <span className="text-red-300 line-through">
                                   {" "}
@@ -259,10 +243,10 @@ const CartItem = ({ text, onClick }: Button) => {
                                 Remover
                               </button>
 
-                              <p className="text-base xl:text-lg leading-6 text-gray-800">
+                              <p className="text-base leading-6 text-gray-800 xl:text-lg">
                                 Quantidade = {food.quantity}
                               </p>
-                              <p className="text-base xl:text-lg font-semibold leading-6 text-gray-800">
+                              <p className="text-base font-semibold leading-6 text-gray-800 xl:text-lg">
                                 {food.price} Kz
                               </p>
                             </div>
@@ -271,13 +255,13 @@ const CartItem = ({ text, onClick }: Button) => {
                       )
                     )}
                   </div>
-                  <div className="flex justify-center md:flex-row flex-col items-stretch w-full space-y-4 md:space-y-0 md:space-x-6 xl:space-x-8">
-                    <div className="flex flex-col px-4 py-6 md:p-6 xl:p-8 w-full bg-gray-50 space-y-6   ">
+                  <div className="flex flex-col items-stretch justify-center w-full space-y-4 md:flex-row md:space-y-0 md:space-x-6 xl:space-x-8">
+                    <div className="flex flex-col w-full px-4 py-6 space-y-6 md:p-6 xl:p-8 bg-gray-50 ">
                       <h3 className="text-xl font-semibold leading-5 text-gray-800">
                         Summary
                       </h3>
-                      <div className="flex justify-center items-center w-full space-y-4 flex-col border-gray-200 border-b pb-4">
-                        <div className="flex justify-between  w-full">
+                      <div className="flex flex-col items-center justify-center w-full pb-4 space-y-4 border-b border-gray-200">
+                        <div className="flex justify-between w-full">
                           <p className="text-base leading-4 text-gray-800">
                             Subtotal
                           </p>
@@ -286,7 +270,7 @@ const CartItem = ({ text, onClick }: Button) => {
                           </p>
                         </div>
                       </div>
-                      <div className="flex justify-between items-center w-full">
+                      <div className="flex items-center justify-between w-full">
                         <p className="text-base font-semibold leading-4 text-gray-800">
                           Total
                         </p>
@@ -295,13 +279,13 @@ const CartItem = ({ text, onClick }: Button) => {
                         </p>
                       </div>
                     </div>
-                    <div className="flex flex-col justify-center px-4 py-6 md:p-6 xl:p-8 w-full bg-gray-50 space-y-6   ">
+                    <div className="flex flex-col justify-center w-full px-4 py-6 space-y-6 md:p-6 xl:p-8 bg-gray-50 ">
                       <h3 className="text-xl font-semibold leading-5 text-gray-800">
                         Shipping
                       </h3>
                       <Link href={"/CheckoutScreen"}>
-                        <div className="w-full flex justify-center items-center">
-                          <button className="hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 py-5 w-96 md:w-full bg-gray-800 text-base font-medium leading-4 text-white">
+                        <div className="flex items-center justify-center w-full">
+                          <button className="py-5 text-base font-medium leading-4 text-white bg-gray-800 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 w-96 md:w-full">
                             continuar para checkout
                           </button>
                         </div>

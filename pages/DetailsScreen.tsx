@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import MenuItem from "@/components/MenuItem";
 
@@ -35,11 +35,9 @@ function DetailsScreen() {
   const totalPrice = useSelector(selectTotalPrice);
   const getAllItems = useSelector(selectTotalItems);
 
-  useEffect(() => {
-   
-    fetchMeals();
-  }, []);
 
+
+  /*
   const fetchMeals = () => {
     fetch(`https://www.sunshinedeliver.com/api/customer/meals/${res_ID}/`)
       .then((response) => response.json())
@@ -51,6 +49,25 @@ function DetailsScreen() {
         console.error(error);
       });
   };
+*/
+
+const fetchMeals = useCallback(() => {
+  fetch(`https://www.sunshinedeliver.com/api/customer/meals/${res_ID}/`)
+    .then((response) => response.json())
+    .then((responseJson) => {
+      setFoods(responseJson.meals);
+      setData(responseJson.meals);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}, [res_ID]);  // Add res_ID to the dependency array
+
+
+useEffect(() => {
+  fetchMeals();
+}, [fetchMeals]);
+
 
   const result = Array.from(
     new Set(

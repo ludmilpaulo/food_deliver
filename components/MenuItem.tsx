@@ -1,6 +1,7 @@
-import React, { useState, useEffect, ReactNode } from "react";
+import React, { useState, useEffect, ReactNode, useCallback } from "react";
 import { FiMinusCircle, FiPlusCircle } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
+import Image from 'next/image';
 import { selectCartItems, updateBusket } from "../redux/slices/basketSlice";
 
 interface Meals {
@@ -31,7 +32,7 @@ const MenuItem = ({ resId, food, resName, resImage, foods }: Meals) => {
 
   const dispatch = useDispatch();
 
-  const setTheQuantity = () => {
+  const setTheQuantity = useCallback(() => {
     const resIndex = cartItems.findIndex(
       (item: { resName: string }) => item.resName === resName
     );
@@ -47,7 +48,8 @@ const MenuItem = ({ resId, food, resName, resImage, foods }: Meals) => {
         setQty(menuItem.quantity);
       }
     }
-  };
+  }, [cartItems, food.id, resName]);  // Include necessary dependencies here
+
 
   function quantityUp() {
     setQty(qty + 1);
@@ -64,8 +66,7 @@ const MenuItem = ({ resId, food, resName, resImage, foods }: Meals) => {
   useEffect(() => {
     console.log(resId, "restid")
     setTheQuantity();
-    //  setFoods(food);
-  }, []);
+  }, [resId, setTheQuantity]);
 
   const match = (id: any) => {
     const resIndex = cartItems.findIndex(
@@ -156,13 +157,19 @@ const MenuItem = ({ resId, food, resName, resImage, foods }: Meals) => {
     }
   };
 
+ 
+
   return (
-    <div className="border shadow-lg rounded-lg hover:scale-105 duration-300">
-      <img
-        src={food?.image}
-        alt={food?.name}
-        className="w-full h-[200px] object-cover rounded-t-lg"
-      />
+    <div className="duration-300 border rounded-lg shadow-lg hover:scale-105">
+     <Image
+  src={food?.image}
+  alt={food?.name}
+  width={500} // specify width
+  height={200} // specify height
+  className="object-cover rounded-t-lg"
+/>
+
+      
       <div className="flex justify-between px-2 py-4">
         <p className="font-bold">{food?.name}</p>
         <p>
@@ -174,7 +181,7 @@ const MenuItem = ({ resId, food, resName, resImage, foods }: Meals) => {
       <div>
         <p>{food?.short_description}</p>
       </div>
-      <div className="flex justify-between items-center pb-3">
+      <div className="flex items-center justify-between pb-3">
         <FiMinusCircle onClick={quantityDown} size={40} color="#004AAD" />
         {qty}
         <FiPlusCircle onClick={quantityUp} size={40} color="#004AAD" />
@@ -183,7 +190,7 @@ const MenuItem = ({ resId, food, resName, resImage, foods }: Meals) => {
       {qty > 0 && (
         <>
           {match(food.id) ? (
-            <div className="animate-bounce items-center">
+            <div className="items-center animate-bounce">
               <button
                 onClick={() => handleRemove(food.id)}
                 className="flex-row items-center bg-indigo-500 w-full h-25 opacity-100 ..."
@@ -192,7 +199,7 @@ const MenuItem = ({ resId, food, resName, resImage, foods }: Meals) => {
               </button>
             </div>
           ) : (
-            <div className="animate-bounce items-center">
+            <div className="items-center animate-bounce">
               <button
                 onClick={() => handleAddRemove(food.id)}
                 className="flex-row items-center bg-indigo-500 w-full h-25 opacity-100 ..."

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
   useLoadScript,
   GoogleMap,
@@ -57,7 +57,7 @@ const OrderScreen = (props: Props) => {
   const [driverLocation, setDriverLocation] = useState<any>();
   const [userId, setUserId] = useState<any>(user?.user_id);
 
-  const getDriverLocation = async () => {
+  const getDriverLocation = useCallback(async () => {
     let tokenvalue = user?.token;
     let userName = user?.username;
 
@@ -79,7 +79,7 @@ const OrderScreen = (props: Props) => {
     let blah2 = result.replace(/['']/g, '"');
 
     setDriverLocation(JSON.parse(blah2));
-  };
+  }, [user?.token, user?.username]); 
 
   useEffect(() => {
     getDriverLocation();
@@ -91,10 +91,11 @@ const OrderScreen = (props: Props) => {
         setCoordinates({ lat: latitude, lng: longitude });
       }
     );
-  }, []);
+  }, [getDriverLocation, driverLocation?.latitude]);
 
   const libraries = useMemo(() => ["places"], []);
-  const mapCenter = useMemo(() => coordinates, []);
+  const mapCenter = useMemo(() => coordinates, [coordinates]);
+
 
   const mapOptions = useMemo<google.maps.MapOptions>(
     () => ({

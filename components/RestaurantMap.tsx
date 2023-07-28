@@ -4,11 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import styles from "../styles/Home.module.css";
 
 const RestaurantMap: NextPage = () => {
-  const [coordinates, setCoordinates] = useState({});
+  const [coordinates, setCoordinates] = useState<google.maps.LatLngLiteral | undefined>(undefined);
 
   useEffect(() => {
     // get the users current location on intial login
-
     navigator.geolocation.getCurrentPosition(
       ({ coords: { latitude, longitude } }) => {
         console.log({ latitude, longitude });
@@ -18,7 +17,7 @@ const RestaurantMap: NextPage = () => {
   }, []);
 
   const libraries = useMemo(() => ["places"], []);
-  const mapCenter = useMemo(() => coordinates, []);
+  const mapCenter = useMemo(() => coordinates, [coordinates]);
 
   const mapOptions = useMemo<google.maps.MapOptions>(
     () => ({
@@ -34,7 +33,7 @@ const RestaurantMap: NextPage = () => {
     libraries: libraries as any,
   });
 
-  if (!isLoaded) {
+  if (!isLoaded || !coordinates) {
     return <p>Loading...</p>;
   }
 
@@ -43,9 +42,8 @@ const RestaurantMap: NextPage = () => {
       <GoogleMap
         options={mapOptions}
         zoom={14}
-        // center={mapCenter}
+        center={mapCenter}
         mapTypeId={google.maps.MapTypeId.ROADMAP}
-        // mapContainerStyle='absolute w-full h-full text-gray-200 max-h-[500px] bg-black/40 flex flex-col justify-center'
         mapContainerStyle={{ width: "800px", height: "500px" }}
         onLoad={() => console.log("Map Component Loaded...")}
       />

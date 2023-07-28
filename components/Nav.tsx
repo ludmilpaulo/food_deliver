@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { IoIosSearch, IoIosLogIn } from 'react-icons/io';
 import { IoLocationSharp } from 'react-icons/io5';
+import Image from 'next/image';
+
 
 
 import Link from 'next/link';
@@ -29,7 +31,13 @@ const Nav = () => {
   return (
     <nav className="flex items-center justify-between p-6 bg-[#0171CE]">
       <div className="flex items-center">
-        <img src="/logo.png" alt="logo" className="w-10 h-10 mr-2" />
+      <Image 
+        src="/logo.png" 
+        alt="logo" 
+        width={40} 
+        height={40} 
+        className="mr-2" 
+    />
         
         <div className="flex ml-16 space-x-4 rounded-full">
     

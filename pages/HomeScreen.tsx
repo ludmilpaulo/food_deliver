@@ -100,7 +100,7 @@ const HomeScreen = ({ restaurantData }: Restaurant)=> {
     <>
     <Header />
       <div className="h-screen bg-center bg-no-repeat bg-cover bg-bg_image md:h-screen">
-        <Nav total={totalPrice} count={getAllItems.length} />
+        <Nav />
         <Hero />
         <div className="container relative mx-auto">
           <div className="flex pb-4 mt-4 space-x-3 border-b border-gray-800 dark:border-gray-700">

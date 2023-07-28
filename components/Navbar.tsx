@@ -39,30 +39,35 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
 
   console.log("resposan", userId);
 
-  const pickUser = async () => {
-    let response = await fetch(
-      "https://www.sunshinedeliver.com/api/customer/profile/",
-      {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user_id: user?.user_id,
-        }),
-      }
-    )
-      .then((response) => response.json())
-      .then((responseJson) => {
-        setUserPhone(responseJson.customer_detais.phone);
-        setUserAddress(responseJson.customer_detais.address);
-        setUserPhoto(responseJson.customer_detais.avatar);
-      })
-      .catch((error) => {
-        // console.error(error);
-      });
-  };
+  useEffect(() => {
+    const pickUser = async () => {
+      let response = await fetch(
+        "https://www.sunshinedeliver.com/api/customer/profile/",
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            user_id: user?.user_id,
+          }),
+        }
+      )
+        .then((response) => response.json())
+        .then((responseJson) => {
+          setUserPhone(responseJson.customer_detais.phone);
+          setUserAddress(responseJson.customer_detais.address);
+          setUserPhoto(responseJson.customer_detais.avatar);
+        })
+        .catch((error) => {
+          // console.error(error);
+        });
+    };
+    pickUser();
+  }, [user?.user_id]);
+  
+
 
   const onLogout = async () => {
     try {
@@ -74,12 +79,7 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
     }
   };
 
-  useEffect(() => {
-    pickUser();
-    //setUserId(user?.user_id);
-    //setUsername(user?.username);
-  }, []);
-
+ 
   return (
     <>
       <div className="max-w-[1640px] bg-bg_image bg-cover bg-center bg-no-repeat mx-auto flex justify-between items-center p-4">
@@ -89,7 +89,7 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
             <AiOutlineMenu size={30} />
           </div>
 
-          <h1 className="h2-2xl sm:h2-3xl lg:h2-4xl px-2">
+          <h1 className="px-2 h2-2xl sm:h2-3xl lg:h2-4xl">
             {username} <span className="font-bold"></span>
           </h1>
         </div>
@@ -97,7 +97,7 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
         {/* Cart button */}
         {!!count && (
           <Link href={"/CartScreen"}>
-            <button className="bg-black text-white h2-white hidden md:flex items-center py-2 rounded-full">
+            <button className="items-center hidden py-2 text-white bg-black rounded-full h2-white md:flex">
               <BsFillCartFill size={20} className="mr-2" /> {total}Kz ({count})
             </button>
           </Link>
@@ -105,7 +105,7 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
 
         {/* Overlay */}
         {nav ? (
-          <div className="bg-black/80 fixed w-full h-screen z-10 top-0 left-0"></div>
+          <div className="fixed top-0 left-0 z-10 w-full h-screen bg-black/80"></div>
         ) : (
           ""
         )}
@@ -121,44 +121,44 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
           <AiOutlineClose
             onClick={() => setNav(!nav)}
             size={30}
-            className="absolute right-4 top-4 cursor-pointer"
+            className="absolute cursor-pointer right-4 top-4"
           />
           <Link href={"/"}>
-            <h2 className="h2-2xl p-4">
+            <h2 className="p-4 h2-2xl">
               SD <span className="font-bold">Kudya</span>
             </h2>
           </Link>
           <nav>
             <ul className="flex flex-col p-4 h2-gray-800">
               <Link href={"/OrderScreen"}>
-                <li className="h2-xl py-4 flex">
+                <li className="flex py-4 h2-xl">
                   <TbTruckDelivery size={25} className="mr-4" /> Pedidos
                 </li>
               </Link>
 
               <Link href={"/OrderHistory"}>
-                <li className="h2-xl py-4 flex">
+                <li className="flex py-4 h2-xl">
                   <MdFavorite size={25} className="mr-4" /> Favoritos
                 </li>
               </Link>
-              <li className="h2-xl py-4 flex">
+              <li className="flex py-4 h2-xl">
                 <FaWallet size={25} className="mr-4" /> Carteira
               </li>
-              <li className="h2-xl py-4 flex">
+              <li className="flex py-4 h2-xl">
                 <MdHelp size={25} className="mr-4" /> Ajuda
               </li>
-              <li className="h2-xl py-4 flex">
+              <li className="flex py-4 h2-xl">
                 <AiFillTag size={25} className="mr-4" /> Promoções
               </li>
-              <li className="h2-xl py-4 flex">
+              <li className="flex py-4 h2-xl">
                 <BsFillSaveFill size={25} className="mr-4" /> Melhores
               </li>
-              <li className="h2-xl py-4 flex">
+              <li className="flex py-4 h2-xl">
                 <FaUserFriends size={25} className="mr-4" /> Invite Friends
               </li>
 
               <a href={"/"} onClick={onLogout}>
-                <li className="h2-xl py-4 flex">
+                <li className="flex py-4 h2-xl">
                   <RiLogoutBoxLine size={25} className="mr-4" /> Sair
                 </li>
               </a>

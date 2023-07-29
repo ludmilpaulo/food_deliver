@@ -5,8 +5,10 @@ import Image from 'next/image';
 
 
 
+
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import logo from "../assets/logo.png";
 
 interface MenuItem {
   href: string;
@@ -29,10 +31,10 @@ const Nav = () => {
   }
 
   return (
-    <nav className="flex items-center justify-between p-6 bg-[#0171CE]">
+    <nav className="flex items-center justify-between p-6 max-w-full h-8 bg-[#0171CE]">
       <div className="flex items-center">
       <Image 
-        src="/logo.png" 
+        src={logo}
         alt="logo" 
         width={40} 
         height={40} 

@@ -1,23 +1,5 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  eslint: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has ESLint errors.
-    ignoreDuringBuilds: true,
-  },
-  reactStrictMode: true,
-  images: {
-    domains: ["www.sunshinedeliver.com"],
-  },
-};
-
-//const withImages = require("next-images");
-//module.exports = withImages();
-
-module.exports = nextConfig;
-
 module.exports = {
-  env: {
-    GOOGLE_MAPS_API_KEY: 'AIzaSyBBkDvVVuQBVSMOt8wQoc_7E-2bvDh2-nw',
+  images: {
+    domains: ['www.sunshinedeliver.com'],
   },
-};
+}

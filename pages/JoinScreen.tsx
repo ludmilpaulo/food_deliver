@@ -6,6 +6,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Nav from "@/components/Nav";
 import Barner from "@/components/Barner";
+import Card from "@/components/Card";
 
 function JoinScreen() {
   return (
@@ -13,7 +14,10 @@ function JoinScreen() {
     <Nav />
     <div className="w-full h-custom">
        <Barner />
-      </div>    
+      </div> 
+      <div className="p-4">
+      <Card />
+    </div>   
     </>
   );
 }

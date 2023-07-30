@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
+import { motion, useAnimation } from "framer-motion";
+
 //import { Restaurant } from '@/interfaces';
 
 type Restaurant = {
@@ -14,6 +16,15 @@ type Restaurants = Restaurant[];
 
 export default function Card() {
   const [restaurants, setRestaurants] = useState<Restaurants>([]);
+  
+  const controls = useAnimation();
+
+  useEffect(() => {
+    controls.start({
+      x: [-200, 0],
+      transition: { repeat: Infinity, duration: 2 },
+    });
+  }, [controls]);
 
   useEffect(() => {
     fetch("https://www.sunshinedeliver.com/api/customer/restaurants/")
@@ -22,14 +33,26 @@ export default function Card() {
   }, []);
 
   return (
-    <div className="p-4 flex flex-wrap justify-around">
+    <motion.div 
+    className="flex flex-wrap justify-around p-4"
+    animate={controls}
+      onHoverStart={() => {
+        controls.stop();
+      }}
+      onHoverEnd={() => {
+        controls.start({
+          x: [-200, 0],
+          transition: { repeat: Infinity, duration: 2 },
+        });
+      }}
+    >
       {restaurants.map((restaurant: Restaurant) => (
         <div
           key={restaurant.id}
-          className="m-4 bg-white bg-opacity-60 backdrop-filter backdrop-blur-lg rounded-xl shadow-lg flex flex-col items-center p-4"
+          className="flex flex-col items-center p-4 m-4 bg-white shadow-lg bg-opacity-60 backdrop-filter backdrop-blur-lg rounded-xl"
         >
           <Image
-            className="h-32 w-32 rounded-full mb-4"
+            className="w-32 h-32 mb-4 rounded-full"
             width={300}
             height={300}
             src={restaurant.logo}
@@ -42,6 +65,6 @@ export default function Card() {
           <p className="text-gray-500">{restaurant.phone}</p>
         </div>
       ))}
-    </div>
+    </motion.div>
   );
 }

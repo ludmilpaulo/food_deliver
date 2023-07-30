@@ -43,7 +43,7 @@ const LoginScreenUser = () => {
       if (res.status === 200) {
         dispatch(loginUser(resJson));
         alert(
-          "Você se conectou com sucesso Agora você pode saborear sua refeição"
+          "Você se conectou com sucesso Agora você pode saborear sua refeição",
         );
         router.push("/HomeScreen");
       } else {
@@ -64,9 +64,9 @@ const LoginScreenUser = () => {
           }}
           className="w-full p-10 mt-16 bg-white rounded shadow lg:w-1/3 md:w-1/2"
         >
-         <p className="text-2xl font-extrabold leading-6 text-gray-800">
-  Faça login na sua conta
-</p>
+          <p className="text-2xl font-extrabold leading-6 text-gray-800">
+            Faça login na sua conta
+          </p>
 
           <Link href={"/SignupScreen"}>
             <p className="mt-4 text-sm font-medium leading-none text-gray-500">

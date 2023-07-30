@@ -1,13 +1,10 @@
-import { useState } from 'react';
-import { IoIosSearch, IoIosLogIn } from 'react-icons/io';
-import { IoLocationSharp } from 'react-icons/io5';
-import Image from 'next/image';
+import { useState } from "react";
+import { IoIosSearch, IoIosLogIn } from "react-icons/io";
+import { IoLocationSharp } from "react-icons/io5";
+import Image from "next/image";
 
-
-
-
-import Link from 'next/link';
-import { useRouter } from 'next/router';
+import Link from "next/link";
+import { useRouter } from "next/router";
 import logo from "../assets/logo.png";
 
 interface MenuItem {
@@ -16,7 +13,7 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
-  { href: '/home', label: 'Home' },
+  { href: "/home", label: "Home" },
   // add more menu items as needed
 ];
 
@@ -28,50 +25,32 @@ const Nav = () => {
   const handleSearch = (event: React.FormEvent) => {
     event.preventDefault();
     router.push(`/search?query=${searchText}`);
-  }
+  };
 
   return (
     <nav className="flex items-center justify-between p-6 max-w-full h-8 bg-[#0171CE]">
       <div className="flex items-center">
-      <Image 
-        src={logo}
-        alt="logo" 
-        width={40} 
-        height={40} 
-        className="mr-2" 
-    />
-        
+        <Image src={logo} alt="logo" width={40} height={40} className="mr-2" />
+
         <div className="flex ml-16 space-x-4 rounded-full">
-    
-
-
           <input
             type="text"
-            className="w-full p-2 mr-2 bg-white rounded-full"
+            className="w-full p-2 mr-2 bg-white"
             placeholder="Search address"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
           />
-       
-      
 
-        <button className="flex items-center space-x-2">
-  <span>localização Atual</span>
-  <IoLocationSharp size={20} />
-</button>
-
-          
-          
+          <button className="flex items-center space-x-2">
+            <span>localização</span>
+            <IoLocationSharp size={20} />
+          </button>
         </div>
       </div>
       <div className="flex items-center">
-        
-        <Link 
-        className="flex items-center space-x-2"
-        href="/login">
-            <span>Conecte-se</span>
+        <Link className="flex items-center space-x-2" href="/login">
+          <span>Conecte-se</span>
           <IoIosLogIn size={20} />
-         
         </Link>
       </div>
     </nav>

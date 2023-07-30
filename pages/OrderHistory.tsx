@@ -1,5 +1,5 @@
 import React, { ReactNode, useCallback, useEffect, useState } from "react";
-import Image from 'next/image'
+import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "../redux/slices/authSlice";
 import {
@@ -49,7 +49,7 @@ const OrderHistory = () => {
         body: JSON.stringify({
           access_token: tokenvalue,
         }),
-      }
+      },
     )
       .then((response) => response.json())
       .then((responseJson) => {
@@ -58,12 +58,11 @@ const OrderHistory = () => {
       .catch((error) => {
         console.error(error);
       });
-    }, [user?.token]); // Assuming tokenvalue is a dependency
+  }, [user?.token]); // Assuming tokenvalue is a dependency
 
-
-    useEffect(() => {
-      orderHistory();
-    }, [orderHistory]);
+  useEffect(() => {
+    orderHistory();
+  }, [orderHistory]);
 
   return (
     <>
@@ -90,14 +89,13 @@ const OrderHistory = () => {
               <div className="flex flex-col items-center justify-center w-full mt-8 space-y-4 ">
                 <div className="flex items-start justify-start w-full border border-gray-200 md:flex-row md:items-center">
                   <div className="w-40 md:w-32">
-                  <Image
+                    <Image
                       className="hidden rounded-full md:block"
                       src={order?.customer?.avatar}
                       alt="girl-in-red-dress"
                       width={500} // Or whatever width you want
                       height={500} // Or whatever height you want
                     />
-
                   </div>
                   <div className="flex flex-col items-start justify-start w-full p-4 md:justify-between md:items-center md:flex-row md:px-8">
                     <div className="flex flex-col items-start justify-start md:flex-shrink-0">
@@ -127,16 +125,13 @@ const OrderHistory = () => {
 
                 <div className="flex items-start justify-start w-full border border-gray-200 md:flex-row md:items-center">
                   <div className="w-40 rounded-full md:w-32">
-                  <Image
-  className="hidden rounded-full md:block"
-  src={order?.customer?.avatar}
-  alt="girl-in-red-dress"
-  width={500} // Or whatever width you want
-  height={500} // Or whatever height you want
-/>
-
-                    
-                  
+                    <Image
+                      className="hidden rounded-full md:block"
+                      src={order?.customer?.avatar}
+                      alt="girl-in-red-dress"
+                      width={500} // Or whatever width you want
+                      height={500} // Or whatever height you want
+                    />
                   </div>
                   <div className="flex flex-col items-start justify-start w-full p-4 md:justify-between md:items-center md:flex-row md:px-8">
                     <div className="flex flex-col items-start justify-start md:flex-shrink-0">
@@ -163,8 +158,12 @@ const OrderHistory = () => {
                     </div>
                   </div>
                 </div>
-                {order?.order_details.map((detais: OrderDetails, index: number) => (
-                    <div key={index} className="flex items-start justify-start w-full border border-gray-200 md:flex-row md:items-center">
+                {order?.order_details.map(
+                  (detais: OrderDetails, index: number) => (
+                    <div
+                      key={index}
+                      className="flex items-start justify-start w-full border border-gray-200 md:flex-row md:items-center"
+                    >
                       <div className="flex flex-col items-start justify-start w-full p-4 md:justify-between md:items-center md:flex-row md:px-8">
                         <div className="flex flex-col items-start justify-start md:flex-shrink-0">
                           <h3 className="text-lg font-semibold leading-6 text-gray-800 md:text-xl md:leading-5">
@@ -192,7 +191,7 @@ const OrderHistory = () => {
                         </div>
                       </div>
                     </div>
-                  )
+                  ),
                 )}
               </div>
 

@@ -8,7 +8,7 @@ import {
 } from "../redux/slices/basketSlice";
 import { useSelector } from "react-redux";
 import Navbar from "@/components/Navbar";
-import withAuth from '../components/ProtectedPage';
+import withAuth from "../components/ProtectedPage";
 
 interface Meals {
   category?: any;
@@ -35,8 +35,6 @@ function DetailsScreen() {
   const totalPrice = useSelector(selectTotalPrice);
   const getAllItems = useSelector(selectTotalItems);
 
-
-
   /*
   const fetchMeals = () => {
     fetch(`https://www.sunshinedeliver.com/api/customer/meals/${res_ID}/`)
@@ -51,37 +49,35 @@ function DetailsScreen() {
   };
 */
 
-const fetchMeals = useCallback(() => {
-  fetch(`https://www.sunshinedeliver.com/api/customer/meals/${res_ID}/`)
-    .then((response) => response.json())
-    .then((responseJson) => {
-      setFoods(responseJson.meals);
-      setData(responseJson.meals);
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-}, [res_ID]);  // Add res_ID to the dependency array
+  const fetchMeals = useCallback(() => {
+    fetch(`https://www.sunshinedeliver.com/api/customer/meals/${res_ID}/`)
+      .then((response) => response.json())
+      .then((responseJson) => {
+        setFoods(responseJson.meals);
+        setData(responseJson.meals);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, [res_ID]); // Add res_ID to the dependency array
 
-
-useEffect(() => {
-  fetchMeals();
-}, [fetchMeals]);
-
+  useEffect(() => {
+    fetchMeals();
+  }, [fetchMeals]);
 
   const result = Array.from(
     new Set(
       data.map((item) => {
         return item.category;
-      })
-    )
+      }),
+    ),
   );
 
   const filterType = (category: string) => {
     setFoods(
       foods.filter((item) => {
         return item.category === category;
-      })
+      }),
     );
   };
 
@@ -116,8 +112,8 @@ useEffect(() => {
                     >
                       {item.category}
                     </button>
-                  ))
-                )
+                  )),
+                ),
               )}
             </div>
           </div>

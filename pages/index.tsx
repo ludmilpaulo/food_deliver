@@ -15,16 +15,10 @@ export default function Home() {
 
   if (user == null) {
     router.push("/JoinScreen");
-  }
-   else {
+  } else {
     router.push("/HomeScreen");
   }
 
-  useEffect(() => {
-   
-   
-  }, []);
-  return <>
-
-  </>;
+  useEffect(() => {}, []);
+  return <></>;
 }

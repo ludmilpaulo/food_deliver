@@ -52,7 +52,7 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
           body: JSON.stringify({
             user_id: user?.user_id,
           }),
-        }
+        },
       )
         .then((response) => response.json())
         .then((responseJson) => {
@@ -66,8 +66,6 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
     };
     pickUser();
   }, [user?.user_id]);
-  
-
 
   const onLogout = async () => {
     try {
@@ -79,7 +77,6 @@ const Navbar = ({ total, count }: { total: any; count: any }) => {
     }
   };
 
- 
   return (
     <>
       <div className="max-w-[1640px] bg-bg_image bg-cover bg-center bg-no-repeat mx-auto flex justify-between items-center p-4">

@@ -30,8 +30,6 @@ const UserProfile = () => {
 
   const [Type, setType] = useState("");
 
-
-
   const userUpdate = async () => {
     let tokenvalue = user?.token;
 
@@ -49,7 +47,7 @@ const UserProfile = () => {
 
     try {
       let response = await fetch(
-        'https://www.sunshinedeliver.com/api/customer/profile/update/',
+        "https://www.sunshinedeliver.com/api/customer/profile/update/",
         {
           method: "POST",
           headers: {
@@ -57,7 +55,7 @@ const UserProfile = () => {
             "Content-Type": "multipart/form-data",
           },
           body: formData,
-        }
+        },
       );
       //response = await response.json();
 
@@ -108,7 +106,7 @@ const UserProfile = () => {
                 className="bg-gray-200 border rounded focus:outline-none text-xs font-medium leading-none text-gray-800 py-3 w-full pl-3 mt-2"
                 type="file"
                 name="myImage"
-                onChange={(e)=>setImage(e.target.value)}
+                onChange={(e) => setImage(e.target.value)}
                 value={image}
               />
             </div>

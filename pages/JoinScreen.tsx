@@ -7,17 +7,19 @@ import Header from "@/components/Header";
 import Nav from "@/components/Nav";
 import Barner from "@/components/Barner";
 import Card from "@/components/Card";
+import Footer from "@/components/Footer";
 
 function JoinScreen() {
   return (
     <>
-    <Nav />
-    <div className="w-full h-custom">
-       <Barner />
-      </div> 
+      <Nav />
+      <div className="w-full h-custom">
+        <Barner />
+      </div>
       <div className="p-4">
-      <Card />
-    </div>   
+        <Card />
+      </div>
+      <Footer />
     </>
   );
 }

@@ -8,7 +8,7 @@ module.exports = {
   theme: {
     extend: {
       height: {
-        custom: '300px',
+        custom: "300px",
       },
       backgroundImage: {
         bg_image: "url('../assets/bg.png')",

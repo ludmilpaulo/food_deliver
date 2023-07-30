@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
+import { useEffect, useState } from "react";
+import Image from "next/image";
 
 interface Restaurant {
   id: number;
@@ -14,38 +14,38 @@ const Banner = () => {
   const [images, setImages] = useState<string[]>([]);
 
   useEffect(() => {
-    fetch('https://www.sunshinedeliver.com/api/customer/restaurants/')
+    fetch("https://www.sunshinedeliver.com/api/customer/restaurants/")
       .then((response) => response.json())
       .then((data: { restaurants: Restaurant[] }) => {
         const imageUrls = data.restaurants.map((item) => item.logo);
         setImages(imageUrls);
       })
-      .catch((error) => console.error('Error:', error));
+      .catch((error) => console.error("Error:", error));
   }, []);
 
   useEffect(() => {
     const slideInterval = setInterval(() => {
-      setCurrentSlide((prevSlide) => (prevSlide === images.length - 1 ? 0 : prevSlide + 1));
+      setCurrentSlide((prevSlide) =>
+        prevSlide === images.length - 1 ? 0 : prevSlide + 1,
+      );
     }, 6000);
 
     return () => clearInterval(slideInterval);
   }, [images]);
 
   return (
-
-    <div className='relative'>
+    <div className="relative">
       {images.length > 0 && (
         <Image
           src={images[currentSlide]}
           alt={`Slide ${currentSlide + 1}`}
-          className='object-cover w-full h-[400px]'
+          className="object-cover w-full h-[400px]"
           width={300}
           height={300}
           unoptimized={true} // To bypass domain check for external images
         />
       )}
     </div>
-   
   );
 };
 

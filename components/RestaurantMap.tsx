@@ -4,7 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import styles from "../styles/Home.module.css";
 
 const RestaurantMap: NextPage = () => {
-  const [coordinates, setCoordinates] = useState<google.maps.LatLngLiteral | undefined>(undefined);
+  const [coordinates, setCoordinates] = useState<
+    google.maps.LatLngLiteral | undefined
+  >(undefined);
 
   useEffect(() => {
     // get the users current location on intial login
@@ -12,7 +14,7 @@ const RestaurantMap: NextPage = () => {
       ({ coords: { latitude, longitude } }) => {
         console.log({ latitude, longitude });
         setCoordinates({ lat: latitude, lng: longitude });
-      }
+      },
     );
   }, []);
 
@@ -25,7 +27,7 @@ const RestaurantMap: NextPage = () => {
       clickableIcons: true,
       scrollwheel: false,
     }),
-    []
+    [],
   );
 
   const { isLoaded } = useLoadScript({

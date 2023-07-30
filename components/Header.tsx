@@ -23,7 +23,7 @@ const Header = (props: Props) => {
         }}
         className="flex flex-row items-center"
       >
-        <SocialIcon url="https://www.facebook.com/sdkudyaa/" fgColor="gray"  />
+        <SocialIcon url="https://www.facebook.com/sdkudyaa/" fgColor="gray" />
         <SocialIcon url="" fgColor="gray" bgColor="transparent" />
         <SocialIcon url="" fgColor="gray" bgColor="transparent" />
       </motion.div>

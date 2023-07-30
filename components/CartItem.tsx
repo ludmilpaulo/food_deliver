@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
-import Image from 'next/image';
+import Image from "next/image";
 
 import {
   selectCartItems,
@@ -52,7 +52,6 @@ const CartItem = ({ text, onClick }: Button) => {
 
   const customer_avatar = `${userPhoto}`;
 
-
   let allCartItems = all;
 
   const dispatch = useDispatch();
@@ -69,12 +68,12 @@ const CartItem = ({ text, onClick }: Button) => {
 
   const handleRemove = (id: any, resName: any, resImage: any) => {
     const resIndex = allCartItems.findIndex(
-      (item: { resName: any }) => item.resName === resName
+      (item: { resName: any }) => item.resName === resName,
     );
 
     if (resIndex >= 0) {
       const menuIndex = allCartItems[resIndex].foods.findIndex(
-        (item: { id: any }) => item.id === id
+        (item: { id: any }) => item.id === id,
       );
       if (menuIndex >= 0) {
         let oldArrays = [...allCartItems];
@@ -99,24 +98,30 @@ const CartItem = ({ text, onClick }: Button) => {
               Nenhum item do carrinho!
             </h1>
             <p className="text-base font-medium leading-6 text-gray-600">
-            {new Date().getFullYear()}
+              {new Date().getFullYear()}
             </p>
           </div>
         )}
-      {allCartItems?.map(
-  (item: {
-    resImage: (id: any, resName: string, resImage: any) => void;
-    resName: string;
-    foods: any[];
-  }, index: number) => (
+        {allCartItems?.map(
+          (
+            item: {
+              resImage: (id: any, resName: string, resImage: any) => void;
+              resName: string;
+              foods: any[];
+            },
+            index: number,
+          ) => (
             <>
-              <div key={index} className="flex flex-col justify-start space-y-2 item-start ">
+              <div
+                key={index}
+                className="flex flex-col justify-start space-y-2 item-start "
+              >
                 <h1 className="text-3xl font-semibold leading-7 text-gray-800 lg:text-4xl lg:leading-9">
                   {" "}
                   {item.resName}
                 </h1>
                 <p className="text-base font-medium leading-6 text-gray-600">
-                {new Date().toISOString()}
+                  {new Date().toISOString()}
                 </p>
               </div>
               <div className="flex flex-col items-stretch w-full mt-10 space-y-4 xl:flex-row jusitfy-center xl:space-x-8 md:space-y-6 xl:space-y-0">
@@ -139,7 +144,7 @@ const CartItem = ({ text, onClick }: Button) => {
                             | React.ReactFragment
                             | null
                             | undefined,
-                          resImage: any
+                          resImage: any,
                         ): void;
                         image: string | undefined;
                         name:
@@ -192,21 +197,17 @@ const CartItem = ({ text, onClick }: Button) => {
                         // eslint-disable-next-line react/jsx-key
                         <div className="flex flex-col items-start justify-start w-full mt-4 md:mt-6 md:flex-row md:items-center md:space-x-6 xl:space-x-8 ">
                           <div className="w-full pb-4 md:pb-8 md:w-40">
-                         
-                          <Image 
-  className="hidden w-full md:block"
-  src={food.image || 'default-image-path.jpg'}
-  alt=""
-/>
+                            <Image
+                              className="hidden w-full md:block"
+                              src={food.image || "default-image-path.jpg"}
+                              alt=""
+                            />
 
-<Image 
-  className="w-full md:hidden"
-  src={food.image || 'default-image-path.jpg'}
-  alt=""
-/>
-
-                                                        
-    
+                            <Image
+                              className="w-full md:hidden"
+                              src={food.image || "default-image-path.jpg"}
+                              alt=""
+                            />
                           </div>
                           <div className="flex flex-col items-start justify-between w-full pb-8 space-y-4 border-b border-gray-200 md:flex-row md:space-y-0">
                             <div className="flex flex-col items-start justify-start w-full space-y-8">
@@ -234,7 +235,7 @@ const CartItem = ({ text, onClick }: Button) => {
                                   handleRemove(
                                     food?.id,
                                     item.resName,
-                                    item.resImage
+                                    item.resImage,
                                   )
                                 }
                                 className="bg-indigo-500 opacity-100 ..."
@@ -252,7 +253,7 @@ const CartItem = ({ text, onClick }: Button) => {
                             </div>
                           </div>
                         </div>
-                      )
+                      ),
                     )}
                   </div>
                   <div className="flex flex-col items-stretch justify-center w-full space-y-4 md:flex-row md:space-y-0 md:space-x-6 xl:space-x-8">
@@ -295,7 +296,7 @@ const CartItem = ({ text, onClick }: Button) => {
                 </div>
               </div>
             </>
-          )
+          ),
         )}
       </div>
     </>

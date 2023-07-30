@@ -19,7 +19,6 @@ interface CartItem {
   // ...other properties
 }
 
-
 export default function CheckoutScreen() {
   const dispatch = useDispatch();
 
@@ -61,7 +60,7 @@ export default function CheckoutScreen() {
   const completeOrder = async () => {
     let tokenvalue = user?.token;
 
-    console.log(tokenvalue, "valor do token")
+    console.log(tokenvalue, "valor do token");
 
     if (!userAddress) {
       alert("Por favor Preencha o Endereço de Entrega");
@@ -81,7 +80,7 @@ export default function CheckoutScreen() {
             address: userAddress,
             order_details: newA,
           }),
-        }
+        },
       )
         .then((response) => response.json())
         .then((responseJson) => {
@@ -146,7 +145,10 @@ export default function CheckoutScreen() {
               </button>
             </div>
             {allCartItems?.map((item: CartItem, index: number) => (
-              <div key={item.id} className="flex flex-col items-start justify-start w-full p-6 bg-gray-50 md:p-14">
+              <div
+                key={item.id}
+                className="flex flex-col items-start justify-start w-full p-6 bg-gray-50 md:p-14"
+              >
                 <div>
                   <h1 className="text-2xl font-semibold leading-6 text-gray-800">
                     Resumo do Pedido

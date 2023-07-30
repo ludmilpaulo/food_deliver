@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "../redux/slices/authSlice";
 import Navbar from "@/components/Navbar";
 import { selectTotalItems, selectTotalPrice } from "@/redux/slices/basketSlice";
-import Map from '../components/Map';
+import Map from "../components/Map";
 import GoogleMapReact from "google-map-react";
 
 type Props = {
@@ -36,15 +36,13 @@ interface LatLon {
 }
 
 const OrderScreen = (props: Props) => {
-
   const defaultProps = {
     center: {
       lat: 37.7749,
-      lng: -122.4194
+      lng: -122.4194,
     },
-    zoom: 11
+    zoom: 11,
   };
-
 
   const dispatch = useDispatch();
 
@@ -72,14 +70,14 @@ const OrderScreen = (props: Props) => {
         body: JSON.stringify({
           access_token: tokenvalue,
         }),
-      }
+      },
     );
     const locationData = await response.json();
     let result = locationData?.location;
     let blah2 = result.replace(/['']/g, '"');
 
     setDriverLocation(JSON.parse(blah2));
-  }, [user?.token, user?.username]); 
+  }, [user?.token, user?.username]);
 
   useEffect(() => {
     getDriverLocation();
@@ -89,13 +87,12 @@ const OrderScreen = (props: Props) => {
       ({ coords: { latitude, longitude } }) => {
         console.log({ latitude, longitude });
         setCoordinates({ lat: latitude, lng: longitude });
-      }
+      },
     );
   }, [getDriverLocation, driverLocation?.latitude]);
 
   const libraries = useMemo(() => ["places"], []);
   const mapCenter = useMemo(() => coordinates, [coordinates]);
-
 
   const mapOptions = useMemo<google.maps.MapOptions>(
     () => ({
@@ -103,7 +100,7 @@ const OrderScreen = (props: Props) => {
       clickableIcons: true,
       scrollwheel: false,
     }),
-    []
+    [],
   );
 
   const { isLoaded } = useLoadScript({
@@ -129,20 +126,15 @@ const OrderScreen = (props: Props) => {
     <>
       <Navbar total={totalPrice} count={getAllItems.length} />
 
-
-     <div style={{ height: '1000px', width: '1000%' }}>
-  
-       
-
-
-      <GoogleMap
-        mapContainerStyle={containerStyle}
-        center={coordinates}
-        zoom={10}
-        //style={{ height: '1000px', width: '1000%' }}
-      >
-        <Marker position={coordinates} />
-      </GoogleMap>
+      <div style={{ height: "1000px", width: "1000%" }}>
+        <GoogleMap
+          mapContainerStyle={containerStyle}
+          center={coordinates}
+          zoom={10}
+          //style={{ height: '1000px', width: '1000%' }}
+        >
+          <Marker position={coordinates} />
+        </GoogleMap>
       </div>
     </>
   );

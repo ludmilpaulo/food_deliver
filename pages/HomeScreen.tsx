@@ -5,10 +5,7 @@ import styles from "@/styles/Home.module.css";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser, logoutUser, selectUser } from "../redux/slices/authSlice";
-import withAuth from '../components/ProtectedPage';
-
-
-
+import withAuth from "../components/ProtectedPage";
 
 import React, { useState, useEffect } from "react";
 import {
@@ -45,7 +42,7 @@ export type Restaurant = {
 
 export async function getServerSideProps() {
   const res = await fetch(
-    "https://www.sunshinedeliver.com/api/customer/restaurants/"
+    "https://www.sunshinedeliver.com/api/customer/restaurants/",
   );
   const data = await res.json();
 
@@ -56,8 +53,7 @@ export async function getServerSideProps() {
   };
 }
 
-
-const HomeScreen = ({ restaurantData }: Restaurant)=> {
+const HomeScreen = ({ restaurantData }: Restaurant) => {
   const router = useRouter();
   const user = useSelector(selectUser);
 
@@ -98,7 +94,7 @@ const HomeScreen = ({ restaurantData }: Restaurant)=> {
 
   return (
     <>
-    <Header />
+      <Header />
       <div className="h-screen bg-center bg-no-repeat bg-cover bg-bg_image md:h-screen">
         <Nav />
         <Hero />
@@ -134,6 +130,6 @@ const HomeScreen = ({ restaurantData }: Restaurant)=> {
       <Footer />
     </>
   );
-}
+};
 
 export default withAuth(HomeScreen);

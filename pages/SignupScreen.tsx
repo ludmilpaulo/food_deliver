@@ -46,7 +46,7 @@ const SignupScreen = () => {
       if (res.status === 200) {
         dispatch(loginUser(resJson));
         alert(
-          "Você se conectou com sucesso Agora você pode saborear sua refeição"
+          "Você se conectou com sucesso Agora você pode saborear sua refeição",
         );
         router.push("/HomeScreen");
       } else {
@@ -67,15 +67,14 @@ const SignupScreen = () => {
           }}
           className="w-full p-10 mt-16 bg-white rounded shadow lg:w-1/3 md:w-1/2"
         >
-         <h1
-  tabIndex={0}
-  aria-label="Login to your account"
-  className="text-2xl font-extrabold leading-6 text-gray-800"
->
-  Inscreva-se Para ter uma Conta
-</h1>
+          <h1
+            tabIndex={0}
+            aria-label="Login to your account"
+            className="text-2xl font-extrabold leading-6 text-gray-800"
+          >
+            Inscreva-se Para ter uma Conta
+          </h1>
 
-          
           <Link href={"/LoginScreenUser"}>
             <p className="mt-4 text-sm font-medium leading-none text-gray-500">
               Se você tem uma conta?{" "}

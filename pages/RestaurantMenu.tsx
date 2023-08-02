@@ -1,0 +1,104 @@
+import React, { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import Image from "next/image";
+import { FiMenu, FiX } from "react-icons/fi";
+import Link from "next/link";
+import Menu from "@/components/Menu";
+
+interface Meals {
+    category?: any;
+    id?: number;
+    image?: string;
+    name?: string;
+    price?: number;
+    quantity?: number;
+    short_description?: string;
+  }
+  
+
+const RestaurantMenu = () => {
+
+   const router = useRouter();
+   const { restaurantId, image_url, restaurantName, address, phone } = router.query;
+   const [foods, setFoods] = useState<Meals[]>([]);
+   const [data, setData] = useState<Meals[]>([]);
+
+   const [open, setOpen] = useState(false);
+
+   //let res_ID: number | null = Array.isArray(restaurantId) || !restaurantId ? null : Number(restaurantId);
+
+   let res_ID: number = Number(restaurantId) || 0;
+
+
+
+   //let res_NAME: string = restaurantName ?? "";
+   let res_NAME: string = Array.isArray(restaurantName) ? restaurantName.join(' ') : restaurantName ?? "";
+
+   let res_Image: string = Array.isArray(image_url) ? image_url[0] : image_url ?? "";
+
+
+ 
+   //let res_Image: string = image_url || "";
+
+
+    const fetchMeals = useCallback(() => {
+        fetch(`https://www.sunshinedeliver.com/api/customer/meals/${res_ID}/`)
+          .then((response) => response.json())
+          .then((responseJson) => {
+            setFoods(responseJson.meals);
+            setData(responseJson.meals);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }, [res_ID]); // Add res_ID to the dependency array
+    
+      useEffect(() => {
+        fetchMeals();
+      }, [fetchMeals]);
+
+
+
+
+  return (
+    <><div className="relative">
+          {res_Image.length > 0 && (
+              <Image
+                  src={res_Image}
+                  alt={res_NAME}
+                  className="object-cover w-full h-[400px]"
+                  width={300}
+                  height={300}
+                  unoptimized={true} // To bypass domain check for external images
+              />
+          )}
+      </div>
+      <div className="grid h-screen grid-cols-1 gap-10 mt-12 bg-center bg-no-repeat bg-cover md:grid-cols-2 lg:grid-cols-3 bg-bg_image md:h-screen">
+          {foods?.map((food) => {
+            return (
+              <Menu
+                key={food.id}
+                resId={res_ID}
+                foods={foods}
+                food={food}
+                resName={res_NAME}
+                resImage={res_Image}
+                meals={undefined}
+                category={food.category}
+                id={0}
+                image={""}
+                name={""}
+                price={0}
+                quantity={0}
+                short_description={""}
+              />
+            );
+          })}
+        </div>
+      </>
+
+
+  )
+}
+
+export default RestaurantMenu

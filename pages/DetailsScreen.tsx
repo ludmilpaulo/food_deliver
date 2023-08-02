@@ -35,19 +35,7 @@ function DetailsScreen() {
   const totalPrice = useSelector(selectTotalPrice);
   const getAllItems = useSelector(selectTotalItems);
 
-  /*
-  const fetchMeals = () => {
-    fetch(`https://www.sunshinedeliver.com/api/customer/meals/${res_ID}/`)
-      .then((response) => response.json())
-      .then((responseJson) => {
-        setFoods(responseJson.meals);
-        setData(responseJson.meals);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-*/
+
 
   const fetchMeals = useCallback(() => {
     fetch(`https://www.sunshinedeliver.com/api/customer/meals/${res_ID}/`)

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 //import { Restaurant } from '@/interfaces';
 
@@ -27,6 +28,7 @@ export default function RestaurantCard() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
     {restaurants.map((restaurant: Restaurant) => (
+  
       <div
         key={restaurant.id}
         className="relative flex flex-col p-4 bg-white shadow-lg bg-opacity-60 backdrop-filter backdrop-blur-lg rounded-xl"
@@ -48,10 +50,24 @@ export default function RestaurantCard() {
           <p className="text-gray-500">{restaurant.address}</p>
           <p className="text-gray-500">{restaurant.phone}</p>
         </div>
-        <button className="mt-auto bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        <Link
+         href={{
+           pathname: "/RestaurantMenu",
+           query: {
+            restaurantName: restaurant.name,
+             restaurantId: restaurant.id,
+             phone: restaurant.phone,
+             image_url: restaurant.logo,
+             address: restaurant.address,
+           },
+         }}
+       >
+        <button className="mt-auto w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
         Ver Menu do {restaurant.name}
         </button>
+        </Link>
       </div>
+     
     ))}
   </div>
   

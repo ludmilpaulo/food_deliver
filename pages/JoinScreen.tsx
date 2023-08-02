@@ -8,6 +8,9 @@ import Nav from "@/components/Nav";
 import Barner from "@/components/Barner";
 import Card from "@/components/Card";
 import Footer from "@/components/Footer";
+import RestaurantCard from "@/components/RestaurantCard";
+import SearchBar from "@/components/SearchBar";
+
 
 function JoinScreen() {
   return (
@@ -16,9 +19,12 @@ function JoinScreen() {
       <div className="w-full h-custom">
         <Barner />
       </div>
-      <div className="p-4">
+      <div>
         <Card />
+        <SearchBar />
+        <RestaurantCard />
       </div>
+   
       <Footer />
     </>
   );

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { FiMenu, FiX } from "react-icons/fi";
 import Link from "next/link";
 import Menu from "@/components/Menu";
+import Nav from "@/components/Nav";
 
 interface Meals {
     category?: any;
@@ -57,23 +58,65 @@ const RestaurantMenu = () => {
         fetchMeals();
       }, [fetchMeals]);
 
-
+     // Get unique category names
+const uniqueCategories = Array.from(
+    new Set(
+      data.map((item) => item.category)
+    )
+  );
+  
+  // Filtering function
+  const filterType = (category: string) => {
+    setFoods(
+      data.filter((item) => item.category === category)
+    );
+  };
 
 
   return (
-    <><div className="relative">
+    <>
+     <Nav />
+    <div className="relative">
           {res_Image.length > 0 && (
               <Image
                   src={res_Image}
                   alt={res_NAME}
-                  className="object-cover w-full h-[400px]"
+                  className="object-cover w-full h-[250px]"
                   width={300}
                   height={300}
                   unoptimized={true} // To bypass domain check for external images
               />
           )}
       </div>
-      <div className="grid h-screen grid-cols-1 gap-10 mt-12 bg-center bg-no-repeat bg-cover md:grid-cols-2 lg:grid-cols-3 bg-bg_image md:h-screen">
+
+        
+      <div className="flex flex-col justify-between lg:flex-row">
+  {/* Filter Type */}
+  <div>
+    <p className="font-bold text-gray-700">Tipo de filtro</p>
+    <div className="flex flex-wrap justfiy-between">
+      <button
+        onClick={fetchMeals}
+        className="m-1 border-[#004AAD] text-orange-600 hover:bg-[#004AAD] hover:text-white"
+      >
+        Todos
+      </button>
+
+      {uniqueCategories.map((category) => (
+        <button
+          key={category} // Added key for each unique category
+          onClick={() => filterType(category)}
+          className="m-1 border-[#004AAD] text-orange-600 hover:bg-[#004AAD] hover:text-white"
+        >
+          {category}
+        </button>
+      ))}
+    </div>
+  </div>
+</div>
+
+
+      <div className="grid h-screen grid-cols-1 gap-10 px-3 mt-12 bg-center md:grid-cols-2 lg:grid-cols-3 md:h-screen">
           {foods?.map((food) => {
             return (
               <Menu

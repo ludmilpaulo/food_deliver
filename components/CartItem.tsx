@@ -201,12 +201,16 @@ const CartItem = ({ text, onClick }: Button) => {
                               className="hidden w-full md:block"
                               src={food.image || "default-image-path.jpg"}
                               alt=""
+                              width={500} // specify width
+                              height={300} // specify height
                             />
 
                             <Image
                               className="w-full md:hidden"
                               src={food.image || "default-image-path.jpg"}
                               alt=""
+                              width={500} // specify width
+                              height={300} // specify height
                             />
                           </div>
                           <div className="flex flex-col items-start justify-between w-full pb-8 space-y-4 border-b border-gray-200 md:flex-row md:space-y-0">

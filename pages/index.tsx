@@ -6,19 +6,11 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "@/redux/slices/authSlice";
+import HomeScreen from "./HomeScreen";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  const router = useRouter();
-  const user = useSelector(selectUser);
 
-  if (user == null) {
-    router.push("/JoinScreen");
-  } else {
-    router.push("/HomeScreen");
-  }
-
-  useEffect(() => {}, []);
-  return <></>;
+  return <HomeScreen />
 }

@@ -5,30 +5,30 @@ import logo from "../assets/logo.png";
 
 export default function Footer() {
   return (
-    <footer className="fixed inset-x-0 bottom-0 px-6 py-10 text-white bg-[#0171CE]">
-      <div className="flex flex-col items-center justify-between md:flex-row">
-        <div className="mb-4">
-          <Image src={logo} alt="Logo" width={150} height={50} />
+    <footer className="fixed inset-x-0 bottom-0 px-2 sm:px-4 md:px-6 lg:px-10 py-4 sm:py-6 md:py-10 text-xs sm:text-sm md:text-base text-white bg-[#0171CE]">
+      <div className="flex flex-col items-center space-y-4 sm:space-y-6 md:space-y-0 md:flex-row md:items-start md:space-x-4 lg:space-x-6 justify-between">
+        <div className="mb-2 sm:mb-4">
+          <Image src={logo} alt="Logo" width={100} height={30} />
         </div>
-        <div className="mb-4">
-          <h2 className="mb-2 text-lg font-bold">About Us</h2>
+        <div className="mb-2 sm:mb-4 text-center md:text-left">
+          <h2 className="mb-2 text-lg font-bold">Sobre nós</h2>
           <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque euismod.</p>
         </div>
-        <div className="mb-4">
-          <h2 className="mb-2 text-lg font-bold">Contact Us</h2>
+        <div className="mb-2 sm:mb-4 text-center md:text-left">
+          <h2 className="mb-2 text-lg font-bold">Contate-nos</h2>
           <p><AiFillPhone /> +1 234 567 890</p>
         </div>
-        <div className="mb-4">
-          <h2 className="mb-2 text-lg font-bold">Follow Us</h2>
-          <div className="flex space-x-3">
+        <div className="mb-2 sm:mb-4 text-center md:text-left">
+          <h2 className="mb-2 text-lg font-bold">Siga-nos</h2>
+          <div className="flex justify-center md:justify-start space-x-3">
             <FaFacebookF className="w-5 h-5" />
             <FaTwitter className="w-5 h-5" />
             <FaInstagram className="w-5 h-5" />
           </div>
         </div>
-        <div className="mb-4">
-          <h2 className="mb-2 text-lg font-bold">Download App</h2>
-          <div className="flex space-x-3">
+        <div className="mb-2 sm:mb-4 text-center md:text-left">
+          <h2 className="mb-2 text-lg font-bold">Baixar aplicativo</h2>
+          <div className="flex justify-center md:justify-start space-x-3">
             <FaApple className="w-5 h-5" />
             <FaGooglePlay className="w-5 h-5" />
           </div>

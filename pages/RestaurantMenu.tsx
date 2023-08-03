@@ -5,6 +5,7 @@ import { FiMenu, FiX } from "react-icons/fi";
 import Link from "next/link";
 import Menu from "@/components/Menu";
 import Nav from "@/components/Nav";
+import withAuth from "@/components/ProtectedPage";
 
 interface Meals {
     category?: any;
@@ -116,32 +117,35 @@ const uniqueCategories = Array.from(
 </div>
 
 
-      <div className="grid h-screen grid-cols-1 gap-10 px-3 mt-12 bg-center md:grid-cols-2 lg:grid-cols-3 md:h-screen">
-          {foods?.map((food) => {
-            return (
-              <Menu
-                key={food.id}
-                resId={res_ID}
-                foods={foods}
-                food={food}
-                resName={res_NAME}
-                resImage={res_Image}
-                meals={undefined}
-                category={food.category}
-                id={0}
-                image={""}
-                name={""}
-                price={0}
-                quantity={0}
-                short_description={""}
-              />
-            );
-          })}
-        </div>
+<div className="grid space-x-4 space-y-4 h-screen grid-cols-1 px-3 mt-12 bg-center md:grid-cols-2 lg:grid-cols-3 md:h-screen">
+  {foods?.map((food) => {
+    return (
+      <Menu
+        key={food.id}
+        resId={res_ID}
+        foods={foods}
+        food={food}
+        resName={res_NAME}
+        resImage={res_Image}
+        meals={undefined}
+        category={food.category}
+        id={0}
+        image={""}
+        name={""}
+        price={0}
+        quantity={0}
+        short_description={""}
+      />
+    );
+  })}
+</div>
+
+
+
       </>
 
 
   )
 }
 
-export default RestaurantMenu
+export default withAuth(RestaurantMenu);

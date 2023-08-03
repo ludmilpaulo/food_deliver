@@ -1,30 +1,30 @@
-import { useRouter } from "next/router";
-import React, { useEffect } from "react";
-//import { useAuth } from 'your-auth-library';
-import { useDispatch, useSelector } from "react-redux";
-import { selectUser } from "@/redux/slices/authSlice";
+import { useSelector } from 'react-redux';
+import { useRouter } from 'next/router';
+import { RootState } from '../redux/store'; // ensure the path to your store file is correct
+import React from 'react';
 
-const withAuth = (WrappedComponent: any) => {
-  const AuthComponent = (props: any) => {
+const withAuth = (WrappedComponent: React.ComponentType<any>) => {
+  const Wrapper = (props: any) => {
     const router = useRouter();
-    const user = useSelector(selectUser);
 
-    const isAuthenticated = user; // replace this with your own auth hook
+    // Get user from redux state
+    const user = useSelector((state: RootState) => state.auth.user);
 
-    useEffect(() => {
-      if (!isAuthenticated) {
-        router.push("/LoginScreenUser");
+    React.useEffect(() => {
+      if (!user) {
+        router.replace('/LoginScreenUser');
       }
-    }, [isAuthenticated, router]);
+    }, [user, router]);
 
-    if (!isAuthenticated) {
+    // component renders only when user is available
+    if (!user) {
       return null;
     }
 
     return <WrappedComponent {...props} />;
   };
 
-  return AuthComponent;
+  return Wrapper;
 };
 
 export default withAuth;

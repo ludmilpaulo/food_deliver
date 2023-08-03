@@ -93,7 +93,8 @@ const Menu = ({ resId, food, resName, resImage, foods }: Meals) => {
   }
 
   return (
-    <div className="duration-300 border rounded-lg shadow-lg hover:scale-105">
+    <div className="flex flex-row-reverse w-64 sm:space-y-0 space-x-reverse">
+    <div className="duration-300 w-full border rounded-lg shadow-lg hover:scale-105">
       <Image
         src={food?.image}
         alt={food?.name}
@@ -101,7 +102,7 @@ const Menu = ({ resId, food, resName, resImage, foods }: Meals) => {
         height={200} // specify height
         className="object-cover rounded-t-lg"
       />
-
+  
       <div className="flex justify-between px-2 py-4">
         <p className="font-bold">{food?.name}</p>
         <p>
@@ -119,6 +120,8 @@ const Menu = ({ resId, food, resName, resImage, foods }: Meals) => {
         <FiPlusCircle onClick={quantityUp} size={40} color="#004AAD" />
       </div>
     </div>
+  </div>
+  
   );
 };
 

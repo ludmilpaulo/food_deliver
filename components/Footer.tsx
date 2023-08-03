@@ -5,7 +5,7 @@ import logo from "../assets/logo.png";
 
 export default function Footer() {
   return (
-    <footer className="fixed inset-x-0 bottom-0 px-2 sm:px-4 md:px-6 lg:px-10 py-4 sm:py-6 md:py-10 text-xs sm:text-sm md:text-base text-white bg-[#0171CE]">
+    <footer className="px-2 sm:px-4 md:px-6 lg:px-10 py-4 sm:py-6 md:py-10 text-xs sm:text-sm md:text-base text-white bg-[#0171CE]">
       <div className="flex flex-col items-center space-y-4 sm:space-y-6 md:space-y-0 md:flex-row md:items-start md:space-x-4 lg:space-x-6 justify-between">
         <div className="mb-2 sm:mb-4">
           <Image src={logo} alt="Logo" width={100} height={30} />

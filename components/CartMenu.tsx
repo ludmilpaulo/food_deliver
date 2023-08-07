@@ -20,16 +20,31 @@ const CartMenu: React.FC = () => {
   const incrementQuantity = (item: CartItem) => {
     const updatedQuantity = (item.quantity || 0) + 1;
     const updatedPrice = updatedQuantity * (item.price || 0);
-    dispatch(updateBasket({ ...item, quantity: updatedQuantity, price: updatedPrice }));
+    dispatch(updateBasket({ 
+      ...item, 
+      quantity: updatedQuantity, 
+      price: updatedPrice,
+      resName: item.name || "",
+      resImage: item.image || "",
+      resId: item.id
+    }));
   }
   
   const decrementQuantity = (item: CartItem) => {
     if ((item.quantity || 0) > 0) {
       const updatedQuantity = (item.quantity || 0) - 1;
       const updatedPrice = updatedQuantity > 0 ? updatedQuantity * (item.price || 0) : 0;
-      dispatch(updateBasket({ ...item, quantity: updatedQuantity, price: updatedPrice }));
+      dispatch(updateBasket({ 
+        ...item, 
+        quantity: updatedQuantity, 
+        price: updatedPrice,
+        resName: item.name || "",
+        resImage: item.image || "",
+        resId: item.id
+      }));
     }
   }
+  
   
   
 

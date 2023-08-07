@@ -15,8 +15,6 @@ const CartMenu: React.FC = () => {
   const dispatch = useDispatch();
   const cartItems = useSelector(selectCartItems);
 
-  console.log('all in', cartItems)
-
   const incrementQuantity = (item: CartItem) => {
     const updatedQuantity = (item.quantity || 0) + 1;
     const updatedPrice = updatedQuantity * (item.price || 0);
@@ -29,7 +27,7 @@ const CartMenu: React.FC = () => {
       resId: item.id
     }));
   }
-  
+
   const decrementQuantity = (item: CartItem) => {
     if ((item.quantity || 0) > 0) {
       const updatedQuantity = (item.quantity || 0) - 1;
@@ -44,18 +42,14 @@ const CartMenu: React.FC = () => {
       }));
     }
   }
-  
-  
-  
 
   return (
-    <>
-      <div className="flex flex-col items-center space-y-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {cartItems.map((item: CartItem) => {
           const totalPrice = (item.price || 0) * (item.quantity || 0);
 
           return (
-            <div key={item.id} className="flex flex-col items-center bg-gray-200 p-4 rounded-md w-full md:w-1/2 lg:w-1/3">
+            <div key={item.id} className="flex flex-col items-center bg-gray-200 p-4 rounded-md w-full">
               <Image
                 className="w-32 h-32 mb-4 rounded-full sm:w-32 sm:h-32 md:w-32 md:h-32 lg:w-64 lg:h-32 xl:w-32 xl:h-32"
                 width={300}
@@ -64,8 +58,8 @@ const CartMenu: React.FC = () => {
                 alt={item.name || "Default name"}
               />
               <p className="text-xl font-bold">{item.name}</p>
-              <p className="text-lg">Price: {item.price}</p>
-              <p className="text-lg">Quantity: {item.quantity}</p>
+              <p className="text-lg">Preço: {item.price}</p>
+              <p className="text-lg">Quantidade: {item.quantity}</p>
               <p className="text-lg">Total: {totalPrice}</p>
               <div className="flex space-x-4">
                 <button onClick={() => incrementQuantity(item)} className="bg-blue-500 text-white p-2 rounded">+</button>
@@ -74,8 +68,7 @@ const CartMenu: React.FC = () => {
             </div>
           );
         })}
-      </div>
-    </>
+    </div>
   );
 }
 

@@ -6,8 +6,6 @@ import {
 } from "../redux/slices/basketSlice";
 import { useSelector } from "react-redux";
 
-import CartItem from "../components/CartItem";
-import Hero from "@/components/Hero";
 
 import { selectCartItems } from "../redux/slices/basketSlice";
 import Nav from "@/components/Nav";

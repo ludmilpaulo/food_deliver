@@ -35,7 +35,7 @@ const Nav = () => {
 
       // Use a service like Google Maps Geocoding API to get the address
       // NOTE: Replace 'YourAPIKey' with your actual API Key
-      const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=YourAPIKey`);
+      const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=AIzaSyBBkDvVVuQBVSMOt8wQoc_7E-2bvDh2-nw`);
 
       if (!response.ok) {
         console.error("Geocoding API response was not ok");

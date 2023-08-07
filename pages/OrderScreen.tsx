@@ -124,7 +124,7 @@ const OrderScreen = (props: Props) => {
 
   return (
     <>
-      <Navbar total={totalPrice} count={getAllItems.length} />
+      
 
       <div style={{ height: "1000px", width: "1000%" }}>
         <GoogleMap

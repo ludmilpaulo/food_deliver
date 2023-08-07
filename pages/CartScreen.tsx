@@ -9,8 +9,9 @@ import { useSelector } from "react-redux";
 import CartItem from "../components/CartItem";
 import Hero from "@/components/Hero";
 
-import { selectCartItems, updateBusket } from "../redux/slices/basketSlice";
-import Navbar from "@/components/Navbar";
+import { selectCartItems } from "../redux/slices/basketSlice";
+import Nav from "@/components/Nav";
+import CartMenu from "@/components/CartMenu";
 
 interface Meals {
   foods: any;
@@ -37,11 +38,11 @@ const CartSreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
 
   return (
-    <div className="flex-1 bg-cover w-full h-full bg-no-repeat bg-bg_image">
-      <Navbar total={totalPrice} count={getAllItems.length} />
+    <div className="flex-1">
+      <Nav />
 
-      <div className="flex-1 bg-bg_image h-screen ">
-        <CartItem text={""} />
+      <div className="flex-1">
+        <CartMenu />
       </div>
     </div>
   );

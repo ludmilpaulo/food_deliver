@@ -1,43 +1,61 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { getAllCartFoods, getTotalCartItemPrice } from "utils/helpers";
+// basketSlice.ts
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+
+// Define the structure of a single meal item
 interface Meals {
-  foods: any;
-  meals: any;
-  food: any;
-  resImage: string;
-  resName: string;
-  resId: number;
-  category: string;
   id: number;
-  image: string;
-  name: string;
   price: number;
   quantity: number;
-  short_description: string;
+  resName: string;
+  resImage: string;
+  resId: number;
+  // other properties ...
 }
 
-const initialState = {
+
+// Define the structure of the basket state
+interface BasketState {
+  items: Meals[];
+}
+
+// Define the initial state for the basket
+const initialState: BasketState = {
   items: [],
 };
 
+// Create the basket slice
 const basketSlice = createSlice({
-  name: "busket",
+  name: "basket",
   initialState,
   reducers: {
-    updateBusket: (state, action) => {
-      state.items = action.payload;
+    updateBasket: (state, action: PayloadAction<Meals>) => {
+      const foodItem = action.payload;
+      const index = state.items.findIndex(item => item.id === foodItem.id);
+    
+      if (index >= 0) {
+        if (foodItem.quantity === 0) {
+          state.items.splice(index, 1); 
+        } else {
+          state.items[index] = foodItem; 
+        }
+      } else if (foodItem.quantity > 0) {
+        state.items.push(foodItem); 
+      }
     },
+    
   },
 });
 
-export const { updateBusket } = basketSlice.actions;
+// Export action creators and selectors
+export const { updateBasket } = basketSlice.actions;
+export const selectCartItems = (state: { basket: BasketState }) => state.basket.items;
+export const selectTotalPrice = (state: { basket: BasketState }) =>
+  state.basket.items.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
+export const selectTotalItems = (state: { basket: BasketState }) => state.basket.items.reduce((total, item) => total + item.quantity, 0);
 
-export const selectCartItems = (state: { busket: { items: any } }) =>
-  state.busket.items;
-export const selectTotalPrice = (state: { busket: { items: any } }) =>
-  getTotalCartItemPrice(state.busket.items);
-export const selectTotalItems = (state: { busket: { items: any } }) =>
-  getAllCartFoods(state.busket.items);
+//export const selectTotalItems = (state: { basket: BasketState }) => state.basket.items
 
+
+// Export the reducer
 export default basketSlice.reducer;

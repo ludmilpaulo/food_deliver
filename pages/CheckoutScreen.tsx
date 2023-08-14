@@ -4,6 +4,7 @@ import { selectUser } from "@/redux/slices/authSlice";
 import { clearCart, selectCartItems } from "@/redux/slices/basketSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from 'next/router';
+import 'leaflet/dist/leaflet.css';
 
 // Dynamically import react-leaflet components to bypass server-side rendering
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), {

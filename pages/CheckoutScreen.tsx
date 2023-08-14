@@ -1,18 +1,18 @@
-// pages/checkout.tsx
-
 import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import 'leaflet/dist/leaflet.css';
 import { selectUser } from "@/redux/slices/authSlice";
 import { clearCart, selectCartItems } from "@/redux/slices/basketSlice";
 import { useDispatch, useSelector } from "react-redux";
-import router from "next/router";
+import { useRouter } from 'next/router';
 
 
   
 
-export default function CheckoutScreen() {
+const CheckoutScreen =() => {
     const [userAddress, setUserAddress] = useState<string>("");
+    const router = useRouter();
+
    // const [location, setLocation] = useState<{ latitude: number, longitude: number } | null>(null);
 
     const [location, setLocation] = useState<{ latitude: number, longitude: number }>({ latitude: 0, longitude: 0 });
@@ -131,3 +131,5 @@ export default function CheckoutScreen() {
         </div>
     );
 }
+
+export default  CheckoutScreen;

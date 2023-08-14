@@ -1,21 +1,18 @@
 import { useEffect, useState } from "react";
 import { IoIosSearch, IoIosLogIn } from "react-icons/io";
 import { IoLocationSharp } from "react-icons/io5";
+import { useSelector } from 'react-redux';
+
+import { RootState } from '../redux/store';
 import Image from "next/image";
 
 import Link from "next/link";
 import { useRouter } from "next/router";
 import logo from "../assets/logo.png";
 
-interface MenuItem {
-  href: string;
-  label: string;
-}
 
-const menuItems: MenuItem[] = [
-  { href: "/home", label: "Home" },
-  // add more menu items as needed
-];
+
+
 
 const Nav = () => {
   const router = useRouter();
@@ -23,6 +20,9 @@ const Nav = () => {
   const [searchText, setSearchText] = useState("");
 
   const [address, setAddress] = useState<string | null>(null);
+
+   // Get user from redux state
+   const user = useSelector((state: RootState) => state.auth.user);
 
   useEffect(() => {
     handleLocation()
@@ -63,17 +63,29 @@ const Nav = () => {
 
           <button 
           onClick={handleLocation}
-          className="flex items-center space-x-2">
+          className="flex items-center space-x-2 text-white">
             <span>localização</span>
             <IoLocationSharp size={20} />
           </button>
         </div>
       </div>
       <div className="flex items-center">
-        <Link className="flex items-center space-x-2" href="/login">
+
+        {user ?(
+           <Link className="flex items-center space-x-2 text-white" href={"/UserProfile"}>
+           <span>Meu Perfil</span>
+           <IoIosLogIn size={20} />
+         </Link>
+
+        ):(
+          <Link className="flex items-center space-x-2 text-white" href={"/LoginScreenUser"}>
           <span>Conecte-se</span>
           <IoIosLogIn size={20} />
         </Link>
+
+        ) }
+      
+       
       </div>
     </nav>
   );

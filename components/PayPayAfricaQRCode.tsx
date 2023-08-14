@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import Image from "next/image";
 
 const PayPayAfricaQRCode = () => {
   const [qrCodeURL, setQRCodeURL] = useState<string>('');
@@ -26,7 +27,11 @@ const PayPayAfricaQRCode = () => {
 
   return (
     <div className="mt-4">
-      {qrCodeURL && <img src={qrCodeURL} alt="PayPay Africa QR Code" />}
+      {qrCodeURL &&  <Image
+           
+            width={300}
+            height={300}
+      src={qrCodeURL} alt="PayPay Africa QR Code" />}
     </div>
   );
 };

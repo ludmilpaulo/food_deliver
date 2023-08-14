@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
-import { RootState } from '../redux/store'; // ensure the path to your store file is correct
+import { RootState } from '../redux/store';
 import React from 'react';
 
 const withAuth = (WrappedComponent: React.ComponentType<any>) => {

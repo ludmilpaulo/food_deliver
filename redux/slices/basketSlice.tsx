@@ -43,12 +43,16 @@ const basketSlice = createSlice({
         state.items.push(foodItem); 
       }
     },
+    // New reducer for clearing the cart
+    clearCart: (state) => {
+      state.items = [];
+    }
     
   },
 });
 
 // Export action creators and selectors
-export const { updateBasket } = basketSlice.actions;
+export const { updateBasket, clearCart } = basketSlice.actions;
 export const selectCartItems = (state: { basket: BasketState }) => state.basket.items;
 export const selectTotalPrice = (state: { basket: BasketState }) =>
   state.basket.items.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);

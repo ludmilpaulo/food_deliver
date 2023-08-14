@@ -1,14 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 
 import {
   selectTotalItems,
   selectTotalPrice,
 } from "../redux/slices/basketSlice";
-import { useSelector } from "react-redux";
-import { selectCartItems } from "../redux/slices/basketSlice";
+import {  useDispatch, useSelector } from "react-redux";
+import { updateBasket, clearCart, selectCartItems  } from "../redux/slices/basketSlice";
 import Nav from "@/components/Nav";
 import CartMenu from "@/components/CartMenu";
+import router from "next/router";
 
 interface Meals {
   foods: any;
@@ -27,12 +28,34 @@ interface Meals {
 }
 
 const CartSreen = () => {
+  const dispatch = useDispatch();
+
   const totalPrice = useSelector(selectTotalPrice);
   const getAllItems = useSelector(selectTotalItems);
-  const all = useSelector(selectCartItems);
-  let allCartItems = all;
+  const allCartItems = useSelector(selectCartItems);
 
-  const [modalVisible, setModalVisible] = useState(false);
+  console.log('all card item', allCartItems)
+
+  useEffect(() => {
+    // Assuming allCartItems is an array
+    const firstResId = allCartItems[0]?.resId;
+    const firstResName = allCartItems[0]?.resName;
+
+    const hasDifferentRestaurant = allCartItems.some(
+        item => item.resId !== firstResId || item.resName !== firstResName
+    );
+
+    if (hasDifferentRestaurant) {
+        alert('Please order food only from one restaurant at a time.');
+        // Clear the cart (You will need to define this action and its reducer logic)
+        dispatch(clearCart());
+        // Redirect to HomeScreen
+        router.push('/HomeScreen'); 
+    }
+}, [allCartItems, dispatch]);
+
+
+
   const [userAddress, setUserAddress] = useState("");
 
   return (
@@ -88,20 +111,14 @@ const CartSreen = () => {
 
               </div>
 
-              <div className="mt-8 flex flex-col justify-start items-start w-full space-y-8 ">
-                <input
-                  value={userAddress}
-                  onChange={(e) => setUserAddress(e.target.value)}
-                  className="px-2 focus:outline-none focus:ring-2 focus:ring-gray-500 border-b border-gray-200 leading-4 text-base placeholder-gray-600 py-4 w-full"
-                  type="text"
-                  placeholder="Por favor, adicione o endereço de entrega"
-                />
-              </div>
-              <button
+            
+              <Link
+                href={"/CheckoutScreen"}
+
                 className="focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 mt-8 text-base font-medium leading-4 hover:bg-black py-4 w-full md:w-4/12 lg:w-full text-white bg-gray-800"
               >
                 Prossiga para o pagamento
-              </button>
+              </Link>
             </div>
           </div>
             

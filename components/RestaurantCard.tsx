@@ -41,7 +41,7 @@ export default function RestaurantCard({restaurantData}: RestaurantCardProps) {
               {restaurant.name}
             </div>
             <p className="text-gray-500">{restaurant.address}</p>
-            <p className="text-gray-500">{restaurant.phone}</p>
+           
           </div>
           <Link
             href={{

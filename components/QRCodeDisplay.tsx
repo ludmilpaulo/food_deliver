@@ -1,6 +1,7 @@
 // components/QRCodeDisplay.tsx
 
 import { useEffect, useState } from 'react';
+import Image from "next/image";
 
 const QRCodeDisplay = () => {
   const [qrCodeURL, setQRCodeURL] = useState<string>('');
@@ -30,7 +31,10 @@ const QRCodeDisplay = () => {
 
   return (
     <div className="mt-4">
-      {qrCodeURL && <img src={qrCodeURL} alt="Generated QR Code" />}
+      {qrCodeURL &&  <Image
+            width={300}
+            height={300}
+      src={qrCodeURL} alt="Generated QR Code" />}
     </div>
   );
 };

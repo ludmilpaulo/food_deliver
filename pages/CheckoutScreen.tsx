@@ -71,7 +71,7 @@ const CheckoutScreen = () => {
         const responseData = await response.json();
         if(responseData.status ==='success'){
             dispatch(clearCart());
-            router.push('/');
+            router.push('/SuccessScreen');
         } else {
             alert(responseData.status);
         }

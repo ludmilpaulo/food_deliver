@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import logo from "../assets/K .gif";
+import logo from "../assets/done.gif";
 import Link from "next/link";
 import router from "next/router";
 

@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.16",
     "@next/font": "13.1.6",
     "@react-google-maps/api": "^2.18.1",
@@ -29,6 +30,7 @@
     "framer-motion": "^9.1.0",
     "google-map-react": "^2.2.0",
     "google-maps-react": "^2.0.6",
+    "headlessui": "^0.0.0",
     "leaflet": "^1.9.4",
     "next": "13.1.6",
     "next-auth": "^4.19.2",

@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { FiSearch } from 'react-icons/fi';
+import { useState } from "react";
+import { FiSearch } from "react-icons/fi";
 
 const SearchBar = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearch = () => {
     // You can handle the search query here.
-    console.log('Searching for:', searchQuery);
+    console.log("Searching for:", searchQuery);
   };
 
   return (
@@ -18,11 +18,11 @@ const SearchBar = () => {
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
       />
-      <button 
-        onClick={handleSearch} 
+      <button
+        onClick={handleSearch}
         className="px-4 py-2 bg-blue-500 text-white rounded-r-md flex items-center justify-center"
       >
-        <FiSearch/>
+        <FiSearch />
       </button>
     </div>
   );

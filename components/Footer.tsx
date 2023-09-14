@@ -1,6 +1,12 @@
-import { FaFacebookF, FaTwitter, FaInstagram, FaApple, FaGooglePlay } from 'react-icons/fa';
-import { AiFillPhone } from 'react-icons/ai';
-import Image from 'next/image';
+import {
+  FaFacebookF,
+  FaTwitter,
+  FaInstagram,
+  FaApple,
+  FaGooglePlay,
+} from "react-icons/fa";
+import { AiFillPhone } from "react-icons/ai";
+import Image from "next/image";
 import logo from "../assets/logo.png";
 
 export default function Footer() {
@@ -12,11 +18,16 @@ export default function Footer() {
         </div>
         <div className="mb-2 sm:mb-4 text-center md:text-left">
           <h2 className="mb-2 text-lg font-bold">Sobre nós</h2>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque euismod.</p>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque
+            euismod.
+          </p>
         </div>
         <div className="mb-2 sm:mb-4 text-center md:text-left">
           <h2 className="mb-2 text-lg font-bold">Contate-nos</h2>
-          <p><AiFillPhone /> +1 234 567 890</p>
+          <p>
+            <AiFillPhone /> +1 234 567 890
+          </p>
         </div>
         <div className="mb-2 sm:mb-4 text-center md:text-left">
           <h2 className="mb-2 text-lg font-bold">Siga-nos</h2>
@@ -35,5 +46,5 @@ export default function Footer() {
         </div>
       </div>
     </footer>
-  )
+  );
 }

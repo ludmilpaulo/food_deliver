@@ -12,10 +12,9 @@ const rootPersistConfig = {
 };
 
 const rootReducer = combineReducers({
-  basket: basketReducer, 
+  basket: basketReducer,
   auth: authReducer,
 });
-
 
 const persistedReducer = persistReducer(rootPersistConfig, rootReducer);
 

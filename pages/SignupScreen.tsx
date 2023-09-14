@@ -2,10 +2,9 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import logo from "../assets/logo.png";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { loginUser } from "../redux/slices/authSlice";
-import { Transition } from "@headlessui/react"; 
-
+import { Transition } from "@headlessui/react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { basAPI } from "@/configs/variable";
@@ -75,53 +74,66 @@ const SignupScreen = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const url = role === "client"
-        ? "https://www.sunshinedeliver.com/signup/"
-        : `${basAPI}fornecedor/`;
-  
+      const url =
+        role === "client"
+          ? `${basAPI}signup/`
+          : `${basAPI}fornecedor/`;
+
       let body;
-  
+
       if (role === "client") {
         body = JSON.stringify({
-          username: username,
-          email: email,
-          password: password,
-          password2: password,
+          username: signupData.username,
+          email: signupData.email,
+          password: signupData.password,
+          password2: signupData.password,
         });
       } else if (role === "restaurant") {
         const formData = new FormData();
-        (Object.keys(signupData) as Array<keyof typeof signupData>).forEach((key) => {
-          const value = signupData[key];
-          if (value !== null) formData.append(key, value as Blob | string);
-        });
-  
+        (Object.keys(signupData) as Array<keyof typeof signupData>).forEach(
+          (key) => {
+            const value = signupData[key];
+            if (value !== null) formData.append(key, value as Blob | string);
+          }
+        );
+
         // Append other form data fields here if needed
-  
+
         body = formData;
       }
-  
+
       const res = await fetch(url, {
         method: "POST",
-        headers: role === "client"
-          ? {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            }
-          : {}, // For form data,  don't need specific headers
+        headers:
+          role === "client"
+            ? {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+              }
+            : {}, // For form data, don't need specific headers
         body: body,
       });
-  
+
       const resJson = await res.json();
       console.log("recebido", resJson);
-      
-      if (res.status === 201) {
+
+      if (resJson.status === 201) {
         dispatch(loginUser(resJson));
-        alert("Você se conectou com sucesso. Agora você pode saborear sua refeição.");
-        if (typeof resJson.fornecedor_id === "object" && resJson.fornecedor_id !== null) {
-          router.push("/RestaurantDashboad");  // Redirect to Dashboard
+        alert(
+          "Você se conectou com sucesso. Agora você pode saborear sua refeição."
+        );
+        if (
+          typeof resJson.fornecedor_id === "object" &&
+          resJson.fornecedor_id !== null
+        ) {
+          router.push("/RestaurantDashboad"); // Redirect to Dashboard
+        } else if (
+          typeof resJson.user === "object" &&
+          resJson.user !== null
+        ) {
+          console.log("Redirecting to HomeScreen");
+          router.push("/HomeScreen");
         }
-        
-       // router.push("/HomeScreen");
       } else {
         alert(Object.values(resJson));
         setLoading(false);
@@ -130,9 +142,6 @@ const SignupScreen = () => {
       console.error(err);
     }
   };
-  
-  
-
 
   return (
     <div className="w-full h-screen px-4 py-16 bg-cover bg-bg_image">
@@ -167,139 +176,132 @@ const SignupScreen = () => {
             </p>
           </Link>
 
-           {/* Role selection */}
-        <div className="mb-4">
-          <label className="mr-4">
-            <input
-              type="radio"
-              name="role"
-              value="client"
-              checked={role === "client"}
-              onChange={handleRoleChange}
-            />
-            Cliente
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="role"
-              value="restaurant"
-              checked={role === "restaurant"}
-              onChange={handleRoleChange}
-            />
-            Fornecedor de Negocio
-          </label>
-        </div>
-
-        <Transition
-          show={loading}
-          enter="transition-opacity duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="transition-opacity duration-300"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <div className="w-full h-full fixed top-0 left-0 flex items-center justify-center z-50">
-            <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+          {/* Role selection */}
+          <div className="mb-4">
+            <label className="mr-4">
+              <input
+                type="radio"
+                name="role"
+                value="client"
+                checked={role === "client"}
+                onChange={handleRoleChange}
+              />
+              Cliente
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="role"
+                value="restaurant"
+                checked={role === "restaurant"}
+                onChange={handleRoleChange}
+              />
+              Fornecedor de Negocio
+            </label>
           </div>
-        </Transition>
 
-      
+          <Transition
+            show={loading}
+            enter="transition-opacity duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="transition-opacity duration-300"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full">
+              <div className="w-32 h-32 border-t-2 border-b-2 border-blue-500 rounded-full animate-spin"></div>
+            </div>
+          </Transition>
 
           {!loading && (
-          <form onSubmit={handleSubmit} className="space-y-4 flex flex-col">
-            <input
-              name="username"
-              placeholder="Usuario"
-              onChange={handleInputChange}
-              className="p-2 border rounded"
-            />
-            <input
-                  type="email"
-                  name="email"
-                  placeholder="Email"
-                  onChange={handleInputChange}
-                  className="p-2 border rounded"
-                />
-            <input
-              type="password"
-              name="password"
-              placeholder="Senha"
-              onChange={handleInputChange}
-              className="p-2 border rounded"
-            />
-            
-            {role === "restaurant" && (
-              <>
-                <input
-                  name="name"
-                  placeholder="Nome do Fornecedor ou do Negocio"
-                  onChange={handleInputChange}
-                  className="p-2 border rounded"
-                />
-                <input
-                  name="phone"
-                  placeholder="Telefone"
-                  onChange={handleInputChange}
-                  className="p-2 border rounded"
-                />
-                <input
-                  name="address"
-                  placeholder="Endereço"
-                  onChange={handleInputChange}
-                  className="p-2 border rounded"
-                />
-              
-                <div className="relative">
+            <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
+              <input
+                name="username"
+                placeholder="Usuario"
+                onChange={handleInputChange}
+                className="p-2 border rounded"
+              />
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                onChange={handleInputChange}
+                className="p-2 border rounded"
+              />
+              <input
+                type="password"
+                name="password"
+                placeholder="Senha"
+                onChange={handleInputChange}
+                className="p-2 border rounded"
+              />
+
+              {role === "restaurant" && (
+                <>
                   <input
-                    type="file"
-                    name="logo"
-                    onChange={handleFileChange}
-                    className="p-2 border rounded absolute opacity-0 w-full h-full cursor-pointer"
+                    name="name"
+                    placeholder="Nome do Fornecedor ou do Negocio"
+                    onChange={handleInputChange}
+                    className="p-2 border rounded"
                   />
-                  <div className="p-2 border rounded cursor-pointer">
-                    {logoLoading ? (
-                      <span className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-500 mx-auto"></span>
-                    ) : (
-                      "Carregar o Logo"
-                    )}
-                  </div>
-                </div>
-                <div className="relative">
                   <input
-                    type="file"
-                    name="restaurant_license"
-                    onChange={handleFileChange}
-                    className="p-2 border rounded absolute opacity-0 w-full h-full cursor-pointer"
+                    name="phone"
+                    placeholder="Telefone"
+                    onChange={handleInputChange}
+                    className="p-2 border rounded"
                   />
-                  <div className="p-2 border rounded cursor-pointer">
-                    {licencaLoading ? (
-                      <span className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-500 mx-auto"></span>
-                    ) : (
-                      "Carregar a Licença"
-                    )}
+                  <input
+                    name="address"
+                    placeholder="Endereço"
+                    onChange={handleInputChange}
+                    className="p-2 border rounded"
+                  />
+
+                  <div className="relative">
+                    <input
+                      type="file"
+                      name="logo"
+                      onChange={handleFileChange}
+                      className="absolute w-full h-full p-2 border rounded opacity-0 cursor-pointer"
+                    />
+                    <div className="p-2 border rounded cursor-pointer">
+                      {logoLoading ? (
+                        <span className="w-5 h-5 mx-auto border-t-2 border-b-2 border-blue-500 rounded-full animate-spin"></span>
+                      ) : (
+                        "Carregar o Logo"
+                      )}
+                    </div>
                   </div>
-                </div>
-              </>
-            )}
+                  <div className="relative">
+                    <input
+                      type="file"
+                      name="restaurant_license"
+                      onChange={handleFileChange}
+                      className="absolute w-full h-full p-2 border rounded opacity-0 cursor-pointer"
+                    />
+                    <div className="p-2 border rounded cursor-pointer">
+                      {licencaLoading ? (
+                        <span className="w-5 h-5 mx-auto border-t-2 border-b-2 border-blue-500 rounded-full animate-spin"></span>
+                      ) : (
+                        "Carregar a Licença"
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
 
-<div className="mt-8">
-            <button
-              onClick={handleSubmit}
-              role="button"
-              type="submit"
-              aria-label="entrar na minha conta"
-              className="w-full py-4 text-sm font-semibold leading-none text-white bg-indigo-700 border rounded focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 focus:outline-none hover:bg-indigo-600"
-            >
-              Inscreva-se Agora
-            </button>
-          </div>
-          </form>
-        )}
-
-          
-
+              <div className="mt-8">
+                <button
+                  type="submit" // Set the button type to submit
+                  aria-label="Entrar na minha conta"
+                  className="w-full py-4 text-sm font-semibold leading-none text-white bg-indigo-700 border rounded focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 focus:outline-none hover:bg-indigo-600"
+                >
+                  Inscreva-se Agora
+                </button>
+              </div>
+            </form>
+          )}
         </motion.div>
       </div>
     </div>

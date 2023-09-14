@@ -68,7 +68,7 @@ function JoinScreen() {
             type="text"
             className="w-full p-2 rounded-l-md"
             value={search}
-            onChange={event => searchFilterFunction(event.target.value)} 
+            onChange={(event) => searchFilterFunction(event.target.value)}
             placeholder="Pesquisar restaurantes"
           />
           <button className="px-4 py-2 bg-blue-500 text-white rounded-r-md flex items-center justify-center">
@@ -77,7 +77,7 @@ function JoinScreen() {
         </div>
 
         <div className="pb-16 mx-8 my-12">
-          <RestaurantCard restaurantData={filteredDataSource}/>
+          <RestaurantCard restaurantData={filteredDataSource} />
         </div>
       </div>
 

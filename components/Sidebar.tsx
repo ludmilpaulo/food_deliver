@@ -13,20 +13,9 @@ import { useDispatch } from "react-redux";
 
 import Products from "./Products";
 import { logoutUser } from "@/redux/slices/authSlice";
+import { FornecedorType } from "@/configs/variable";
 
-type FornecedorType = {
-  id: number;
-  usuario: number;
-  nome_fornecedor: string;
-  telefone: string;
-  endereco: string;
-  logo: string;
-  licenca: string;
-  aprovado: boolean;
-  criado_em: string;
-  modificado_em: string;
-  children: ReactNode;
-};
+
 
 interface SidebarProps {
   fornecedor: FornecedorType | null;
@@ -36,7 +25,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
   const [showProducts, setShowProducts] = useState(false);
 
-  console.log("fonecedordata", fornecedor)
+  console.log("fonecedordata", fornecedor);
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -49,11 +38,11 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
 
   return (
     <div className="flex h-screen">
-      <nav className="h-screen w-64 bg-gray-800 text-white p-4">
+      <nav className="w-64 h-screen p-4 text-white bg-gray-800">
         <ul className="space-y-4">
           {/* Profile Section */}
           <li className="flex items-center space-x-4">
-            <div className="w-12 h-12 relative">
+            <div className="relative w-12 h-12">
               <Image
                 src={fornecedor?.logo || "/path/to/default/image.png"}
                 width={500}
@@ -70,12 +59,12 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
             </div>
           </li>
 
-          <li className="uppercase font-semibold tracking-wide text-xs mt-4 mb-2">
+          <li className="mt-4 mb-2 text-xs font-semibold tracking-wide uppercase">
             Painel
           </li>
 
           <li
-            className="hover:bg-blue-500 p-2 rounded"
+            className="p-2 rounded hover:bg-blue-500"
             onClick={() => {
               console.log("Produtos clicked!");
               setShowProducts(true); // Set showProducts to true when "Produtos" is clicked
@@ -88,7 +77,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
           </li>
 
           <li
-            className="hover:bg-blue-500 p-2 rounded"
+            className="p-2 rounded hover:bg-blue-500"
             onClick={() => {
               console.log("Pedidos clicked!"); // Add this
               onNavClick && onNavClick("Pedidos");
@@ -101,7 +90,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
           </li>
 
           <li
-            className="hover:bg-blue-500 p-2 rounded"
+            className="p-2 rounded hover:bg-blue-500"
             onClick={() => {
               console.log("Pedidos clicked!"); // Add this
               onNavClick && onNavClick("Pedidos");
@@ -114,7 +103,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
           </li>
 
           <li
-            className="hover:bg-blue-500 p-2 rounded"
+            className="p-2 rounded hover:bg-blue-500"
             onClick={() => {
               console.log("Pedidos clicked!"); // Add this
               onNavClick && onNavClick("Pedidos");
@@ -127,7 +116,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
           </li>
 
           <li
-            className="hover:bg-blue-500 p-2 rounded"
+            className="p-2 rounded hover:bg-blue-500"
             onClick={() => {
               console.log("Pedidos clicked!"); // Add this
               onNavClick && onNavClick("Pedidos");
@@ -140,7 +129,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
           </li>
 
           <li
-            className="hover:bg-blue-500 p-2 rounded"
+            className="p-2 rounded hover:bg-blue-500"
             onClick={() => {
               console.log("Pedidos clicked!"); // Add this
               onNavClick && onNavClick("Pedidos");
@@ -155,7 +144,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
           {/* Menu Items */}
 
           {/* Logout */}
-          <li className="hover:bg-red-500 p-2 rounded mt-4">
+          <li className="p-2 mt-4 rounded hover:bg-red-500">
             <Link href="">
               <div
                 onClick={handleLogout}

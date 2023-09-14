@@ -124,8 +124,6 @@ const OrderScreen = (props: Props) => {
 
   return (
     <>
-      
-
       <div style={{ height: "1000px", width: "1000%" }}>
         <GoogleMap
           mapContainerStyle={containerStyle}

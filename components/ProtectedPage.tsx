@@ -1,7 +1,7 @@
-import { useSelector } from 'react-redux';
-import { useRouter } from 'next/router';
-import { RootState } from '../redux/store';
-import React from 'react';
+import { useSelector } from "react-redux";
+import { useRouter } from "next/router";
+import { RootState } from "../redux/store";
+import React from "react";
 
 const withAuth = (WrappedComponent: React.ComponentType<any>) => {
   const Wrapper = (props: any) => {
@@ -12,7 +12,7 @@ const withAuth = (WrappedComponent: React.ComponentType<any>) => {
 
     React.useEffect(() => {
       if (!user) {
-        router.replace('/LoginScreenUser');
+        router.replace("/LoginScreenUser");
       }
     }, [user, router]);
 

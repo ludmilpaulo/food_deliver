@@ -16,7 +16,9 @@ type Restaurant = {
 
 type Restaurants = Restaurant[];
 
-export default function RestaurantCard({restaurantData}: RestaurantCardProps) {
+export default function RestaurantCard({
+  restaurantData,
+}: RestaurantCardProps) {
   const [isOpen, setIsOpen] = useState(true);
 
   return (
@@ -27,7 +29,7 @@ export default function RestaurantCard({restaurantData}: RestaurantCardProps) {
           className="relative flex flex-col p-4 bg-white shadow-lg bg-opacity-60 backdrop-filter backdrop-blur-lg rounded-xl"
         >
           <div className="absolute top-0 left-0 p-2 bg-blue-500 text-white uppercase font-bold text-xs rounded-br-lg">
-            {isOpen ? 'Aberto' : 'Fechado'}
+            {isOpen ? "Aberto" : "Fechado"}
           </div>
           <Image
             className="w-32 h-32 mb-4 rounded-full self-center"
@@ -41,7 +43,6 @@ export default function RestaurantCard({restaurantData}: RestaurantCardProps) {
               {restaurant.name}
             </div>
             <p className="text-gray-500">{restaurant.address}</p>
-           
           </div>
           <Link
             href={{

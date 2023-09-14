@@ -11,6 +11,5 @@ import HomeScreen from "./HomeScreen";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-
-  return <HomeScreen />
+  return <HomeScreen />;
 }

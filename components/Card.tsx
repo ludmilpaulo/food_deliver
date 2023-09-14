@@ -30,7 +30,6 @@ export default function Card() {
     }
   }, [isHovered, controls]);
 
-
   useEffect(() => {
     fetch("https://www.sunshinedeliver.com/api/customer/restaurants/")
       .then((response) => response.json())
@@ -39,41 +38,43 @@ export default function Card() {
 
   return (
     <div className="p-4 flex flex-row overflow-x-auto scroll-snap-x-mandatory">
-      <motion.div 
-        animate={controls} 
-        className="flex flex-row overflow-x-auto scroll-snap-x-mandatory" 
-        onMouseEnter={() => setIsHovered(true)} 
+      <motion.div
+        animate={controls}
+        className="flex flex-row overflow-x-auto scroll-snap-x-mandatory"
+        onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
         {restaurants.map((restaurant: Restaurant) => (
-           // eslint-disable-next-line react/jsx-key
-           <Link
-           href={{
-             pathname: "/RestaurantMenu",
-             query: {
-              restaurantName: restaurant.name,
-               restaurantId: restaurant.id,
-               phone: restaurant.phone,
-               image_url: restaurant.logo,
-               address: restaurant.address,
-             },
-           }}
-         >
-          <div key={restaurant.id} className="flex-shrink-0 flex-none scroll-snap-start">
-            <div className="flex flex-col items-center p-4 m-4 bg-white shadow-lg bg-opacity-60 backdrop-filter backdrop-blur-lg rounded-xl">
-              <Image
-                className="w-32 h-32 mb-4 rounded-full sm:w-32 sm:h-32 md:w-32 md:h-32 lg:w-64 lg:h-32 xl:w-32 xl:h-32"
-                width={300}
-                height={300}
-                src={restaurant.logo}
-                alt={restaurant.name}
-              />
-              <div className="text-xl font-medium text-black">
-                {restaurant.name}
+          // eslint-disable-next-line react/jsx-key
+          <Link
+            href={{
+              pathname: "/RestaurantMenu",
+              query: {
+                restaurantName: restaurant.name,
+                restaurantId: restaurant.id,
+                phone: restaurant.phone,
+                image_url: restaurant.logo,
+                address: restaurant.address,
+              },
+            }}
+          >
+            <div
+              key={restaurant.id}
+              className="flex-shrink-0 flex-none scroll-snap-start"
+            >
+              <div className="flex flex-col items-center p-4 m-4 bg-white shadow-lg bg-opacity-60 backdrop-filter backdrop-blur-lg rounded-xl">
+                <Image
+                  className="w-32 h-32 mb-4 rounded-full sm:w-32 sm:h-32 md:w-32 md:h-32 lg:w-64 lg:h-32 xl:w-32 xl:h-32"
+                  width={300}
+                  height={300}
+                  src={restaurant.logo}
+                  alt={restaurant.name}
+                />
+                <div className="text-xl font-medium text-black">
+                  {restaurant.name}
+                </div>
               </div>
-             
             </div>
-          </div>
           </Link>
         ))}
       </motion.div>

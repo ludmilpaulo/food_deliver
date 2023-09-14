@@ -1,30 +1,30 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { local } from "@/configs/variable";
-import { User } from "@/redux/authReducer";
-import { RootState } from "@/redux/store";
+import { basAPI } from "@/configs/variable";
+
 import { useSelector } from "react-redux";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useRouter } from "next/router";
 import { Transition } from "@headlessui/react";
+import { selectUser } from "@/redux/slices/authSlice";
 
 // Define the TypeScript type for a product based on the response structure.
 type Product = {
-  user_id?:number;
+  user_id?: number;
   id?: number;
-  nome: string;
-  descricao_curta: string;
-  imagem: string;
-  preco: string;
-  categoria: string | number;
+  name: string;
+  short_description: string;
+  image: string;
+  price: string;
+  category: string | number;
   // Add other fields if necessary...
 };
 
 type Categoria = {
   id: number;
-  nome: string;
+  name: string;
   slug: string;
 };
 
@@ -54,7 +54,7 @@ const Products: React.FC<ProductsProps> = () => {
     const fetchCategorias = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`${local}/api/categorias/`);
+        const response = await fetch(`${basAPI}/api/categorias/`);
         if (response.ok) {
           const data = await response.json();
           setCategorias(data);
@@ -79,20 +79,20 @@ const Products: React.FC<ProductsProps> = () => {
     }
     if (user.user_id !== undefined) {
       formData.append("user_id", String(user.user_id));
-      formData.append("fornecedor", String(user.user_id));
+      formData.append("restaurant", String(user.user_id));
     }
 
-    if (data.imagem) {
-      formData.append("imagem", data.imagem[0]);
+    if (data.image) {
+      formData.append("image", data.image[0]);
     }
 
     try {
-      const response = await fetch(`${local}/api/add-product/?`, {
+      const response = await fetch(`${basAPI}/api/add-product/`, {
         method: "POST",
         body: formData,
       });
       const result = await response.json();
-      console.log("adiocionar", result)
+      console.log("adiocionar", result);
       alert("produto adicionado com sucesso");
       setLoading(false);
     } catch (error) {
@@ -107,12 +107,12 @@ const Products: React.FC<ProductsProps> = () => {
       if (user?.user_id) {
         try {
           const response = await fetch(
-            `${local}/api/get_products/?user_id=${user.user_id}`
+            `${basAPI}/api/get_products/?user_id=${user.user_id}`,
           );
           if (response.ok) {
             const data = await response.json();
 
-            console.log("produtos", data)
+            console.log("produtos", data);
             if (data && data.length > 0) {
               setProducts(data);
               setLoading(false);
@@ -129,23 +129,23 @@ const Products: React.FC<ProductsProps> = () => {
     fetchProductData();
   }, [user]);
 
-  const handleUpdate = async (productId: number, updatedProductData: Product) => {
+  const handleUpdate = async (
+    productId: number,
+    updatedProductData: Product,
+  ) => {
     try {
       // Include the user_id in the updatedProductData object
       updatedProductData.user_id = user.user_id;
-  
-      const response = await fetch(
-        `${local}/api/update-product/`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updatedProductData),
-        }
-      );
+
+      const response = await fetch(`${basAPI}/api/update-product/`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedProductData),
+      });
       console.log("update=>", response);
-  
+
       if (response.ok) {
         alert("Product updated successfully!");
       } else {
@@ -153,10 +153,11 @@ const Products: React.FC<ProductsProps> = () => {
       }
     } catch (error) {
       console.error("Error updating product:", error);
-      alert("An error occurred while trying to update the product. Please try again.");
+      alert(
+        "An error occurred while trying to update the product. Please try again.",
+      );
     }
   };
-  
 
   const handleDelete = async (productId: number) => {
     const user_id = user?.user_id;
@@ -169,14 +170,14 @@ const Products: React.FC<ProductsProps> = () => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
         const response = await fetch(
-          `${local}/api/delete-product/${productId}`,
+          `${basAPI}/api/delete-product/${productId}`,
           {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({ user_id: user_id }),
-          }
+          },
         );
 
         if (response.ok) {
@@ -193,7 +194,9 @@ const Products: React.FC<ProductsProps> = () => {
         }
       } catch (error) {
         console.error("Error deleting product:", error);
-        alert("An error occurred while trying to delete the product. Please try again.");
+        alert(
+          "An error occurred while trying to delete the product. Please try again.",
+        );
       }
     }
   };
@@ -206,12 +209,12 @@ const Products: React.FC<ProductsProps> = () => {
 
   return (
     <>
-      <div className="container mx-auto px-4">
+      <div className="container px-4 mx-auto">
         <div className="content-wrapper">
-          <div className="page-header flex justify-center items-center">
+          <div className="flex items-center justify-center page-header">
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="ml-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+              className="px-4 py-2 ml-4 text-white bg-blue-500 rounded hover:bg-blue-600"
             >
               Adicionar produto
             </button>
@@ -226,207 +229,218 @@ const Products: React.FC<ProductsProps> = () => {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="w-full h-full fixed top-0 left-0 flex items-center justify-center z-50">
-              <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+            <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full">
+              <div className="w-32 h-32 border-t-2 border-b-2 border-blue-500 rounded-full animate-spin"></div>
             </div>
           </Transition>
 
           {!loading && (
             <>
               {isAddModalOpen && (
-                <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50">
-                  <div className="bg-white p-6 rounded-lg w-1/2">
-                    <h2 className="text-xl font-bold mb-4">
+                <div className="fixed top-0 left-0 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+                  <div className="w-1/2 p-6 bg-white rounded-lg">
+                    <h2 className="mb-4 text-xl font-bold">
                       Adicionar Produto
                     </h2>
                     <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="mb-4">
-                  <label className="block mb-2">Nome</label>
-                  <input
-                    {...register("nome", { required: true })}
-                    className="w-full p-2 border"
-                  />
-                  {errors.nome && (
-                    <span className="text-red-500">Nome is required</span>
-                  )}
-                </div>
+                      <div className="mb-4">
+                        <label className="block mb-2">Nome</label>
+                        <input
+                          {...register("name", { required: true })}
+                          className="w-full p-2 border"
+                        />
+                        {errors.name && (
+                          <span className="text-red-500">Nome is required</span>
+                        )}
+                      </div>
 
-                <div className="mb-4">
-                  <label className="block mb-2">Descrição Curta</label>
-                  <input
-                    {...register("descricao_curta", { required: true })}
-                    className="w-full p-2 border"
-                  />
-                  {errors.descricao_curta && (
-                    <span className="text-red-500">
-                      Descrição Curta is required
-                    </span>
-                  )}
-                </div>
+                      <div className="mb-4">
+                        <label className="block mb-2">Descrição Curta</label>
+                        <input
+                          {...register("short_description", { required: true })}
+                          className="w-full p-2 border"
+                        />
+                        {errors.short_description && (
+                          <span className="text-red-500">
+                            Descrição Curta is required
+                          </span>
+                        )}
+                      </div>
 
-                <div className="mb-4">
-                  <label className="block mb-2">Imagem URL</label>
-                  <input
-                    type="file"
-                    {...register("imagem", { required: true })}
-                    className="w-full p-2 border"
-                  />
+                      <div className="mb-4">
+                        <label className="block mb-2">Imagem URL</label>
+                        <input
+                          type="file"
+                          {...register("image", { required: true })}
+                          className="w-full p-2 border"
+                        />
 
-                  {errors.imagem && (
-                    <span className="text-red-500">Imagem URL is required</span>
-                  )}
-                </div>
+                        {errors.image && (
+                          <span className="text-red-500">
+                            Imagem URL is required
+                          </span>
+                        )}
+                      </div>
 
-                <div className="mb-4">
-                  <label className="block mb-2">Preço</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    {...register("preco", { required: true })}
-                    className="w-full p-2 border"
-                  />
-                  {errors.preco && (
-                    <span className="text-red-500">Preço is required</span>
-                  )}
-                </div>
+                      <div className="mb-4">
+                        <label className="block mb-2">Preço</label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          {...register("price", { required: true })}
+                          className="w-full p-2 border"
+                        />
+                        {errors.price && (
+                          <span className="text-red-500">
+                            Preço is required
+                          </span>
+                        )}
+                      </div>
 
-                <div className="mb-4">
-                <label className="block mb-2">Categoria</label>
-                <input
-                    list="categorias"
-                    {...register("categoria", { required: true })}
-                    className="w-full p-2 border"
-                />
-                <datalist id="categorias">
-                    {categorias.map((categoria) => (
-                        <option key={categoria.id} value={categoria.nome} />
-                    ))}
-                </datalist>
+                      <div className="mb-4">
+                        <label className="block mb-2">Categoria</label>
+                        <input
+                          list="category"
+                          {...register("category", { required: true })}
+                          className="w-full p-2 border"
+                        />
+                        <datalist id="categorias">
+                          {categorias.map((categoria) => (
+                            <option key={categoria.id} value={categoria.name} />
+                          ))}
+                        </datalist>
 
-                {errors.categoria && (
-                    <span className="text-red-500">Categoria is required</span>
-                )}
-            </div>
+                        {errors.category && (
+                          <span className="text-red-500">
+                            Categoria is required
+                          </span>
+                        )}
+                      </div>
 
-                {/* ... (Add other form fields similarly) */}
+                      {/* ... (Add other form fields similarly) */}
 
-                <div className="flex justify-end mt-4">
-                  <button
-                    type="submit"
-                    className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
-                  >
-                    Salvar
-                  </button>
-                  <button
-                    onClick={() => setIsAddModalOpen(false)}
-                    className="ml-4 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
-                  >
-                    Cancelar
-                  </button>
-                </div>
+                      <div className="flex justify-end mt-4">
+                        <button
+                          type="submit"
+                          className="px-4 py-2 text-white bg-green-500 rounded hover:bg-green-600"
+                        >
+                          Salvar
+                        </button>
+                        <button
+                          onClick={() => setIsAddModalOpen(false)}
+                          className="px-4 py-2 ml-4 text-white bg-red-500 rounded hover:bg-red-600"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
                     </form>
                   </div>
                 </div>
               )}
 
               {isEditModalOpen && (
-                <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50">
-                  <div className="bg-white p-6 rounded-lg w-1/2">
-                    <h2 className="text-xl font-bold mb-4">Editar Produto</h2>
+                <div className="fixed top-0 left-0 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+                  <div className="w-1/2 p-6 bg-white rounded-lg">
+                    <h2 className="mb-4 text-xl font-bold">Editar Produto</h2>
                     <form
                       onSubmit={handleSubmit((data) =>
-                        handleUpdate(editingProduct?.id || 0, data)
+                        handleUpdate(editingProduct?.id || 0, data),
                       )}
                     >
-                            <div className="mb-4">
-                  <label className="block mb-2">Nome</label>
-                  <input
-                    {...register("nome", { required: true })}
-                    className="w-full p-2 border"
-                    defaultValue={editingProduct?.nome}
-                  />
-                  {/* ... other form fields similarly */}
-                </div>
-                {/* ... other modal content */}
+                      <div className="mb-4">
+                        <label className="block mb-2">Nome</label>
+                        <input
+                          {...register("name", { required: true })}
+                          className="w-full p-2 border"
+                          defaultValue={editingProduct?.name}
+                        />
+                        {/* ... other form fields similarly */}
+                      </div>
+                      {/* ... other modal content */}
 
-                <div className="mb-4">
-                  <label className="block mb-2">Descrição Curta</label>
-                  <input
-                    {...register("descricao_curta", { required: true })}
-                    className="w-full p-2 border"
-                    defaultValue={editingProduct?.descricao_curta}
-                  />
-                  {errors.descricao_curta && (
-                    <span className="text-red-500">
-                      Descrição Curta is required
-                    </span>
-                  )}
-                </div>
+                      <div className="mb-4">
+                        <label className="block mb-2">Descrição Curta</label>
+                        <input
+                          {...register("short_description", { required: true })}
+                          className="w-full p-2 border"
+                          defaultValue={editingProduct?.short_description}
+                        />
+                        {errors.short_description && (
+                          <span className="text-red-500">
+                            Descrição Curta is required
+                          </span>
+                        )}
+                      </div>
 
-                <div className="mb-4">
-                  <label className="block mb-2">Imagem URL</label>
-                  <input
-                    type="file"
-                    {...register("imagem", { required: true })}
-                    className="w-full p-2 border"
-                  />
+                      <div className="mb-4">
+                        <label className="block mb-2">Imagem URL</label>
+                        <input
+                          type="file"
+                          {...register("image", { required: true })}
+                          className="w-full p-2 border"
+                        />
 
-                  {errors.imagem && (
-                    <span className="text-red-500">Imagem URL is required</span>
-                  )}
-                </div>
+                        {errors.image && (
+                          <span className="text-red-500">
+                            Imagem URL is required
+                          </span>
+                        )}
+                      </div>
 
-                <div className="mb-4">
-                  <label className="block mb-2">Preço</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    {...register("preco", { required: true })}
-                    className="w-full p-2 border"
-                  />
-                  {errors.preco && (
-                    <span className="text-red-500">Preço is required</span>
-                  )}
-                </div>
+                      <div className="mb-4">
+                        <label className="block mb-2">Preço</label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          {...register("price", { required: true })}
+                          className="w-full p-2 border"
+                        />
+                        {errors.price && (
+                          <span className="text-red-500">
+                            Preço is required
+                          </span>
+                        )}
+                      </div>
 
-                <div className="mb-4">
-                <label className="block mb-2">Categoria</label>
-                <input
-                    list="categorias"
-                    {...register("categoria", { required: true })}
-                    className="w-full p-2 border"
-                />
-                <datalist id="categorias">
-                    {categorias.map((categoria) => (
-                        <option key={categoria.id} value={categoria.nome} />
-                    ))}
-                </datalist>
+                      <div className="mb-4">
+                        <label className="block mb-2">Categoria</label>
+                        <input
+                          list="category"
+                          {...register("category", { required: true })}
+                          className="w-full p-2 border"
+                        />
+                        <datalist id="categorias">
+                          {categorias.map((categoria) => (
+                            <option key={categoria.id} value={categoria.name} />
+                          ))}
+                        </datalist>
 
-                {errors.categoria && (
-                    <span className="text-red-500">Categoria is required</span>
-                )}
-            </div>
+                        {errors.category && (
+                          <span className="text-red-500">
+                            Categoria is required
+                          </span>
+                        )}
+                      </div>
 
+                      {/* ... (Add other form fields similarly) */}
 
-                {/* ... (Add other form fields similarly) */}
-
-                <div className="flex justify-end mt-4">
-                <button
-              type="submit"
-              className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
-            >
-              {editingProduct ? "Update" : "Salvar"}
-            </button>
-            <button
-              onClick={() => {
-                setIsEditModalOpen(false);
-                setEditingProduct(null);  // Reset the editing product when modal is closed.
-              }}
-              className="ml-4 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
-            >
-              Cancelar
-            </button>
-                </div>
+                      <div className="flex justify-end mt-4">
+                        <button
+                          type="submit"
+                          className="px-4 py-2 text-white bg-green-500 rounded hover:bg-green-600"
+                        >
+                          {editingProduct ? "Update" : "Salvar"}
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsEditModalOpen(false);
+                            setEditingProduct(null); // Reset the editing product when modal is closed.
+                          }}
+                          className="px-4 py-2 ml-4 text-white bg-red-500 rounded hover:bg-red-600"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
                     </form>
                   </div>
                 </div>
@@ -440,54 +454,56 @@ const Products: React.FC<ProductsProps> = () => {
                         <table className="min-w-full bg-white border rounded-lg">
                           <thead>
                             <tr>
-                              <th className="py-2 px-4 border">No</th>
-                              <th className="py-2 px-4 border">Nome</th>
-                              <th className="py-2 px-4 border">
+                              <th className="px-4 py-2 border">No</th>
+                              <th className="px-4 py-2 border">Nome</th>
+                              <th className="px-4 py-2 border">
                                 Pequena descrição
                               </th>
-                              <th className="py-2 px-4 border">Preço</th>
-                              <th className="py-2 px-4 border">Imagem</th>
-                              <th className="py-2 px-4 border">Ações</th>
+                              <th className="px-4 py-2 border">Preço</th>
+                              <th className="px-4 py-2 border">Imagem</th>
+                              <th className="px-4 py-2 border">Ações</th>
                             </tr>
                           </thead>
                           <tbody>
                             {products?.map((product, index) => (
                               <tr key={index} className="table-info">
-                                <td className="py-2 px-4 border">{product.id}</td>
-                                <td className="py-2 px-4 border text-black">
+                                <td className="px-4 py-2 border">
+                                  {product.id}
+                                </td>
+                                <td className="px-4 py-2 text-black border">
                                   <Link
                                     href={`/restaurant/edit-product/${product.id}`}
                                   >
-                                    <p className="text-black">{product.nome}</p>
+                                    <p className="text-black">{product.name}</p>
                                   </Link>
                                 </td>
-                                <td className="py-2 px-4 border">
-                                  {product.descricao_curta}
+                                <td className="px-4 py-2 border">
+                                  {product.short_description}
                                 </td>
-                                <td className="py-2 px-4 border">
-                                  {product.preco} Kz
+                                <td className="px-4 py-2 border">
+                                  {product.price} Kz
                                 </td>
-                                <td className="py-2 px-4 border text-center relative">
+                                <td className="relative px-4 py-2 text-center border">
                                   <div className="absolute inset-0">
                                     <Image
-                                      className="rounded-full object-cover"
+                                      className="object-cover rounded-full"
                                       src={
-                                        product.imagem ||
+                                        product.image ||
                                         "/path/to/default/image.png"
                                       }
                                       layout="fill"
-                                      alt={product.nome}
+                                      alt={product.name}
                                     />
                                   </div>
                                 </td>
-                                <td className="py-2 px-4 border flex justify-around">
-                                 {/** <button
+                                <td className="flex justify-around px-4 py-2 border">
+                                  {/** <button
                                     className="text-blue-600 hover:text-blue-800 focus:outline-none"
                                     onClick={() => openEditModal(product)}
                                   >
                                     <FaEdit />
                                   </button>
-                                  */} 
+                                  */}
                                   <button
                                     className="text-red-600 hover:text-red-800 focus:outline-none"
                                     onClick={() =>

@@ -1,10 +1,10 @@
 // components/QRCodeDisplay.tsx
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import Image from "next/image";
 
 const QRCodeDisplay = () => {
-  const [qrCodeURL, setQRCodeURL] = useState<string>('');
+  const [qrCodeURL, setQRCodeURL] = useState<string>("");
 
   useEffect(() => {
     const generateQR = async () => {
@@ -18,7 +18,7 @@ const QRCodeDisplay = () => {
       `;
 
       try {
-        const QRCode = require('qrcode');
+        const QRCode = require("qrcode");
         const url = await QRCode.toDataURL(data);
         setQRCodeURL(url);
       } catch (err) {
@@ -31,10 +31,14 @@ const QRCodeDisplay = () => {
 
   return (
     <div className="mt-4">
-      {qrCodeURL &&  <Image
-            width={300}
-            height={300}
-      src={qrCodeURL} alt="Generated QR Code" />}
+      {qrCodeURL && (
+        <Image
+          width={300}
+          height={300}
+          src={qrCodeURL}
+          alt="Generated QR Code"
+        />
+      )}
     </div>
   );
 };

@@ -54,7 +54,7 @@ const Products: React.FC<ProductsProps> = () => {
     const fetchCategorias = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`${basAPI}/api/categorias/`);
+        const response = await fetch(`${basAPI}api/categorias/`);
         if (response.ok) {
           const data = await response.json();
           setCategorias(data);
@@ -79,7 +79,7 @@ const Products: React.FC<ProductsProps> = () => {
     }
     if (user.user_id !== undefined) {
       formData.append("user_id", String(user.user_id));
-      formData.append("restaurant", String(user.user_id));
+      formData.append("access_token", String(user.token));
     }
 
     if (data.image) {
@@ -87,7 +87,7 @@ const Products: React.FC<ProductsProps> = () => {
     }
 
     try {
-      const response = await fetch(`${basAPI}/api/add-product/`, {
+      const response = await fetch(`${basAPI}api/add-product/`, {
         method: "POST",
         body: formData,
       });
@@ -107,12 +107,12 @@ const Products: React.FC<ProductsProps> = () => {
       if (user?.user_id) {
         try {
           const response = await fetch(
-            `${basAPI}/api/get_products/?user_id=${user.user_id}`,
+            `${basAPI}api/get_products/?user_id=${user.user_id}`,
           );
           if (response.ok) {
             const data = await response.json();
 
-            console.log("produtos", data);
+            console.log("produtos==>", data);
             if (data && data.length > 0) {
               setProducts(data);
               setLoading(false);

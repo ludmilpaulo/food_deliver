@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion, useAnimation } from "framer-motion";
 import Link from "next/link";
+import { basAPI } from "@/configs/variable";
 
 type Restaurant = {
   id: number;
@@ -31,13 +32,13 @@ export default function Card() {
   }, [isHovered, controls]);
 
   useEffect(() => {
-    fetch("https://www.sunshinedeliver.com/api/customer/restaurants/")
+    fetch(`${basAPI}api/customer/restaurants/`)
       .then((response) => response.json())
       .then((data) => setRestaurants(data.restaurants));
   }, []);
 
   return (
-    <div className="p-4 flex flex-row overflow-x-auto scroll-snap-x-mandatory">
+    <div className="flex flex-row p-4 overflow-x-auto scroll-snap-x-mandatory">
       <motion.div
         animate={controls}
         className="flex flex-row overflow-x-auto scroll-snap-x-mandatory"
@@ -60,7 +61,7 @@ export default function Card() {
           >
             <div
               key={restaurant.id}
-              className="flex-shrink-0 flex-none scroll-snap-start"
+              className="flex-none flex-shrink-0 scroll-snap-start"
             >
               <div className="flex flex-col items-center p-4 m-4 bg-white shadow-lg bg-opacity-60 backdrop-filter backdrop-blur-lg rounded-xl">
                 <Image

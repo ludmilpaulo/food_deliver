@@ -5,7 +5,7 @@ import Image from "next/image";
 
 // Replace the redux slices, configs, and other utils you use with their web equivalents.
 import { logoutUser, selectUser } from "../redux/slices/authSlice";
-import { googleAPi } from "../configs/variable";
+import { basAPI, googleAPi } from "../configs/variable";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import withAuth from "@/components/ProtectedPage";
@@ -92,7 +92,7 @@ const UserProfile: React.FC = () => {
 
     try {
       const response = await fetch(
-        "https://www.sunshinedeliver.com/api/customer/profile/update/",
+        `${basAPI}api/customer/profile/update/`,
         {
           method: "POST",
           headers: {
@@ -105,7 +105,7 @@ const UserProfile: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         alert(data.status);
-        router.push("/HomeScreen"); // Navigate to HomeScreen in Next.js
+       // router.push("/HomeScreen"); // Navigate to HomeScreen in Next.js
       } else {
         const resp = await response.json();
         alert(resp.non_field_errors);
@@ -122,11 +122,11 @@ const UserProfile: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex-grow">
-        <Nav />
+       
 
         <div className="flex-1 p-5">
           <div className="flex flex-col items-center space-y-5">
-            <div className="rounded-full overflow-hidden w-48 h-48 mt-4">
+            <div className="w-48 h-48 mt-4 overflow-hidden rounded-full">
               {imageInfo && (
                 <Image
                   src={URL.createObjectURL(imageInfo)}
@@ -155,7 +155,7 @@ const UserProfile: React.FC = () => {
             </div>
             <div className="w-full mx-12">
               <input
-                className="border w-full p-4 rounded"
+                className="w-full p-4 border rounded"
                 placeholder="Primeiro Nome"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
@@ -163,7 +163,7 @@ const UserProfile: React.FC = () => {
             </div>
             <div className="w-full">
               <input
-                className="border w-full mt-5 p-4 rounded"
+                className="w-full p-4 mt-5 border rounded"
                 placeholder="Ultimo Nome"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
@@ -171,7 +171,7 @@ const UserProfile: React.FC = () => {
             </div>
             <div className="w-full">
               <input
-                className="border w-full mt-5 p-4 rounded"
+                className="w-full p-4 mt-5 border rounded"
                 placeholder="Número de Telefone"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
@@ -179,7 +179,7 @@ const UserProfile: React.FC = () => {
             </div>
             <div>
               <button
-                className="bg-blue-500 text-white p-4 rounded mt-5"
+                className="p-4 mt-5 text-white bg-blue-500 rounded"
                 onClick={userUpdate}
               >
                 Atualize seu Perfil
@@ -188,7 +188,7 @@ const UserProfile: React.FC = () => {
           </div>
         </div>
       </div>
-      <Footer />
+     
     </div>
   );
 };

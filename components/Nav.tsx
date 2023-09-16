@@ -77,7 +77,7 @@ const Nav = () => {
         {user ? (
           <Link
             className="flex items-center space-x-2 text-white"
-            href={"/UserProfile"}
+            href={"/UserDashboard"}
           >
             <span>Meu Perfil</span>
             <IoIosLogIn size={20} />

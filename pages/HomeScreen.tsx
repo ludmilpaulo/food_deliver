@@ -10,6 +10,7 @@ import Card from "@/components/Card";
 import Footer from "@/components/Footer";
 import RestaurantCard from "@/components/RestaurantCard";
 import { FiSearch } from "react-icons/fi";
+import { basAPI } from "@/configs/variable";
 
 type Restaurant = {
   id: number;
@@ -29,7 +30,7 @@ function HomeScreen() {
   const [masterDataSource, setMasterDataSource] = useState<Restaurants>([]);
 
   useEffect(() => {
-    fetch("https://www.sunshinedeliver.com/api/customer/restaurants/")
+    fetch(`${basAPI}api/customer/restaurants/`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data);

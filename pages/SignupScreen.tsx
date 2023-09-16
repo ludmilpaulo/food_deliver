@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import Image from "next/image";
 import { motion } from "framer-motion";
-import logo from "../assets/logo.png";
 import { useDispatch } from "react-redux";
 import { loginUser } from "../redux/slices/authSlice";
 import { Transition } from "@headlessui/react";
@@ -9,12 +7,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { basAPI } from "@/configs/variable";
 
-type Inputs = {
-  username: string;
-  password: string;
-};
 
-type Props = {};
 
 const SignupScreen = () => {
   const router = useRouter();
@@ -115,9 +108,9 @@ const SignupScreen = () => {
       });
 
       const resJson = await res.json();
-      console.log("recebido", resJson);
+      console.log("recebido", res);
 
-      if (resJson.status === 201) {
+      if (res.status === 201) {
         dispatch(loginUser(resJson));
         alert(
           "Você se conectou com sucesso. Agora você pode saborear sua refeição."
@@ -127,14 +120,17 @@ const SignupScreen = () => {
           resJson.fornecedor_id !== null
         ) {
           router.push("/RestaurantDashboad"); // Redirect to Dashboard
-        } else if (
-          typeof resJson.user === "object" &&
-          resJson.user !== null
-        ) {
-          console.log("Redirecting to HomeScreen");
-          router.push("/HomeScreen");
-        }
-      } else {
+        } 
+      }
+      else if (
+        typeof resJson.user === "object" &&
+        resJson.user !== null
+      ) {
+        dispatch(loginUser(resJson));
+        console.log("Redirecting to HomeScreen");
+        router.push("/HomeScreen");
+      } 
+      else {
         alert(Object.values(resJson));
         setLoading(false);
       }

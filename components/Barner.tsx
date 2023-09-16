@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { basAPI } from "@/configs/variable";
 
 interface Restaurant {
   id: number;
@@ -14,7 +15,7 @@ const Banner = () => {
   const [images, setImages] = useState<string[]>([]);
 
   useEffect(() => {
-    fetch("https://www.sunshinedeliver.com/api/customer/restaurants/")
+    fetch(`${basAPI}api/customer/restaurants/`)
       .then((response) => response.json())
       .then((data: { restaurants: Restaurant[] }) => {
         const imageUrls = data.restaurants.map((item) => item.logo);

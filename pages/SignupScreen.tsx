@@ -7,8 +7,6 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { basAPI } from "@/configs/variable";
 
-
-
 const SignupScreen = () => {
   const router = useRouter();
 
@@ -68,9 +66,7 @@ const SignupScreen = () => {
     setLoading(true);
     try {
       const url =
-        role === "client"
-          ? `${basAPI}signup/`
-          : `${basAPI}fornecedor/`;
+        role === "client" ? `${basAPI}signup/` : `${basAPI}fornecedor/`;
 
       let body;
 
@@ -87,7 +83,7 @@ const SignupScreen = () => {
           (key) => {
             const value = signupData[key];
             if (value !== null) formData.append(key, value as Blob | string);
-          }
+          },
         );
 
         // Append other form data fields here if needed
@@ -113,24 +109,19 @@ const SignupScreen = () => {
       if (res.status === 201) {
         dispatch(loginUser(resJson));
         alert(
-          "Você se conectou com sucesso. Agora você pode saborear sua refeição."
+          "Você se conectou com sucesso. Agora você pode saborear sua refeição.",
         );
         if (
           typeof resJson.fornecedor_id === "object" &&
           resJson.fornecedor_id !== null
         ) {
           router.push("/RestaurantDashboad"); // Redirect to Dashboard
-        } 
-      }
-      else if (
-        typeof resJson.user === "object" &&
-        resJson.user !== null
-      ) {
+        }
+      } else if (typeof resJson.user === "object" && resJson.user !== null) {
         dispatch(loginUser(resJson));
         console.log("Redirecting to HomeScreen");
         router.push("/HomeScreen");
-      } 
-      else {
+      } else {
         alert(Object.values(resJson));
         setLoading(false);
       }

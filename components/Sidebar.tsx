@@ -15,8 +15,6 @@ import Products from "./Products";
 import { logoutUser } from "@/redux/slices/authSlice";
 import { FornecedorType } from "@/configs/variable";
 
-
-
 interface SidebarProps {
   fornecedor: FornecedorType | null;
   onNavClick?: (navItem: string) => void; // Callback function to notify the parent about a menu click
@@ -85,7 +83,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
           >
             <Link className="flex items-center space-x-3" href={""}>
               <MdLaptop className="text-lg" />
-              <span>Produtos</span>
+              <span>Pedidos</span>
             </Link>
           </li>
 

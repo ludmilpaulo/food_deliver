@@ -6,8 +6,6 @@ import { FornecedorType, basAPI } from "@/configs/variable";
 import withAuth from "@/components/ProtectedPage";
 import { selectUser } from "@/redux/slices/authSlice";
 
-
-
 const RestaurantDashboad: React.FC = () => {
   const user = useSelector(selectUser);
   const [fornecedor, setFornecedor] = useState<FornecedorType | null>(null);

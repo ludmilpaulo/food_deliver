@@ -40,13 +40,19 @@ const LoginScreenUser = () => {
       let resJson = await res.json();
       console.log("recebido", resJson);
 
-      if (res.status === 200) {
+      if (res.status === 200 && resJson.is_customer === true) {
         dispatch(loginUser(resJson));
         alert(
           "Você se conectou com sucesso Agora você pode saborear sua refeição",
         );
         router.push("/HomeScreen");
-      } else {
+      } else if(resJson.is_customer === false) {
+        dispatch(loginUser(resJson));
+        router.push("/RestaurantDashboad"); // Redirect to Dashboard
+       // alert(Object.values(resJson));
+      }
+      
+      else {
         alert(Object.values(resJson));
       }
     } catch (err) {

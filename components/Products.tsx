@@ -95,36 +95,39 @@ const Products: React.FC<ProductsProps> = () => {
       console.log("adiocionar", result);
       alert("produto adicionado com sucesso");
       setLoading(false);
+      fetchProductData();
     } catch (error) {
       console.error("An exception occurred:", error);
     }
   };
+  const fetchProductData = async () => {
+    setLoading(true);
 
-  useEffect(() => {
-    const fetchProductData = async () => {
-      setLoading(true);
+    if (user?.user_id) {
+      try {
+        const response = await fetch(
+          `${basAPI}api/get_products/?user_id=${user.user_id}`,
+        );
+        if (response.ok) {
+          const data = await response.json();
 
-      if (user?.user_id) {
-        try {
-          const response = await fetch(
-            `${basAPI}api/get_products/?user_id=${user.user_id}`,
-          );
-          if (response.ok) {
-            const data = await response.json();
-
-            console.log("produtos==>", data);
-            if (data && data.length > 0) {
-              setProducts(data);
-              setLoading(false);
-            }
-          } else {
-            console.error("Failed to fetch product data");
+          console.log("produtos==>", data);
+          if (data && data.length > 0) {
+            setProducts(data);
+            setLoading(false);
           }
-        } catch (error) {
-          console.error("An error occurred:", error);
+        } else {
+          console.error("Failed to fetch product data");
         }
+      } catch (error) {
+        console.error("An error occurred:", error);
       }
-    };
+    }
+  };
+
+  
+  useEffect(() => {
+  
 
     fetchProductData();
   }, [user]);

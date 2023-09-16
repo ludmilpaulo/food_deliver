@@ -70,13 +70,15 @@ const UserDashboard: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
           {userDetails && (
             <li className="flex items-center space-x-4">
               <div className="relative w-12 h-12">
-              <Image
-  src={`${basAPI}${userDetails?.avatar || "/path/to/default/image.png"}`}
-  width={500}
-  height={300}
-  className="rounded-full"
-  alt=""
-/>
+                <Image
+                  src={`${basAPI}${
+                    userDetails?.avatar || "/path/to/default/image.png"
+                  }`}
+                  width={500}
+                  height={300}
+                  className="rounded-full"
+                  alt=""
+                />
                 <span className="absolute bottom-0 right-0 block w-3 h-3 bg-green-400 rounded-full"></span>
               </div>
               <div>

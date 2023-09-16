@@ -91,21 +91,18 @@ const UserProfile: React.FC = () => {
     formData.append("phone", phone);
 
     try {
-      const response = await fetch(
-        `${basAPI}api/customer/profile/update/`,
-        {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-          },
-          body: formData,
+      const response = await fetch(`${basAPI}api/customer/profile/update/`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
         },
-      );
+        body: formData,
+      });
 
       if (response.ok) {
         const data = await response.json();
         alert(data.status);
-       // router.push("/HomeScreen"); // Navigate to HomeScreen in Next.js
+        // router.push("/HomeScreen"); // Navigate to HomeScreen in Next.js
       } else {
         const resp = await response.json();
         alert(resp.non_field_errors);
@@ -122,8 +119,6 @@ const UserProfile: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex-grow">
-       
-
         <div className="flex-1 p-5">
           <div className="flex flex-col items-center space-y-5">
             <div className="w-48 h-48 mt-4 overflow-hidden rounded-full">
@@ -188,7 +183,6 @@ const UserProfile: React.FC = () => {
           </div>
         </div>
       </div>
-     
     </div>
   );
 };

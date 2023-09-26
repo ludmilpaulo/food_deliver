@@ -17,10 +17,10 @@ export default function Home() {
 
   useEffect(()=>{
 
-    if (user.is_customer === true) {
+    if (user?.is_customer === true) {
      
       router.push("/HomeScreen");
-    } else if(user.is_customer === false) {
+    } else if(user?.is_customer === false) {
     
       router.push("/RestaurantDashboad"); // Redirect to Dashboard
      // alert(Object.values(resJson));

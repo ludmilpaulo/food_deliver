@@ -25,6 +25,7 @@ const UserDashboard: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
   const user = useSelector(selectUser);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchUserDetails = async () => {
     try {
       const res = await fetch(`${basAPI}api/customer/profile/`, {
@@ -52,7 +53,7 @@ const UserDashboard: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
 
   useEffect(() => {
     fetchUserDetails();
-  }, [userDetails]);
+  }, [fetchUserDetails, userDetails]);
 
   const dispatch = useDispatch();
   const router = useRouter();

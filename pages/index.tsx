@@ -14,19 +14,14 @@ export default function Home() {
   const router = useRouter();
 
   const user = useSelector(selectUser);
-
-  useEffect(()=>{
-
-    if (user?.is_customer === true) {
-     
+  useEffect(() => {
+    if (user !== null && typeof user === 'object' && user.is_customer === true) {
       router.push("/HomeScreen");
-    } else if(user?.is_customer === false) {
-    
-      router.push("/RestaurantDashboad"); // Redirect to Dashboard
-     // alert(Object.values(resJson));
+    } else if (user !== null && typeof user === 'object' && user.is_customer === false) {
+      router.push("/RestaurantDashboard"); // Redirect to Dashboard
     }
-
-  },[])
+  }, [router, user]);
+  
 
   console.log("user==>>", user)
 

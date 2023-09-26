@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { basAPI } from "@/configs/variable";
 
@@ -100,7 +100,8 @@ const Products: React.FC<ProductsProps> = () => {
       console.error("An exception occurred:", error);
     }
   };
-  const fetchProductData = async () => {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const fetchProductData = useCallback(async () => {
     setLoading(true);
 
     if (user?.user_id) {
@@ -123,14 +124,14 @@ const Products: React.FC<ProductsProps> = () => {
         console.error("An error occurred:", error);
       }
     }
-  };
+  }, [user]);
 
   
   useEffect(() => {
   
 
     fetchProductData();
-  }, [user]);
+  }, [fetchProductData, user]);
 
   const handleUpdate = async (
     productId: number,

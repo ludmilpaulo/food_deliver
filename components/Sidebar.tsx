@@ -14,6 +14,7 @@ import { useDispatch } from "react-redux";
 import Products from "./Products";
 import { logoutUser } from "@/redux/slices/authSlice";
 import { FornecedorType } from "@/configs/variable";
+import Order from "./Order";
 
 interface SidebarProps {
   fornecedor: FornecedorType | null;
@@ -22,6 +23,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
   const [showProducts, setShowProducts] = useState(false);
+  const [ showOrders, setShowOrders] = useState(false);
 
   console.log("fonecedordata", fornecedor);
 
@@ -65,7 +67,9 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
             className="p-2 rounded hover:bg-blue-500"
             onClick={() => {
               console.log("Produtos clicked!");
-              setShowProducts(true); // Set showProducts to true when "Produtos" is clicked
+              setShowOrders(false); 
+              setShowProducts(true)
+             // Set showProducts to true when "Produtos" is clicked
             }}
           >
             <Link className="flex items-center space-x-3" href={""}>
@@ -77,7 +81,9 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
           <li
             className="p-2 rounded hover:bg-blue-500"
             onClick={() => {
+              setShowProducts(false);
               console.log("Pedidos clicked!"); // Add this
+              setShowOrders(true); 
               onNavClick && onNavClick("Pedidos");
             }}
           >
@@ -158,6 +164,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
 
       <div className="flex-1 overflow-y-auto bg-gray-100">
         {showProducts && <Products />}{" "}
+        {showOrders && <Order />}{" "}
         {/* Conditionally render Products based on showProducts state */}
       </div>
     </div>

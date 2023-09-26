@@ -7,6 +7,7 @@ import { loginUser } from "../redux/slices/authSlice";
 
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { basAPI } from "@/configs/variable";
 
 type Inputs = {
   username: string;
@@ -25,7 +26,7 @@ const LoginScreenUser = () => {
 
   let handleSubmit = async () => {
     try {
-      let res = await fetch("https://www.sunshinedeliver.com/login/", {
+      let res = await fetch(`${basAPI}login/`, {
         method: "POST",
         // mode: 'no-cors',
         headers: {

@@ -42,6 +42,7 @@ const UserDashboard: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
         const resJson = await res.json();
         setUserDetails(resJson.customer_detais);
       } else {
+        dispatch(logoutUser());
         console.error("Failed to fetch user details");
       }
     } catch (error) {

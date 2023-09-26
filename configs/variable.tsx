@@ -45,3 +45,11 @@ export interface OrderTypes {
   total: number;
   status: string;
 }
+
+export type Restaurant = {
+  id: number;
+  name: string;
+  phone: string;
+  address: string;
+  logo: string;
+};

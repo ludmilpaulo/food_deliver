@@ -10,15 +10,9 @@ import Card from "@/components/Card";
 import Footer from "@/components/Footer";
 import RestaurantCard from "@/components/RestaurantCard";
 import { FiSearch } from "react-icons/fi";
-import { basAPI } from "@/configs/variable";
+import { Restaurant, basAPI } from "@/configs/variable";
 
-type Restaurant = {
-  id: number;
-  name: string;
-  phone: string;
-  address: string;
-  logo: string;
-};
+
 
 type Restaurants = Restaurant[];
 

@@ -11,5 +11,29 @@ import HomeScreen from "./HomeScreen";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  return <HomeScreen />;
+  const router = useRouter();
+
+  const user = useSelector(selectUser);
+
+  useEffect(()=>{
+
+    if (user.is_customer === true) {
+     
+      router.push("/HomeScreen");
+    } else if(user.is_customer === false) {
+    
+      router.push("/RestaurantDashboad"); // Redirect to Dashboard
+     // alert(Object.values(resJson));
+    }
+
+  },[])
+
+  console.log("user==>>", user)
+
+
+  return (
+    <>
+    </>
+
+  );
 }

@@ -9,6 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import logo from "../assets/logo.png";
+import { googleAPi } from "@/configs/variable";
 
 const Nav = () => {
   const router = useRouter();
@@ -33,7 +34,7 @@ const Nav = () => {
         // Use a service like Google Maps Geocoding API to get the address
         // NOTE: Replace 'YourAPIKey' with your actual API Key
         const response = await fetch(
-          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=AIzaSyBBkDvVVuQBVSMOt8wQoc_7E-2bvDh2-nw`,
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=${googleAPi}`,
         );
 
         if (!response.ok) {
@@ -42,7 +43,13 @@ const Nav = () => {
         }
 
         const data = await response.json();
-        setAddress(data.results[0].formatted_address);
+        if (data.results && data.results.length > 0) {
+          const formattedAddress = data.results[0].formatted_address;
+          setAddress(formattedAddress);
+        } else {
+          console.error("No results found in the API response");
+        }
+        
       },
       (error) => console.error(error),
     );

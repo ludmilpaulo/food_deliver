@@ -2,13 +2,10 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  MdLaptop,
   MdContacts,
-  MdBarChart,
-  MdTableBar,
   MdLogout,
 } from "react-icons/md";
-import { ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { logoutUser, selectUser } from "@/redux/slices/authSlice";

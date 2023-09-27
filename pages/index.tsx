@@ -20,6 +20,9 @@ export default function Home() {
     } else if (user !== null && typeof user === 'object' && user.is_customer === false) {
       router.push("/RestaurantDashboard"); // Redirect to Dashboard
     }
+    if (user == null && typeof user === 'object') {
+      router.push("/LoginScreenUser");
+    }
   }, [router, user]);
   
 

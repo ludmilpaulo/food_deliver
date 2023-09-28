@@ -75,7 +75,8 @@ const Team: React.FC = () => {
                       <div className="px-6 mt-16">
                         <div className="font-bold text-3xl text-center pb-1">{member.name_complete}</div>
                         <p className="text-gray-800 text-sm text-center">{member.position}</p>
-                        <p className="text-center text-gray-600 text-base pt-3 font-normal">{member.about}</p>
+                       
+                        <p className="text-center text-gray-600 text-base pt-3 font-normal" dangerouslySetInnerHTML={{ __html: member.about }} />
                         <div className="w-full flex justify-center pt-5 pb-5">
                           <SocialIcon url={member.linkedin} className="mx-5" />
                           <SocialIcon url={member.facebook} className="mx-5" />

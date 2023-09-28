@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logoutUser, selectUser } from "@/redux/slices/authSlice";
 import { FornecedorType, UserDetails, basAPI } from "@/configs/variable";
 import UserProfile from "@/components/UserProfile";
+import Nav from "@/components/Nav";
 
 interface SidebarProps {
   fornecedor: FornecedorType | null;
@@ -62,7 +63,8 @@ const UserDashboard: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
   };
 
   return (
-    <div className="flex h-screen">
+    <><Nav /><div className="flex h-screen">
+
       <nav className="w-64 h-screen p-4 text-white bg-gray-800">
         <ul className="space-y-4">
           {/* Profile Section */}
@@ -70,14 +72,11 @@ const UserDashboard: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
             <li className="flex items-center space-x-4">
               <div className="relative w-12 h-12">
                 <Image
-                  src={`${basAPI}${
-                    userDetails?.avatar || "/path/to/default/image.png"
-                  }`}
+                  src={`${basAPI}${userDetails?.avatar || "/path/to/default/image.png"}`}
                   width={500}
                   height={300}
                   className="rounded-full"
-                  alt=""
-                />
+                  alt="" />
                 <span className="absolute bottom-0 right-0 block w-3 h-3 bg-green-400 rounded-full"></span>
               </div>
               <div>
@@ -97,7 +96,7 @@ const UserDashboard: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
             onClick={() => {
               console.log("Atualizar o Perfil clicked!");
               setShowProducts(true);
-            }}
+            } }
           >
             <Link className="flex items-center space-x-3" href={""}>
               <MdContacts className="text-lg" />
@@ -125,7 +124,7 @@ const UserDashboard: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
       <div className="flex-1 overflow-y-auto bg-gray-100">
         {showProducts && <UserProfile />}
       </div>
-    </div>
+    </div></>
   );
 };
 

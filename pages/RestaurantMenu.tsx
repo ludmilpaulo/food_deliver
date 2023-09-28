@@ -54,6 +54,7 @@ const RestaurantMenu = () => {
   }, [res_ID]); // Add res_ID to the dependency array
 
   useEffect(() => {
+    console.log("meals data", foods)
     fetchMeals();
   }, [fetchMeals]);
 

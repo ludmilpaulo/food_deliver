@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { selectUser } from "@/redux/slices/authSlice";
+import { logoutUser, selectUser } from "@/redux/slices/authSlice";
 import { clearCart, selectCartItems } from "@/redux/slices/basketSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
+import Image from "next/image";
 import "leaflet/dist/leaflet.css";
+import { UserDetails, basAPI } from "@/configs/variable";
 
 // Dynamically import react-leaflet components to bypass server-side rendering
 const MapContainer = dynamic(
@@ -36,6 +38,41 @@ const CheckoutScreen = () => {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const allCartItems = useSelector(selectCartItems);
+  const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
+ 
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const fetchUserDetails = async () => {
+    try {
+      const res = await fetch(`${basAPI}api/customer/profile/`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: user.user_id,
+        }),
+      });
+
+      if (res.ok) {
+        const resJson = await res.json();
+        setUserDetails(resJson.customer_detais);
+      } else {
+        dispatch(logoutUser());
+        console.error("Failed to fetch user details");
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  };
+
+  useEffect(() => {
+    console.log("user detais", userDetails)
+    console.log("Image URL:", `${basAPI}${userDetails?.avatar || "/path/to/default/image.png"}`);
+
+    fetchUserDetails();
+  }, [fetchUserDetails, userDetails]);
 
   const getUserLocation = async () => {
     if (typeof window !== "undefined" && !navigator.geolocation) {
@@ -102,11 +139,28 @@ const CheckoutScreen = () => {
       <div className="bg-blue-300 relative h-60">
         <MapContainer
           center={[location.latitude, location.longitude]}
-          zoom={13}
+          zoom={10}
           style={{ height: "100%", width: "100%" }}
         >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          <Marker position={[location.latitude, location.longitude]} />
+
+          {userDetails && (
+  <Marker position={[location.latitude, location.longitude]}>
+    
+      <Image
+        src={`${basAPI}${userDetails?.avatar || "/path/to/default/image.png"}`}
+        width={50}
+        height={30}
+        className="rounded-full"
+        alt=""
+      />
+      
+  </Marker>
+)}
+
+
+
+        
         </MapContainer>
       </div>
 

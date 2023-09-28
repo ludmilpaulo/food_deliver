@@ -43,8 +43,10 @@ const Nav = () => {
         }
 
         const data = await response.json();
+        console.log("user location", data)
         if (data.results && data.results.length > 0) {
           const formattedAddress = data.results[0].formatted_address;
+          console.log("user location",formattedAddress)
           setAddress(formattedAddress);
         } else {
           console.error("No results found in the API response");

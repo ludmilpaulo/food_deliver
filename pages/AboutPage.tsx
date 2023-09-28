@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import AboutUs from '../components/AboutUs';
 import Footer from '@/components/Footer';
 import Nav from '@/components/Nav';
+import Team from '@/components/Team';
 
 
 
@@ -42,11 +43,15 @@ const AboutPage: React.FC = () => {
     if (!data) {
       return <div>No data available</div>;
     }
-  return (   <><Nav /><div className="flex justify-center items-center h-screen">
+  return (   <><Nav /><div className="flex justify-center items-center">
 
       <AboutUs />
 
-  </div><Footer /></>
+     
+
+  </div>
+  <Team />
+  <Footer /></>
   );
 };
 

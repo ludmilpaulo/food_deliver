@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { SocialIcon } from 'react-social-icons';
 import Image from "next/image";
 
+
 type Props = {};
 
 const AboutUs: React.FC<Props> = () => {
@@ -30,6 +31,7 @@ const AboutUs: React.FC<Props> = () => {
     fetchData();
   }, []);
 
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -43,32 +45,29 @@ const AboutUs: React.FC<Props> = () => {
   }
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-semibold mb-4">{data.name_complete}</h2>
-      <p className="text-gray-700 mb-4"><div dangerouslySetInnerHTML={{ __html: data.about }} /></p>
-      <p className="text-gray-700 mb-4">{data.address}</p>
-      <p className="text-gray-700 mb-4">{data.phone}</p>
-      <p className="text-gray-700 mb-4">{data.email}</p>
-
-     
-      <div>
-                <Image
-                  className="w-64 h-64 mb-4 sm:w-32 sm:h-32 md:w-32 md:h-32 lg:w-64 lg:h-32 xl:w-32 xl:h-32"
-                  width={300}
-                  height={300}
-                  src={data.avatar}
-                  alt={data.name_complete}
-                />
-      </div>
-
-      {/* Social Icons */}
-      <div className="flex space-x-4">
-        {data.linkedin && <SocialIcon url={data.linkedin} bgColor="#fff" fgColor="#000" style={{ height: 30, width: 30 }} />}
-        {data.facebook && <SocialIcon url={data.facebook} bgColor="#fff" fgColor="#000" style={{ height: 30, width: 30 }} />}
-        {data.twitter && <SocialIcon url={data.twitter} bgColor="#fff" fgColor="#000" style={{ height: 30, width: 30 }} />}
-        {data.instagram && <SocialIcon url={data.instagram} bgColor="#fff" fgColor="#000" style={{ height: 30, width: 30 }} />}
+    <div className="p-4 bg-white rounded-lg shadow-md flex relative">
+    {/* Image Div */}
+    <div className="w-full h-screen">
+    <Image
+          className="w-full h-full object-cover"
+          src={data.avatar}
+          alt={data.name_complete}
+          width={0}
+          height={0}
+        />
+    </div>
+  
+    {/* Text Div */}
+    <div className="w-1/2 pr-4 absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="text-white text-center">
+        <h2 className="text-2xl font-semibold mb-4">{data.name_complete}</h2>
+        <p className="text-gray-700 mb-4" dangerouslySetInnerHTML={{ __html: data.about }} />
       </div>
     </div>
+  </div>
+  
+
+
   );
 };
 

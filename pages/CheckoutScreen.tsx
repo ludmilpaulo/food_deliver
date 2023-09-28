@@ -105,7 +105,7 @@ const CheckoutScreen = () => {
     const orderDetails = formattedCartItems;
 
     let response = await fetch(
-      "https://www.sunshinedeliver.com/api/customer/order/add/",
+      `${basAPI}api/customer/order/add/`,
       {
         method: "POST",
         headers: {

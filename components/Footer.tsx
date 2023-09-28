@@ -6,6 +6,7 @@ import {
   FaGooglePlay,
 } from "react-icons/fa";
 import { AiFillPhone } from "react-icons/ai";
+import Link from "next/link";
 import Image from "next/image";
 import logo from "../assets/logo.png";
 
@@ -17,17 +18,16 @@ export default function Footer() {
           <Image src={logo} alt="Logo" width={100} height={30} />
         </div>
         <div className="mb-2 sm:mb-4 text-center md:text-left">
+          <Link href={"/AboutPage"}>
           <h2 className="mb-2 text-lg font-bold">Sobre nós</h2>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque
-            euismod.
-          </p>
+          </Link>
+          <h2 className="mb-2 text-lg font-bold">Vagas Abertas</h2>
+        
+        
         </div>
         <div className="mb-2 sm:mb-4 text-center md:text-left">
           <h2 className="mb-2 text-lg font-bold">Contate-nos</h2>
-          <p>
-            <AiFillPhone /> +1 234 567 890
-          </p>
+  
         </div>
         <div className="mb-2 sm:mb-4 text-center md:text-left">
           <h2 className="mb-2 text-lg font-bold">Siga-nos</h2>

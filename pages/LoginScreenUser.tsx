@@ -8,6 +8,8 @@ import { loginUser } from "../redux/slices/authSlice";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { basAPI } from "@/configs/variable";
+import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 
 type Inputs = {
   username: string;
@@ -62,7 +64,7 @@ const LoginScreenUser = () => {
   };
 
   return (
-    <div className="w-full h-screen px-4 py-16 bg-cover bg-bg_image">
+    <><Nav /><div className="w-full h-screen px-4 py-16 bg-cover bg-bg_image">
       <div className="flex flex-col items-center justify-center">
         <motion.div
           animate={{
@@ -96,8 +98,7 @@ const LoginScreenUser = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               type="text"
-              className="w-full py-3 pl-3 mt-2 text-xs font-medium leading-none text-gray-800 bg-gray-200 border rounded focus:outline-none"
-            />
+              className="w-full py-3 pl-3 mt-2 text-xs font-medium leading-none text-gray-800 bg-gray-200 border rounded focus:outline-none" />
           </div>
           <div className="w-full mt-6">
             <div className="relative flex items-center justify-center">
@@ -106,8 +107,7 @@ const LoginScreenUser = () => {
                 placeholder="Enter your password"
                 onChange={(e) => setPassword(e.target.value)}
                 type="password"
-                className="w-full py-3 pl-3 mt-2 text-xs font-medium leading-none text-gray-800 bg-gray-200 border rounded focus:outline-none"
-              />
+                className="w-full py-3 pl-3 mt-2 text-xs font-medium leading-none text-gray-800 bg-gray-200 border rounded focus:outline-none" />
             </div>
           </div>
           <div className="mt-8">
@@ -124,6 +124,8 @@ const LoginScreenUser = () => {
         </motion.div>
       </div>
     </div>
+    <Footer />
+    </>
   );
 };
 

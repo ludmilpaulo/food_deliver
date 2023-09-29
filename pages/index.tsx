@@ -23,6 +23,15 @@ export default function Home() {
     if (user == null && typeof user === 'object') {
       router.push("/LoginScreenUser");
     }
+    if (
+      typeof user.fornecedor_id === "object" &&
+      user.fornecedor_id !== null
+    ) {
+      router.push("/RestaurantDashboad"); // Redirect to Dashboard
+    }
+    else{
+      router.push("/LoginScreenUser");
+    }
   }, [router, user]);
   
 

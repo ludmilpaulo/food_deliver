@@ -29,6 +29,7 @@ const AboutUs: React.FC<Props> = () => {
     };
 
     fetchData();
+    console.log("data about",data)
   }, []);
 
 
@@ -44,31 +45,18 @@ const AboutUs: React.FC<Props> = () => {
     return <div>No data available</div>;
   }
 
-  return (
-    <div className="p-4 bg-white rounded-lg shadow-md flex relative">
-    {/* Image Div */}
-    <div className="w-full h-screen">
-    <Image
-          className="w-full h-full object-cover"
-          src={data.avatar}
-          alt={data.name_complete}
-          width={0}
-          height={0}
-        />
-    </div>
-  
-    {/* Text Div */}
-    <div className="w-1/2 pr-4 absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="text-white text-center">
-        <h2 className="text-2xl font-semibold mb-4">{data.name_complete}</h2>
-        <p className="text-gray-700 mb-4" dangerouslySetInnerHTML={{ __html: data.about }} />
-      </div>
-    </div>
-  </div>
-  
 
+    return (
+      <div className="w-full 2xl:container 2xl:mx-auto lg:py-16 lg:px-20 md:py-12 md:px-6 py-9 px-4">
+   
+       
+          <h1 className="text-3xl lg:text-4xl font-bold leading-9 text-gray-800 pb-4">Sobre nós</h1>
+          <p className="font-normal text-base leading-6 text-gray-600 w-full lg:max-w-[5/12]" dangerouslySetInnerHTML={{ __html: data.about }} />
+        </div>
 
-  );
+    
+    );
 };
 
 export default AboutUs;
+

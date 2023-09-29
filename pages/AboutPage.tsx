@@ -4,6 +4,7 @@ import AboutUs from '../components/AboutUs';
 import Footer from '@/components/Footer';
 import Nav from '@/components/Nav';
 import Team from '@/components/Team';
+import Social from '@/components/Social';
 
 
 
@@ -51,6 +52,7 @@ const AboutPage: React.FC = () => {
 
   </div>
   <Team />
+  <Social />
   <Footer /></>
   );
 };

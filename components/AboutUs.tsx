@@ -48,7 +48,20 @@ const AboutUs: React.FC<Props> = () => {
 
     return (
       <div className="w-full 2xl:container 2xl:mx-auto lg:py-16 lg:px-20 md:py-12 md:px-6 py-9 px-4">
-   
+    <div
+          className="absolute top-0
+          left-0
+          w-full
+          h-96
+          bg-gradient-to-br
+          from-[#FCB61A]
+          to-[#0171CE]
+          rounded-md
+          filter
+          blur-3xl
+          opacity-50
+          -z-20"
+        />
        
           <h1 className="text-3xl lg:text-4xl font-bold leading-9 text-gray-800 pb-4">Sobre nós</h1>
           <p className="font-normal text-base leading-6 text-gray-600 w-full lg:max-w-[5/12]" dangerouslySetInnerHTML={{ __html: data.about }} />

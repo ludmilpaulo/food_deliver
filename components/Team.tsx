@@ -44,6 +44,20 @@ const Team: React.FC = () => {
   
         <div>
           <div className="container flex justify-center mx-auto pt-16">
+          <div
+          className="absolute top-0
+          left-0
+          w-full
+          h-96
+          bg-gradient-to-br
+          from-[#FCB61A]
+          to-[#0171CE]
+          rounded-md
+          filter
+          blur-3xl
+          opacity-50
+          -z-20"
+        />
             <div>
               <p className="text-gray-500 text-lg text-center font-normal pb-3">Esquadrão da plataforma</p>
               <h1 className="xl:text-4xl text-3xl text-center text-gray-800 font-extrabold pb-6 sm:w-4/6 w-5/6 mx-auto">

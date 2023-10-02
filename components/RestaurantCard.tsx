@@ -23,6 +23,20 @@ export default function RestaurantCard({
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 py-4 px-4 mb-12">
+      <div
+          className="absolute top-0
+          left-0
+          w-full
+          h-96
+          bg-gradient-to-br
+          from-[#FCB61A]
+          to-[#0171CE]
+          rounded-md
+          filter
+          blur-3xl
+          opacity-50
+          -z-20"
+        />
       {restaurantData.map((restaurant: Restaurant) => (
         <div
           key={restaurant.id}

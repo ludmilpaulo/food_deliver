@@ -82,6 +82,20 @@ const RestaurantMenu = () => {
           />
         )}
       </div>
+      <div
+          className="absolute top-0
+          left-0
+          w-full
+          h-96
+          bg-gradient-to-br
+          from-[#FCB61A]
+          to-[#0171CE]
+          rounded-md
+          filter
+          blur-3xl
+          opacity-50
+          -z-20"
+        />
 
       <div className="flex flex-col justify-between lg:flex-row p-4">
         {/* Filter Type */}

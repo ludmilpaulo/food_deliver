@@ -59,6 +59,7 @@ const Nav = () => {
 
   return (
     <nav className="flex items-center justify-between p-6 max-w-full h-8 bg-[#0171CE]">
+      
       <div className="flex items-center">
         <Link href="/HomeScreen">
           <Image

@@ -52,11 +52,13 @@ function HomeScreen() {
     <div className="flex flex-col min-h-screen">
       <div className="flex-grow">
         <Nav />
+        
         <div className="w-full h-auto sm:h-custom">
           <Barner />
         </div>
         <div className="px-2 sm:px-4">
           <Card />
+          
 
           <div className="flex items-center justify-center px-4 sm:px-24 mx-4 sm:mx-24 border-2 border-[#0171CE] rounded-md mt-4">
             <input
@@ -69,6 +71,7 @@ function HomeScreen() {
           </div>
 
           <div className="pb-16 mx-8 my-12">
+            
             <RestaurantCard restaurantData={filteredDataSource} />
           </div>
         </div>

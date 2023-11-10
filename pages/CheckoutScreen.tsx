@@ -136,7 +136,7 @@ const CheckoutScreen = () => {
 
   return (
     <div>
-      <div className="bg-blue-300 relative h-60">
+      <div className="relative bg-blue-300 h-60">
         <MapContainer
           center={[location.latitude, location.longitude]}
           zoom={10}
@@ -172,13 +172,13 @@ const CheckoutScreen = () => {
           value={userAddress}
         />
         <div
-          className="h-10 w-full bg-blue-500 my-4 rounded-full flex items-center justify-center border border-blue-500 cursor-pointer"
+          className="flex items-center justify-center w-full h-10 my-4 bg-blue-500 border border-blue-500 rounded-full cursor-pointer"
           onClick={completeOrder}
         >
           <p>Pagar na entrega</p>
         </div>
         <div
-          className="h-10 w-full bg-blue-500 rounded-full flex items-center justify-center border border-blue-500 cursor-pointer"
+          className="flex items-center justify-center w-full h-10 bg-blue-500 border border-blue-500 rounded-full cursor-pointer"
           onClick={completeOrder}
         >
           <p>FAÇA SEU PEDIDO</p>

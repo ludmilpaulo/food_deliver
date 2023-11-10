@@ -12,7 +12,7 @@ const withAuth = (WrappedComponent: React.ComponentType<any>) => {
 
     React.useEffect(() => {
       if (!user) {
-        router.replace("/LoginScreenUser");
+        router.replace("/");
       }
     }, [user, router]);
 

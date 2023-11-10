@@ -57,7 +57,7 @@ function HomeScreen() {
           <Barner />
         </div>
         <div className="px-2 sm:px-4">
-          <Card />
+          <Card onSelectCategory={(category) => setSearch(category)}/>
           
 
           <div className="flex items-center justify-center px-4 sm:px-24 mx-4 sm:mx-24 border-2 border-[#0171CE] rounded-md mt-4">

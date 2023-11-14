@@ -21,8 +21,9 @@ export default function Footer() {
           <Link href={"/AboutPage"}>
           <h2 className="mb-2 text-lg font-bold">Sobre nós</h2>
           </Link>
-          <h2 className="mb-2 text-lg font-bold">Vagas Abertas</h2>
-        
+          <Link href="https://www.privacypolicygenerator.info/live.php?token=wwVCZyy12vbw2T3Q7AAqYntKTKTMDq5Q">
+          <h2 className="mb-2 text-lg font-bold">política de Privacidade</h2>
+        </Link>
         
         </div>
         <div className="mb-2 sm:mb-4 text-center md:text-left">

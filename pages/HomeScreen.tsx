@@ -6,7 +6,7 @@ import Link from "next/link";
 import withAuth from "@/components/ProtectedPage";
 import Nav from "@/components/Nav";
 import Barner from "@/components/Barner";
-import Card from "@/components/Card";
+import Card from "@/components/CategoryCard";
 import Footer from "@/components/Footer";
 import RestaurantCard from "@/components/RestaurantCard";
 import { FiSearch } from "react-icons/fi";

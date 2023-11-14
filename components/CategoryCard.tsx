@@ -17,7 +17,7 @@ interface CategoriesProps {
 
 type Restaurants = Restaurant[];
 
-export default function Card({ onSelectCategory }: CategoriesProps) {
+export default function CategoryCard({ onSelectCategory }: CategoriesProps) {
   const [restaurants, setRestaurants] = useState<Restaurants>([]);
   const [isHovered, setIsHovered] = useState(false);
 

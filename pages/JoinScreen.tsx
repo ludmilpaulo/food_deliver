@@ -6,11 +6,13 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Nav from "@/components/Nav";
 import Barner from "@/components/Barner";
-import Card from "@/components/Card";
+import Card from "@/components/CategoryCard";
 import Footer from "@/components/Footer";
 import RestaurantCard from "@/components/RestaurantCard";
 import SearchBar from "@/components/SearchBar";
 import { FiSearch } from "react-icons/fi";
+import CategoryCard from "@/components/CategoryCard";
+
 
 type Restaurant = {
   id: number;
@@ -61,7 +63,7 @@ function JoinScreen() {
         <Barner />
       </div>
       <div className="px-2 sm:px-4">
-        <Card />
+      <CategoryCard onSelectCategory={(category) => console.log(category)} />
 
         <div className="flex items-center border-2 border-sky-500 rounded-md mt-4">
           <input

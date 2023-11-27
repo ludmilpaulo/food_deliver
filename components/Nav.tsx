@@ -65,8 +65,8 @@ const Nav = () => {
           <Image
             src={logo}
             alt="logo"
-            width={40}
-            height={40}
+            width={75}
+            height={10}
             className="mr-2"
           />
         </Link>

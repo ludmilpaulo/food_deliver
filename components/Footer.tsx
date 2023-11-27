@@ -42,7 +42,7 @@ export default function Footer() {
           <h2 className="mb-2 text-lg font-bold">Baixar aplicativo</h2>
           <div className="flex justify-center md:justify-start space-x-3">
             <FaApple className="w-5 h-5" />
-            <FaGooglePlay className="w-5 h-5" />
+            <FaGooglePlay href="https://play.google.com/store/apps/details?id=com.ludmil.kudyaclient" className="w-5 h-5" />
           </div>
         </div>
       </div>

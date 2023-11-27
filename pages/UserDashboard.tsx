@@ -12,6 +12,7 @@ import { logoutUser, selectUser } from "@/redux/slices/authSlice";
 import { FornecedorType, UserDetails, basAPI } from "@/configs/variable";
 import UserProfile from "@/components/UserProfile";
 import Nav from "@/components/Nav";
+import OrderHistory from "@/components/OrderHistory";
 
 interface SidebarProps {
   fornecedor: FornecedorType | null;
@@ -22,6 +23,8 @@ const UserDashboard: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
   const [showProducts, setShowProducts] = useState(false);
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
   const user = useSelector(selectUser);
+
+  const [ showOrderHistory, setShowOrderHistory] = useState(false)
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchUserDetails = async () => {
@@ -96,11 +99,26 @@ const UserDashboard: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
             onClick={() => {
               console.log("Atualizar o Perfil clicked!");
               setShowProducts(true);
+              setShowOrderHistory(false);
             } }
           >
             <Link className="flex items-center space-x-3" href={""}>
               <MdContacts className="text-lg" />
               <span>Atualizar o Perfil</span>
+            </Link>
+          </li>
+
+          <li
+            className="p-2 rounded hover:bg-blue-500"
+            onClick={() => {
+              console.log("Atualizar o Perfil clicked!");
+              setShowProducts(false);
+              setShowOrderHistory(true);
+            } }
+          >
+            <Link className="flex items-center space-x-3" href={""}>
+              <MdContacts className="text-lg" />
+              <span>Meu Pedido</span>
             </Link>
           </li>
 
@@ -123,6 +141,7 @@ const UserDashboard: React.FC<SidebarProps> = ({ fornecedor, onNavClick }) => {
 
       <div className="flex-1 overflow-y-auto bg-gray-100">
         {showProducts && <UserProfile />}
+        {showOrderHistory && <OrderHistory />}
       </div>
     </div></>
   );

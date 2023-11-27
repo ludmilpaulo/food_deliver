@@ -14,25 +14,21 @@ export default function Home() {
   const router = useRouter();
 
   const user = useSelector(selectUser);
-  useEffect(() => {
-    if (user !== null && typeof user === 'object' && user.is_customer === true) {
+
+useEffect(() => {
+  if (user !== null && typeof user === 'object') {
+    if (user.is_customer === true) {
       router.push("/HomeScreen");
-    } else if (user !== null && typeof user === 'object' && user.is_customer === false) {
-      router.push("/RestaurantDashboard"); // Redirect to Dashboard
-    }
-    if (user == null && typeof user === 'object') {
+    } else if (user.fornecedor_id !== null) {
+      router.push("/RestaurantDashboard");
+    } else {
       router.push("/LoginScreenUser");
     }
-    if (
-      typeof user.fornecedor_id === "object" &&
-      user.fornecedor_id !== null
-    ) {
-      router.push("/RestaurantDashboad"); // Redirect to Dashboard
-    }
-    else{
-      router.push("/LoginScreenUser");
-    }
-  }, [router, user]);
+  } else {
+    router.push("/LoginScreenUser");
+  }
+}, [router, user]);
+
   
 
   console.log("user==>>", user)

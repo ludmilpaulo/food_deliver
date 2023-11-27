@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import logo from "../assets/logo.png";
+import logo from "../assets/azul.png";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/slices/authSlice";
+
 
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -64,7 +65,9 @@ const LoginScreenUser = () => {
   };
 
   return (
-    <><Nav /><div className="w-full h-screen px-4 py-16">
+    <><Nav />
+    
+    <div className="w-full h-screen px-4 py-16">
       <div
           className="absolute top-0
           left-0
@@ -87,10 +90,19 @@ const LoginScreenUser = () => {
           }}
           className="w-full p-10 mt-16 bg-white rounded shadow lg:w-1/3 md:w-1/2"
         >
+          {/* Add the logo in the top center */}
+          <div className="flex justify-center mb-6">
+            <Image
+              src={logo} // Update the path based on your project structure
+              alt="logo"
+              width={100}
+              height={100}
+            />
+          </div>
           <p className="text-2xl font-extrabold leading-6 text-gray-800">
             Faça login na sua conta
           </p>
-
+            <br></br>
           <Link href={"/SignupScreen"}>
             <p className="mt-4 text-sm font-medium leading-none text-gray-500">
               Não tem uma conta?{" "}

@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-undef */
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useDispatch } from "react-redux";
@@ -5,7 +6,10 @@ import { loginUser } from "../redux/slices/authSlice";
 import { Transition } from "@headlessui/react";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import Image from "next/image";
 import { basAPI } from "@/configs/variable";
+import logo from "../assets/azul.png";
+import Nav from "@/components/Nav";
 
 const SignupScreen = () => {
   const router = useRouter();
@@ -131,7 +135,22 @@ const SignupScreen = () => {
   };
 
   return (
-    <div className="w-full h-screen px-4 py-16 bg-cover bg-bg_image">
+    <><Nav />
+    <div className="w-full h-screen px-4 py-16">
+    <div
+          className="absolute top-0
+          left-0
+          w-full
+          h-96
+          bg-gradient-to-br
+          from-[#FCB61A]
+          to-[#0171CE]
+          rounded-md
+          filter
+          blur-3xl
+          opacity-50
+          -z-20"
+        />
       <div className="flex flex-col items-center justify-center">
         <motion.div
           animate={{
@@ -140,6 +159,16 @@ const SignupScreen = () => {
           }}
           className="w-full p-10 mt-16 bg-white rounded shadow lg:w-1/3 md:w-1/2"
         >
+         <div className="flex justify-center mb-6">
+              <Image
+                src={logo}
+                alt="Logo"
+                width={100}
+                height={100}
+              />
+            </div>
+
+
           <h1
             tabIndex={0}
             aria-label="Login to your account"
@@ -147,6 +176,7 @@ const SignupScreen = () => {
           >
             Inscreva-se Para ter uma Conta
           </h1>
+          <br></br>
 
           <Link href={"/LoginScreenUser"}>
             <p className="mt-4 text-sm font-medium leading-none text-gray-500">
@@ -161,6 +191,7 @@ const SignupScreen = () => {
                 Entre aqui
               </span>
             </p>
+            <br></br>
           </Link>
 
           {/* Role selection */}
@@ -186,7 +217,7 @@ const SignupScreen = () => {
               Fornecedor de Negocio
             </label>
           </div>
-
+          <br></br>
           <Transition
             show={loading}
             enter="transition-opacity duration-300"
@@ -196,9 +227,12 @@ const SignupScreen = () => {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full">
-              <div className="w-32 h-32 border-t-2 border-b-2 border-blue-500 rounded-full animate-spin"></div>
-            </div>
+           {loading && (
+  <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full">
+    <div className="w-32 h-32 border-t-2 border-b-2 border-blue-500 rounded-full animate-spin"></div>
+  </div>
+)}
+
           </Transition>
 
           {!loading && (
@@ -292,6 +326,7 @@ const SignupScreen = () => {
         </motion.div>
       </div>
     </div>
+    </>
   );
 };
 

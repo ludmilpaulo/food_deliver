@@ -28,7 +28,7 @@ const Team: React.FC = () => {
     // Fetch data from the API endpoint
     const fetchData = async () => {
       try {
-        const response = await fetch('https://www.sunshinedeliver.com/api/team/');
+        const response = await fetch('https://www.kudya.shop/api/team/');
         const result = await response.json();
         setData(result);
       } catch (error) {

@@ -62,7 +62,7 @@ const OrderHistory: NextPage = () => {
 
   const fetchOrderHistory = async () => {
     try {
-      let response = await fetch('https://www.sunshinedeliver.com/api/customer/order/history/', {
+      let response = await fetch('https://www.kudya.shop/api/customer/order/history/', {
         method: 'POST',
         headers: {
           Accept: 'application/json',

@@ -32,7 +32,7 @@ function JoinScreen() {
   const [masterDataSource, setMasterDataSource] = useState<Restaurants>([]);
 
   useEffect(() => {
-    fetch("https://www.sunshinedeliver.com/api/customer/restaurants/")
+    fetch("https://www.kudya.shop/api/customer/restaurants/")
       .then((response) => response.json())
       .then((data) => {
         console.log(data);

@@ -60,7 +60,7 @@ const OrderScreen = (props: Props) => {
     let userName = user?.username;
 
     let response = await fetch(
-      "https://www.sunshinedeliver.com/api/customer/driver/location/",
+      "https://www.kudya.shop/api/customer/driver/location/",
       {
         method: "POST",
         headers: {

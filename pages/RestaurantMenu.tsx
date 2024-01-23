@@ -42,7 +42,7 @@ const RestaurantMenu = () => {
   //let res_Image: string = image_url || "";
 
   const fetchMeals = useCallback(() => {
-    fetch(`https://www.sunshinedeliver.com/api/customer/meals/${res_ID}/`)
+    fetch(`https://www.kudya.shop/api/customer/meals/${res_ID}/`)
       .then((response) => response.json())
       .then((responseJson) => {
         setFoods(responseJson.meals);

@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 
 export const googleAPi = "AIzaSyDn1X_BlFj-57ydasP6uZK_X_WTERNJb78";
 
-export const basAPI = "https://www.sunshinedeliver.com/";
+export const basAPI = "https://www.kudya.shop/";
 
 export type UserDetails = {
   // customer_detais: string;

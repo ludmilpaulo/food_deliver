@@ -1,6 +1,12 @@
 import React from 'react';
 import Image from 'next/image';
 
+type Category = {
+  id: number;
+  name: string;
+  image: string;
+};
+
 type RestaurantProps = {
   restaurant: {
     id: number;
@@ -8,11 +14,7 @@ type RestaurantProps = {
     phone: string;
     address: string;
     logo: string;
-    category: {
-      id: number;
-      name: string;
-      image: string;
-    };
+    category?: Category; // Mark category as optional
     barnner: boolean;
     is_approved: boolean;
   };

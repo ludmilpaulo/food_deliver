@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.0.3",
-    "@next/font": "^14.2.3",
     "@reduxjs/toolkit": "^2.2.5",
     "axios": "^1.7.1",
     "date-fns": "^3.6.0",

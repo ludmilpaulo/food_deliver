@@ -1,14 +1,29 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { selectUser } from '@/redux/slices/authSlice';
 import { OrderTypes } from '@/services/types';
 import { fetchOrders, updateOrderStatus } from '@/services/apiService';
 import { Transition } from '@headlessui/react';
 
-const Order = () => {
+const Order: React.FC = () => {
   const [orders, setOrders] = useState<OrderTypes[]>([]);
   const [loading, setLoading] = useState(false);
   const user = useSelector(selectUser);
+
+  const fetchOrderData = useCallback(async () => {
+    setLoading(true);
+
+    if (user?.user_id) {
+      try {
+        const data = await fetchOrders(user.user_id);
+        setOrders(data);
+      } catch (error) {
+        console.error("An error occurred:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  }, [user?.user_id]);
 
   const handleStatus = async (orderId: number) => {
     const user_id = user?.user_id;
@@ -30,27 +45,13 @@ const Order = () => {
     }
   };
 
-  const fetchOrderData = async () => {
-    setLoading(true);
-
-    if (user?.user_id) {
-      try {
-        const data = await fetchOrders(user.user_id);
-        setOrders(data);
-        setLoading(false);
-      } catch (error) {
-        console.error("An error occurred:", error);
-      }
-    }
-  };
-
   useEffect(() => {
     fetchOrderData();
 
     const intervalId = setInterval(fetchOrderData, 5000);
 
     return () => clearInterval(intervalId);
-  }, [user.user_id]);
+  }, [fetchOrderData]);
 
   return (
     <div className="container mx-auto px-4">

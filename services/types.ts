@@ -1,4 +1,4 @@
-export const baseAPI = "http://127.0.0.1:8000" 
+export const baseAPI = "https://ludmil.pythonanywhere.com" 
 import { ReactNode } from "react";
 
 export type UserDetails = {
@@ -43,20 +43,23 @@ export type UserDetails = {
     status: string;
   }
   
+  export type Category = {
+    id: number;
+    name: string;
+    image: string;
+  };
+  
   export type Restaurant = {
     id: number;
     name: string;
     phone: string;
     address: string;
     logo: string;
-    category?: {
-      name: string;
-      image: string;
-    };
-    is_approved: boolean;
+    category?: Category; // Mark category as optional
     barnner: boolean;
+    is_approved: boolean;
   };
-
+  
   export type Product = {
     user_id?: number;
     id?: number;

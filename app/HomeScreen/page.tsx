@@ -4,7 +4,7 @@ import withAuth from "@/components/ProtectedPage";
 import RestaurantCard from "./RestaurantCard"; // Adjust the import path if necessary
 import { FiSearch } from "react-icons/fi";
 import { Transition } from "@headlessui/react";
-import { Restaurant } from "@/services/types";
+import { baseAPI, Restaurant } from "@/services/types";
 
 type Restaurants = Restaurant[];
 
@@ -16,7 +16,7 @@ function HomeScreen() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/customer/customer/restaurants/`)
+    fetch(`${baseAPI}/customer/customer/restaurants/`)
       .then((response) => response.json())
       .then((data) => {
         const approvedRestaurants = data.restaurants.filter(

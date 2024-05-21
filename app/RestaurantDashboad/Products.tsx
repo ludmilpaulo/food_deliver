@@ -81,7 +81,11 @@ const Products: React.FC = () => {
       loadProducts();
     } catch (error) {
       console.error("Falha ao adicionar produto:", error);
-      alert(`Erro: ${error.message}`);
+      if (error instanceof Error) {
+        alert(`Erro: ${error.message}`);
+      } else {
+        alert('Erro desconhecido');
+      }
     } finally {
       setLoading(false);
     }
@@ -110,7 +114,11 @@ const Products: React.FC = () => {
       loadProducts();
     } catch (error) {
       console.error("Falha ao atualizar produto:", error);
-      alert(`Erro: ${error.message}`);
+      if (error instanceof Error) {
+        alert(`Erro: ${error.message}`);
+      } else {
+        alert('Erro desconhecido');
+      }
     } finally {
       setLoading(false);
     }
@@ -127,7 +135,11 @@ const Products: React.FC = () => {
       loadProducts();
     } catch (error) {
       console.error("Falha ao excluir produto:", error);
-      alert(`Erro: ${error.message}`);
+      if (error instanceof Error) {
+        alert(`Erro: ${error.message}`);
+      } else {
+        alert('Erro desconhecido');
+      }
     } finally {
       setLoading(false);
     }

@@ -3,10 +3,11 @@ import { useSelector } from "react-redux";
 import { selectUser } from "@/redux/slices/authSlice";
 import { getRestaurant, getOpeningHours } from "@/services/apiService";
 import { RestaurantType, OpeningHourType } from "@/services/types";
-import RestaurantProfile from "./RestaurantProfile";
-import OpeningHour from "./OpeningHour";
-import OpeningHoursCalendar from "./OpeningHoursCalendar"; // Import OpeningHoursCalendar component
+
 import styles from './Profile.module.css'; // Import the CSS module
+import OpeningHour from "./OpeningHour";
+import OpeningHoursCalendar from "./OpeningHoursCalendar";
+import RestaurantProfile from "./RestaurantProfile";
 
 const Profile: React.FC = () => {
   const user = useSelector(selectUser);

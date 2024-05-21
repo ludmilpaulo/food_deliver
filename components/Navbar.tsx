@@ -76,7 +76,7 @@ const Navbar: React.FC = () => {
                 <IoMdCart size={20} className="mr-1" /> Cart
               </span>
             </Link>
-            <Link href="/login">
+            <Link href="/LoginScreenUser">
               <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
                 <IoMdPerson size={20} className="mr-1" /> Login
               </span>

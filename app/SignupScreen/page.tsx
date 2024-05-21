@@ -72,7 +72,7 @@ const SignupScreen = () => {
         dispatch(loginUser(data));
         alert("Você se conectou com sucesso. Agora você pode saborear sua refeição.");
         if (role === "restaurant") {
-          router.push("/RestaurantDashboard"); // Redirect to Dashboard
+          router.push("/RestaurantDashboad"); // Redirect to Dashboard
         } else {
           router.push("/HomeScreen");
         }

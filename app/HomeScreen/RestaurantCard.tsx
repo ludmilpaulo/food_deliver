@@ -1,5 +1,7 @@
+"use client";
 import React from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 type OpeningHour = {
   day: string;
@@ -29,6 +31,8 @@ type RestaurantProps = {
 };
 
 const RestaurantCard: React.FC<RestaurantProps> = ({ restaurant }) => {
+  const router = useRouter();
+
   if (!restaurant) {
     return null; // Render nothing if the restaurant is undefined
   }
@@ -38,18 +42,11 @@ const RestaurantCard: React.FC<RestaurantProps> = ({ restaurant }) => {
     const currentDay = today.toLocaleString('pt-BR', { weekday: 'long' }).toLowerCase();
     const currentTime = today.getHours() * 60 + today.getMinutes();
 
-    console.log("Today:", today);
-    console.log("Current Day:", currentDay);
-    console.log("Current Time (in minutes):", currentTime);
-
     const openingHour = restaurant.opening_hours.find(
       (hour) => hour.day.toLowerCase() === currentDay
     );
 
-    console.log("Opening Hour for Today:", openingHour);
-
     if (!openingHour || openingHour.is_closed) {
-      console.log("Restaurant is closed today or no opening hours found.");
       return false;
     }
 
@@ -69,20 +66,14 @@ const RestaurantCard: React.FC<RestaurantProps> = ({ restaurant }) => {
     const openingTime = parseTime(openingHour.from_hour);
     const closingTime = parseTime(openingHour.to_hour) - 20; // 20 minutes before closing
 
-    console.log("Opening Time (in minutes):", openingTime);
-    console.log("Adjusted Closing Time (in minutes, 20 minutes earlier):", closingTime);
-
-    const isCurrentlyOpen = currentTime >= openingTime && currentTime <= closingTime;
-    console.log("Is Restaurant Currently Open:", isCurrentlyOpen);
-
-    return isCurrentlyOpen;
+    return currentTime >= openingTime && currentTime <= closingTime;
   };
 
   const handleClick = () => {
     if (!isOpen()) {
       alert(`O restaurante ${restaurant.name} está fechado de momento, tente mais tarde`);
     } else {
-      // Handle restaurant click when it's open
+      router.push(`/RestaurantMenuPage?restaurant_id=${restaurant.id}`);
     }
   };
 

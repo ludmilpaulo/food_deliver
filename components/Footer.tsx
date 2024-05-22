@@ -11,16 +11,16 @@ const Footer: React.FC = () => {
             <h4 className="text-lg font-semibold mb-2">Download Our App</h4>
             <div className="flex space-x-4">
               <Link href="https://apps.apple.com">
-                <a className="flex items-center space-x-2 hover:text-gray-200 transition duration-300">
+                <span className="flex items-center space-x-2 hover:text-gray-200 transition duration-300">
                   <FaApple className="w-5 h-5" />
                   <span>App Store</span>
-                </a>
+                </span>
               </Link>
               <Link href="https://play.google.com/store/apps/details?id=com.ludmil.kudyaclient">
-                <a className="flex items-center space-x-2 hover:text-gray-200 transition duration-300">
+                <span className="flex items-center space-x-2 hover:text-gray-200 transition duration-300">
                   <FaGooglePlay className="w-5 h-5" />
                   <span>Google Play</span>
-                </a>
+                </span>
               </Link>
             </div>
           </div>
@@ -44,17 +44,17 @@ const Footer: React.FC = () => {
             <ul className="space-y-2">
               <li>
                 <Link href="/contact">
-                  <a className="hover:text-gray-200 transition duration-300">Contate-nos</a>
+                  <span className="hover:text-gray-200 transition duration-300">Contate-nos</span>
                 </Link>
               </li>
               <li>
                 <Link href="/careers">
-                  <a className="hover:text-gray-200 transition duration-300">Carreiras</a>
+                  <span className="hover:text-gray-200 transition duration-300">Carreiras</span>
                 </Link>
               </li>
               <li>
                 <Link href="/about">
-                  <a className="hover:text-gray-200 transition duration-300">Acerca de Nós</a>
+                  <span className="hover:text-gray-200 transition duration-300">Acerca de Nós</span>
                 </Link>
               </li>
             </ul>

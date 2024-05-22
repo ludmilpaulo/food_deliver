@@ -1,65 +1,45 @@
-// basketSlice.ts
+// slices/basketSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-// Define the structure of a single meal item
-interface Meals {
+type Meal = {
   id: number;
+  name: string;
   price: number;
   quantity: number;
-  resName: string;
-  resImage: string;
-  resId: number;
-  // other properties ...
-}
+};
 
-// Define the structure of the basket state
-interface BasketState {
-  items: Meals[];
-}
+type BasketState = {
+  items: Meal[];
+};
 
-// Define the initial state for the basket
 const initialState: BasketState = {
   items: [],
 };
 
-// Create the basket slice
 const basketSlice = createSlice({
   name: "basket",
   initialState,
   reducers: {
-    updateBasket: (state, action: PayloadAction<Meals>) => {
-      const foodItem = action.payload;
-      const index = state.items.findIndex((item) => item.id === foodItem.id);
-
-      if (index >= 0) {
-        if (foodItem.quantity === 0) {
-          state.items.splice(index, 1);
-        } else {
-          state.items[index] = foodItem;
-        }
-      } else if (foodItem.quantity > 0) {
-        state.items.push(foodItem);
+    addItem: (state, action: PayloadAction<Meal>) => {
+      const existingItem = state.items.find((item) => item.id === action.payload.id);
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        state.items.push({ ...action.payload, quantity: 1 });
       }
     },
-    // New reducer for clearing the cart
-    clearCart: (state) => {
-      state.items = [];
+    removeItem: (state, action: PayloadAction<number>) => {
+      const index = state.items.findIndex((item) => item.id === action.payload);
+      if (index !== -1) {
+        if (state.items[index].quantity > 1) {
+          state.items[index].quantity -= 1;
+        } else {
+          state.items.splice(index, 1);
+        }
+      }
     },
   },
 });
 
-// Export action creators and selectors
-export const { updateBasket, clearCart } = basketSlice.actions;
-export const selectCartItems = (state: { basket: BasketState }) =>
-  state.basket.items;
-export const selectTotalPrice = (state: { basket: BasketState }) =>
-  state.basket.items
-    .reduce((total, item) => total + item.price * item.quantity, 0)
-    .toFixed(2);
-export const selectTotalItems = (state: { basket: BasketState }) =>
-  state.basket.items.reduce((total, item) => total + item.quantity, 0);
-
-//export const selectTotalItems = (state: { basket: BasketState }) => state.basket.items
-
-// Export the reducer
+export const { addItem, removeItem } = basketSlice.actions;
 export default basketSlice.reducer;

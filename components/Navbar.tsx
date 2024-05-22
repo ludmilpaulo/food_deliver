@@ -7,6 +7,7 @@ import Image from 'next/image';
 import logo from '@/assets/azul.png';
 import { selectUser } from '@/redux/slices/authSlice';
 import { useSelector } from 'react-redux';
+import { useAppSelector } from '@/redux/store';
 
 const Navbar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -14,6 +15,8 @@ const Navbar: React.FC = () => {
   const router = useRouter();
 
   const user = useSelector(selectUser);
+  const cartItems = useAppSelector((state) => state.basket.items);
+  const cartQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -77,10 +80,15 @@ const Navbar: React.FC = () => {
                 <IoIosSearch size={20} />
               </button>
             </form>
-            <Link href="/cart">
+            <Link href="/cart" className="relative">
               <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
                 <IoMdCart size={20} className="mr-1" /> Cart
               </span>
+              {cartQuantity > 0 && (
+                <span className="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
+                  {cartQuantity}
+                </span>
+              )}
             </Link>
             {user ? (
               <Link href="/profile">
@@ -139,10 +147,15 @@ const Navbar: React.FC = () => {
                 <IoMdPerson size={20} className="mr-1" /> Profile
               </span>
             </Link>
-            <Link href="/cart">
-              <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer px-4">
+            <Link href="/cart" className="relative px-4">
+              <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
                 <IoMdCart size={20} className="mr-1" /> Cart
               </span>
+              {cartQuantity > 0 && (
+                <span className="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
+                  {cartQuantity}
+                </span>
+              )}
             </Link>
             {!user && (
               <Link href="/LoginScreenUser">

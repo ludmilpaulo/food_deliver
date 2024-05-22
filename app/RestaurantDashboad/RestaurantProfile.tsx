@@ -1,12 +1,13 @@
 import React, { ChangeEvent, useState } from "react";
 import { MdEdit, MdSave, MdCancel } from "react-icons/md";
-import { RestaurantType } from "@/services/types";
+import { Restaurant, RestaurantType } from "@/services/types";
 import { updateRestaurant } from "@/services/apiService";
 
-interface RestaurantProfileProps {
-  restaurant: RestaurantType;
-  setRestaurant: React.Dispatch<React.SetStateAction<RestaurantType | null>>;
-}
+
+type RestaurantProfileProps = {
+    restaurant: RestaurantType;
+    setRestaurant: (restaurant: RestaurantType) => void;
+  };
 
 const RestaurantProfile: React.FC<RestaurantProfileProps> = ({ restaurant, setRestaurant }) => {
   const [editMode, setEditMode] = useState<boolean>(false);

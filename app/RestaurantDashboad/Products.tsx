@@ -6,7 +6,7 @@ import { Transition } from "@headlessui/react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { selectUser } from "@/redux/slices/authSlice";
 import { fetchCategorias, fetchProducts, addProduct, updateProduct, deleteProduct } from "@/services/apiService";
-import { Product, Categoria } from "@/services/types";
+import { Product, Category, Categoria } from "@/services/types";
 import AddProductModal from "./AddProductModal";
 import EditProductModal from "./EditProductModal";
 

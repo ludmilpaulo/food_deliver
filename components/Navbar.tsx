@@ -5,11 +5,15 @@ import { IoMdMenu, IoMdClose, IoIosSearch, IoMdCart, IoMdPerson, IoMdRestaurant 
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import logo from '@/assets/azul.png';
+import { selectUser } from '@/redux/slices/authSlice';
+import { useSelector } from 'react-redux';
 
 const Navbar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
   const router = useRouter();
+
+  const user = useSelector(selectUser);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -23,7 +27,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="bg-white shadow-lg">
+    <nav className="bg-gradient-to-r from-yellow-400 to-blue-600 shadow-lg">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center">
@@ -36,23 +40,25 @@ const Navbar: React.FC = () => {
                 className="cursor-pointer"
               />
             </Link>
-            <div className="hidden md:flex space-x-6 ml-10">
-              <Link href="/restaurants">
-                <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
-                  <IoMdRestaurant size={20} className="mr-1" /> Restaurants
-                </span>
-              </Link>
-              <Link href="/orders">
-                <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
-                  <IoMdCart size={20} className="mr-1" /> Orders
-                </span>
-              </Link>
-              <Link href="/profile">
-                <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
-                  <IoMdPerson size={20} className="mr-1" /> Profile
-                </span>
-              </Link>
-            </div>
+            {user ? (
+              <div className="hidden md:flex space-x-6 ml-10">
+                <Link href="/restaurants">
+                  <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
+                    <IoMdRestaurant size={20} className="mr-1" /> Restaurants
+                  </span>
+                </Link>
+                <Link href="/orders">
+                  <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
+                    <IoMdCart size={20} className="mr-1" /> Orders
+                  </span>
+                </Link>
+                <Link href="/profile">
+                  <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
+                    <IoMdPerson size={20} className="mr-1" /> Profile
+                  </span>
+                </Link>
+              </div>
+            ) : null}
           </div>
           <div className="hidden md:flex items-center space-x-6">
             <form onSubmit={handleSearch} className="relative">
@@ -76,11 +82,19 @@ const Navbar: React.FC = () => {
                 <IoMdCart size={20} className="mr-1" /> Cart
               </span>
             </Link>
-            <Link href="/LoginScreenUser">
-              <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
-                <IoMdPerson size={20} className="mr-1" /> Login
-              </span>
-            </Link>
+            {user ? (
+              <Link href="/profile">
+                <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
+                  <IoMdPerson size={20} className="mr-1" /> Profile
+                </span>
+              </Link>
+            ) : (
+              <Link href="/LoginScreenUser">
+                <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
+                  <IoMdPerson size={20} className="mr-1" /> Login
+                </span>
+              </Link>
+            )}
           </div>
           <div className="md:hidden flex items-center">
             <button onClick={toggleMenu}>
@@ -130,11 +144,13 @@ const Navbar: React.FC = () => {
                 <IoMdCart size={20} className="mr-1" /> Cart
               </span>
             </Link>
-            <Link href="/login">
-              <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer px-4">
-                <IoMdPerson size={20} className="mr-1" /> Login
-              </span>
-            </Link>
+            {!user && (
+              <Link href="/LoginScreenUser">
+                <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer px-4">
+                  <IoMdPerson size={20} className="mr-1" /> Login
+                </span>
+              </Link>
+            )}
           </div>
         )}
       </div>

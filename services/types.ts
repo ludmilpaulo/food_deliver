@@ -43,23 +43,7 @@ export type UserDetails = {
     status: string;
   }
   
-  export type Category = {
-    id: number;
-    name: string;
-    image: string;
-  };
-  
-  export type Restaurant = {
-    id: number;
-    name: string;
-    phone: string;
-    address: string;
-    logo: string;
-    category?: Category; // Mark category as optional
-    barnner: boolean;
-    is_approved: boolean;
-  };
-  
+
   export type Product = {
     user_id?: number;
     id?: number;
@@ -71,6 +55,33 @@ export type UserDetails = {
     // Add other fields if necessary...
   };
   
+ // @/services/types.ts
+
+export type OpeningHour = {
+    day: string;
+    from_hour: string;
+    to_hour: string;
+    is_closed: boolean;
+  };
+  
+  export type Category = {
+    id: number;
+    name: string;
+    image: string | null;
+  };
+  
+  export type Restaurant = {
+    id: number;
+    name: string;
+    phone: string;
+    address: string;
+    logo: string;
+    category?: Category;
+    barnner: boolean;
+    is_approved: boolean;
+    opening_hours: OpeningHour[];
+  };
+
   export type Categoria = {
     id: number;
     name: string;
@@ -87,17 +98,25 @@ export type UserDetails = {
     is_closed: boolean;
   }
   
-  export interface RestaurantType {
+  
+  
+
+
+  export type CategoryType = {
     id: number;
-    user: number;
-    category: number;
+    name: string;
+    image: string | null;
+  };
+  
+  export type RestaurantType = {
+    id: number;
     name: string;
     phone: string;
     address: string;
     logo: string;
-    restaurant_license: string;
+    category?: CategoryType;
     barnner: boolean;
     is_approved: boolean;
     opening_hours: OpeningHourType[];
-  }
+  };
   

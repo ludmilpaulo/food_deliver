@@ -4,8 +4,8 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import Head from "next/head";
 import { Transition } from "@headlessui/react";
-import { fetchAboutUsData } from "@/services/information";
-import { AboutUsData, baseAPI } from "@/services/types";
+import { fetchAboutUsData } from "@/services/information"; // Ensure this path is correct
+import { AboutUsData, baseAPI } from "@/services/types"; // Ensure this path is correct
 
 const About: NextPage = () => {
   const [headerData, setHeaderData] = useState<AboutUsData | null>(null);
@@ -16,7 +16,11 @@ const About: NextPage = () => {
       setLoading(true);
       try {
         const data = await fetchAboutUsData();
-        setHeaderData(data);
+        if (data) {
+          setHeaderData(data);
+        } else {
+          console.error("No data returned from fetchAboutUsData");
+        }
       } catch (error) {
         console.error("Error fetching About Us data:", error);
       }
@@ -27,28 +31,31 @@ const About: NextPage = () => {
   }, []);
 
   const renderHtmlContent = (html: string) => {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
-    const images = doc.querySelectorAll("img");
+    if (typeof document !== "undefined") {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, "text/html");
+      const images = doc.querySelectorAll("img");
 
-    images.forEach((img) => {
-      const src = img.getAttribute("src");
-      if (src && src.startsWith("/")) {
-        // Replace relative path with absolute URL
-        img.setAttribute("src", `${baseAPI}${src}`);
-      }
-    });
+      images.forEach((img) => {
+        const src = img.getAttribute("src");
+        if (src && src.startsWith("/")) {
+          // Replace relative path with absolute URL
+          img.setAttribute("src", `${baseAPI}${src}`);
+        }
+      });
 
-    return doc.documentElement.innerHTML;
+      return doc.documentElement.innerHTML;
+    }
+    return html;
   };
 
   return (
     <div style={{ overflowX: 'hidden' }}>
       <Head>
-        <title>About Us | {headerData?.title}</title>
+        <title>Sobre nós | {headerData?.title}</title>
         <meta
           name="description"
-          content="Learn more about our team and our story."
+          content="Saiba mais sobre nossa equipe e nossa história."
         />
       </Head>
       <Transition

@@ -1,106 +1,140 @@
 "use client";
-import type { NextPage } from "next";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import Head from "next/head";
-import { Transition } from "@headlessui/react";
-import { fetchAboutUsData } from "@/services/information"; // Ensure this path is correct
-import { AboutUsData, baseAPI } from "@/services/types"; // Ensure this path is correct
 
-const About: NextPage = () => {
-  const [headerData, setHeaderData] = useState<AboutUsData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+import React, { useEffect, useState } from "react";
+import Link from 'next/link';
+import { SocialIcon } from "react-social-icons";
+import { motion, useAnimation } from 'framer-motion';
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
+
+import { FaFacebook, FaGithub, FaInstagram, FaLinkedin, FaTwitter } from 'react-icons/fa';
+import { fetchAboutUsData } from "@/services/information";
+import { AboutUsData } from "@/services/types";
+
+
+const AboutUs = () => {
+    const [aboutUsData, setAboutUsData] = useState<AboutUsData | null>(null);
+   
+    const [isHovered, setIsHovered] = useState(false);
+
+  const controls = useAnimation();
+
+  
+  
+  
+  
+    useEffect(() => {
+      const fetchData = async () => {
         const data = await fetchAboutUsData();
-        if (data) {
-          setHeaderData(data);
-        } else {
-          console.error("No data returned from fetchAboutUsData");
-        }
-      } catch (error) {
-        console.error("Error fetching About Us data:", error);
-      }
-      setLoading(false);
-    };
-
-    fetchData();
-  }, []);
-
-  const renderHtmlContent = (html: string) => {
-    if (typeof document !== "undefined") {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, "text/html");
-      const images = doc.querySelectorAll("img");
-
-      images.forEach((img) => {
-        const src = img.getAttribute("src");
-        if (src && src.startsWith("/")) {
-          // Replace relative path with absolute URL
-          img.setAttribute("src", `${baseAPI}${src}`);
-        }
-      });
-
-      return doc.documentElement.innerHTML;
-    }
-    return html;
-  };
-
-  return (
-    <div style={{ overflowX: 'hidden' }}>
-      <Head>
-        <title>Sobre nós | {headerData?.title}</title>
-        <meta
-          name="description"
-          content="Saiba mais sobre nossa equipe e nossa história."
-        />
-      </Head>
-      <Transition
-        show={loading}
-        enter="transition-opacity duration-500 ease-out"
-        enterFrom="opacity-0"
-        enterTo="opacity-100"
-        leave="transition-opacity duration-500 ease-in"
-        leaveFrom="opacity-100"
-        leaveTo="opacity-0"
-        as="div" // Specify a container element here
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-      >
-        {loading && (
-          <div className="w-16 h-16 border-4 border-t-blue-500 border-b-blue-500 rounded-full animate-spin"></div>
-        )}
-      </Transition>
-
-      {!loading && headerData && (
-        <div
-          className="bg-cover bg-center w-full h-auto min-h-screen"
-          style={{ backgroundImage: `url(${headerData.backgroundImage})` }}
+        
+        setAboutUsData(data);
+      };
+      fetchData();
+    }, []);
+  
+    return (
+        <>
+        <div className="mx-auto p-4 pt-6 md:p-6 lg:p-12"
+         style={{
+            backgroundImage: `url(${aboutUsData?.backgroundApp})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}
         >
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
-            <Image
-              src={headerData.logo}
-              alt={headerData.title}
-              className="w-auto mx-auto"
-              width={200}
-              height={100}
-              priority
-            />
-            <div className="mt-4 p-6 bg-white bg-opacity-90 rounded-md shadow max-w-full">
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: renderHtmlContent(headerData.about),
-                }}
-                className="text-sm sm:text-base md:text-lg leading-relaxed"
-              />
+          <h1 className="text-3xl font-bold mb-4 text-center">About Us</h1>
+          {aboutUsData && (
+            <div className="prose lg:prose-xl bg-white">
+                <strong>{aboutUsData.title}</strong>
+             <div dangerouslySetInnerHTML={{ __html: aboutUsData.about }} />
+              
+              <address>
+              <motion.div
+  initial={{
+    x: -500,
+    opacity: 0,
+    scale: 0.5,
+  }}
+  animate={{
+    x: 0,
+    opacity: 1,
+    scale: 1,
+  }}
+  transition={{
+    duration: 2,
+  }}
+  className="flex flex-row items-center"
+>
+  <>
+    {aboutUsData?.facebook && <SocialIcon url={aboutUsData.facebook} />}
+    {aboutUsData?.linkedin && <SocialIcon url={aboutUsData.linkedin} />}
+    {aboutUsData?.twitter && <SocialIcon url={aboutUsData.twitter} />}
+   
+    {aboutUsData?.instagram && <SocialIcon url={aboutUsData.instagram} />}
+  </>
+</motion.div>
+
+
+      <motion.div
+        initial={{
+          x: 500,
+          opacity: 0,
+          scale: 0.5,
+        }}
+        animate={{
+          x: 0,
+          opacity: 1,
+          scale: 1,
+        }}
+        transition={{
+          duration: 2,
+        }}
+        className="flex flex-row items-center text-gray-300 cursor-pointer"
+      >
+        {aboutUsData.email && (
+                    <Link href={`mailto:${aboutUsData.email}`}>
+        <SocialIcon
+          className="cursor-pointer"
+          network="email"
+          fgColor="gray"
+          bgColor="transparent"
+        />
+        <p className="uppercase md:inline-flex text-sm text-gray-400">
+          {" "}
+          {aboutUsData.email}
+        </p>
+        </Link>
+    )}
+      </motion.div>
+                <p>
+                  
+                  <br />
+                  {aboutUsData.address}
+                  <br />
+                  
+                      <span className="text-blue-600 hover:text-blue-800">
+                       
+                      </span>
+                    
+                  <br />
+                  {aboutUsData.phone && (
+                    <Link href={`tel:${aboutUsData.phone}`}>
+                      <span className="text-blue-600 hover:text-blue-800">
+                        {aboutUsData.phone}
+                      </span>
+                    </Link>
+                  )}
+                </p>
+                
+              </address>
             </div>
-          </div>
+          )}
         </div>
-      )}
-    </div>
-  );
+      
+        
+      </>
+      
+      
+    );
 };
 
-export default About;
+export default AboutUs;

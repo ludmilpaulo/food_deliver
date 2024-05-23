@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUser, logoutUser } from '@/redux/slices/authSlice';
@@ -26,31 +26,31 @@ const CheckoutPage: React.FC = () => {
   const allCartItems = useSelector(selectCartItems);
 
   useEffect(() => {
-    const storedItems = sessionStorage.getItem('checkoutItems');
-    if (storedItems) {
-      setItems(JSON.parse(storedItems));
+    if (typeof window !== "undefined") {
+      const storedItems = sessionStorage.getItem('checkoutItems');
+      if (storedItems) {
+        setItems(JSON.parse(storedItems));
+      }
+
+      if (restaurantId) {
+        fetchRestaurantDetails(restaurantId)
+          .then(setRestaurant)
+          .catch((error) => console.error('Error fetching restaurant details:', error));
+      }
+
+      fetchUserDetails(user?.user_id, user?.token)
+        .then(setUserDetails)
+        .catch((error) => {
+          console.error('Error fetching user details:', error);
+          dispatch(logoutUser());
+        });
+
+      getUserLocation();
     }
-
-    if (restaurantId) {
-      fetchRestaurantDetails(restaurantId)
-        .then(setRestaurant)
-        .catch((error) => console.error('Error fetching restaurant details:', error));
-    }
-
-    fetchUserDetails(user?.user_id, user?.token)
-      .then(setUserDetails)
-      .catch((error) => {
-        console.error('Error fetching user details:', error);
-        dispatch(logoutUser());
-      });
-
-    getUserLocation();
   }, [restaurantId, user?.user_id, user?.token, dispatch]);
 
   const getUserLocation = async () => {
-    if (typeof window !== "undefined" && !navigator.geolocation) {
-      alert("Geolocation is not supported by your browser.");
-    } else {
+    if (typeof window !== "undefined" && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setLocation({
@@ -62,6 +62,8 @@ const CheckoutPage: React.FC = () => {
           alert("Unable to retrieve your location");
         },
       );
+    } else {
+      alert("Geolocation is not supported by your browser.");
     }
   };
 
@@ -124,4 +126,12 @@ const CheckoutPage: React.FC = () => {
   );
 };
 
-export default CheckoutPage;
+const CheckoutPageWrapper: React.FC = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CheckoutPage />
+    </Suspense>
+  );
+};
+
+export default CheckoutPageWrapper;

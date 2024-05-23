@@ -1,17 +1,12 @@
 "use client";
 import React, { Suspense, useEffect, useState } from 'react';
-import Link from 'next/link';
-import { IoMdMenu, IoMdClose, IoIosSearch, IoMdCart, IoMdPerson, IoMdRestaurant } from 'react-icons/io';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import logo from '@/assets/azul.png';
-import { selectUser } from '@/redux/slices/authSlice';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/redux/store';
 import { Transition } from '@headlessui/react';
 import { addItem, removeItem } from '@/redux/slices/basketSlice';
 import { baseAPI } from '@/services/types';
-
 
 type Meal = {
   id: number;
@@ -20,20 +15,18 @@ type Meal = {
   short_description: string;
   price: number;
   quantity: number;
-  category: { id: number; name: string };
+  category: string;
   restaurant: number;
 };
 
-type Category = {
-  id: number;
-  name: string;
-};
+type Category = string;
 
 const RestaurantMenu: React.FC = () => {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [meals, setMeals] = useState<Meal[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const restaurant_id = searchParams.get('restaurant_id');
   const dispatch = useDispatch();
@@ -45,11 +38,7 @@ const RestaurantMenu: React.FC = () => {
         .then((response) => response.json())
         .then((data) => {
           setMeals(data.meals);
-          const uniqueCategories = Array.from(new Set(data.meals.map((meal: Meal) => meal.category.id)))
-            .map((id) => ({
-              id: id as number, // Cast id to number
-              name: data.meals.find((meal: Meal) => meal.category.id === id)?.category.name || 'Unknown',
-            }));
+          const uniqueCategories = Array.from(new Set<string>(data.meals.map((meal: Meal) => meal.category)));
           setCategories(uniqueCategories);
           setLoading(false);
         })
@@ -61,7 +50,7 @@ const RestaurantMenu: React.FC = () => {
   }, [restaurant_id]);
 
   const filteredMeals = selectedCategory
-    ? meals.filter((meal) => meal.category.id === selectedCategory)
+    ? meals.filter((meal) => meal.category === selectedCategory)
     : meals;
 
   const handleAddToCart = (meal: Meal) => {
@@ -70,6 +59,13 @@ const RestaurantMenu: React.FC = () => {
 
   const handleRemoveFromCart = (mealId: number) => {
     dispatch(removeItem(mealId));
+  };
+
+  const isInCart = (mealId: number) => cartItems.some((item) => item.id === mealId);
+
+  const handleViewDetails = (meal: Meal) => {
+    sessionStorage.setItem('selectedMeal', JSON.stringify(meal));
+    router.push(`/FoodDetailsPage`);
   };
 
   return (
@@ -94,15 +90,15 @@ const RestaurantMenu: React.FC = () => {
         <div>
           <div className="flex justify-between mb-6">
             <div className="flex space-x-4">
-              {categories.map((category) => (
+              {categories.map((category, index) => (
                 <button
-                  key={category.id}
+                  key={index}
                   className={`px-4 py-2 rounded-full text-sm font-semibold ${
-                    selectedCategory === category.id ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'
+                    selectedCategory === category ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'
                   }`}
-                  onClick={() => setSelectedCategory(category.id)}
+                  onClick={() => setSelectedCategory(category)}
                 >
-                  {category.name}
+                  {category}
                 </button>
               ))}
               <button
@@ -121,7 +117,7 @@ const RestaurantMenu: React.FC = () => {
                 <Image src={meal.image_url} alt={meal.name} width={400} height={300} className="w-full h-48 object-cover" />
                 <div className="p-4">
                   <h2 className="text-2xl font-semibold text-gray-800">{meal.name}</h2>
-                  <p className="text-gray-600">{meal.short_description}</p>
+                  <p className="text-gray-600">{meal.short_description.length > 100 ? `${meal.short_description.substring(0, 100)}...` : meal.short_description}</p>
                   <p className="text-gray-800 font-bold">Preço: {meal.price} Kz</p>
                   <div className="flex items-center mt-4">
                     <button
@@ -139,6 +135,23 @@ const RestaurantMenu: React.FC = () => {
                     >
                       -
                     </button>
+                  </div>
+                  <div className="mt-4">
+                    {isInCart(meal.id) ? (
+                      <button
+                        className="px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700"
+                        onClick={() => router.push('/cart')}
+                      >
+                        Ir para o carrinho
+                      </button>
+                    ) : (
+                      <button
+                        className="px-4 py-2 bg-gray-600 text-white rounded-full hover:bg-gray-700"
+                        onClick={() => handleViewDetails(meal)}
+                      >
+                        Ver a refeição
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

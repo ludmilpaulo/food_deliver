@@ -1,11 +1,12 @@
-// slices/basketSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { RootState } from '../store'; // Adjust the import path according to your project structure
 
 type Meal = {
   id: number;
   name: string;
   price: number;
   quantity: number;
+  restaurant: number; // Add restaurant property to the Meal type
 };
 
 type BasketState = {
@@ -38,8 +39,14 @@ const basketSlice = createSlice({
         }
       }
     },
+    clearCart: (state, action: PayloadAction<number>) => { // Add clearCart reducer
+      state.items = state.items.filter(item => item.restaurant !== action.payload);
+    },
   },
 });
 
-export const { addItem, removeItem } = basketSlice.actions;
+export const { addItem, removeItem, clearCart } = basketSlice.actions;
+
+export const selectCartItems = (state: RootState) => state.basket.items;
+
 export default basketSlice.reducer;

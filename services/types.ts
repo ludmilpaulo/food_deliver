@@ -1,4 +1,10 @@
-export const baseAPI = "https://ludmil.pythonanywhere.com" 
+// src/services/types.ts
+export const baseAPI: string = process.env.NEXT_PUBLIC_BASE_API || 'https://ludmil.pythonanywhere.com';
+
+
+
+//export const baseAPI = "https://ludmil.pythonanywhere.com";
+
 import { ReactNode } from "react";
 
 export type UserDetails = {

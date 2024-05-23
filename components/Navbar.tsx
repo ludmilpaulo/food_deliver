@@ -45,19 +45,19 @@ const Navbar: React.FC = () => {
             </Link>
             {user ? (
               <div className="hidden md:flex space-x-6 ml-10">
-                <Link href="/restaurants">
+                <Link href="/HomeScreen">
                   <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
-                    <IoMdRestaurant size={20} className="mr-1" /> Restaurants
+                    <IoMdRestaurant size={20} className="mr-1" /> Restaurantes
                   </span>
                 </Link>
                 <Link href="/orders">
                   <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
-                    <IoMdCart size={20} className="mr-1" /> Orders
+                    <IoMdCart size={20} className="mr-1" /> Pedidos
                   </span>
                 </Link>
                 <Link href="/profile">
                   <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
-                    <IoMdPerson size={20} className="mr-1" /> Profile
+                    <IoMdPerson size={20} className="mr-1" /> Perfil
                   </span>
                 </Link>
               </div>

@@ -21,7 +21,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
   const [resume, setResume] = useState<File | null>(null);
 
   const handleApply = async () => {
-    if (!resume) return alert('Please attach a resume.');
+    if (!resume) return alert('Por favor, anexe um currículo.');
     setLoading(true);
     const formData = new FormData();
     formData.append('career', String(careerId));
@@ -36,11 +36,11 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
 
     if (response.ok) {
       setLoading(false);
-      alert('Application submitted successfully!');
+      alert('Inscrição enviada com sucesso!');
       closeModal();
     } else {
       setLoading(false);
-      alert('Failed to submit application.');
+      alert('Falha ao enviar inscrição.');
     }
   };
 
@@ -60,7 +60,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
             <div className="fixed inset-0 bg-black bg-opacity-50" />
           </Transition.Child>
 
-          {/* This element is to trick the browser into centering the modal contents. */}
+          {/* Este elemento é para enganar o navegador e centralizar o conteúdo do modal. */}
           <span className="inline-block h-screen align-middle" aria-hidden="true">
             &#8203;
           </span>
@@ -75,19 +75,19 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
           >
             <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg">
               <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
-                Apply for {careerTitle}
+                Candidate-se para {careerTitle}
               </Dialog.Title>
               <div className="mt-2">
                 <input
                   type="text"
-                  placeholder="Please type your Full Name"
+                  placeholder="Digite seu Nome Completo"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   className="input input-bordered w-full mb-4 p-2 border border-gray-300 rounded-md"
                 />
                 <input
                   type="email"
-                  placeholder="Please type your Email"
+                  placeholder="Digite seu Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="input input-bordered w-full mb-4 p-2 border border-gray-300 rounded-md"
@@ -106,7 +106,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
                   onClick={handleApply}
                   disabled={loading}
                 >
-                  {loading ? 'Submitting...' : 'Submit Application'}
+                  {loading ? 'Enviando...' : 'Enviar Inscrição'}
                 </button>
               </div>
             </div>

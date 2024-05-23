@@ -18,7 +18,7 @@ export const CareerCard: React.FC<CareerCardProps> = ({ career, onClick }) => (
       onClick={onClick}
       className="mt-4 inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
     >
-      Apply Now
+      Candidatar-se Agora
     </button>
   </div>
 );

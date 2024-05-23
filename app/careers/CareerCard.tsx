@@ -1,4 +1,4 @@
-// components/CareerCard.tsx
+"use client";
 import React from "react";
 import { CareerPosition } from "./types";
 

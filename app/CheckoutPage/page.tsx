@@ -4,11 +4,15 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUser, logoutUser } from '@/redux/slices/authSlice';
 import { selectCartItems, clearCart } from '@/redux/slices/basketSlice';
-import MapComponent from '@/components/MapComponent';
+import dynamic from 'next/dynamic'; // Import dynamic from Next.js for dynamic imports
+
+// Dynamically import components that use browser-specific APIs
+const MapComponent = dynamic(() => import('@/components/MapComponent'), { ssr: false });
+const AddressInput = dynamic(() => import('./AddressInput'), { ssr: false });
+const PaymentDetails = dynamic(() => import('./PaymentDetails'), { ssr: false });
+
 import { fetchRestaurantDetails, fetchUserDetails, completeOrderRequest } from '@/services/checkoutService';
 import { baseAPI } from '@/services/types';
-import AddressInput from './AddressInput';
-import PaymentDetails from './PaymentDetails';
 
 const CheckoutPage: React.FC = () => {
   const [items, setItems] = useState<any[]>([]);
@@ -106,11 +110,13 @@ const CheckoutPage: React.FC = () => {
         <h1 className="text-3xl font-semibold mb-6 text-gray-800">Checkout - {restaurant.name}</h1>
       )}
 
-      <MapComponent latitude={location.latitude} longitude={location.longitude} avatarUrl={`${baseAPI}${userDetails?.avatar || "/path/to/default/image.png"}`} />
-
-      <AddressInput useCurrentLocation={useCurrentLocation} setUseCurrentLocation={setUseCurrentLocation} userAddress={userAddress} setUserAddress={setUserAddress} />
-
-      <PaymentDetails paymentMethod={paymentMethod} setPaymentMethod={setPaymentMethod} />
+      {typeof window !== "undefined" && (
+        <>
+          <MapComponent latitude={location.latitude} longitude={location.longitude} avatarUrl={`${baseAPI}${userDetails?.avatar || "/path/to/default/image.png"}`} />
+          <AddressInput useCurrentLocation={useCurrentLocation} setUseCurrentLocation={setUseCurrentLocation} userAddress={userAddress} setUserAddress={setUserAddress} />
+          <PaymentDetails paymentMethod={paymentMethod} setPaymentMethod={setPaymentMethod} />
+        </>
+      )}
 
       <div className="flex justify-between items-center my-4">
         <p className="text-lg font-semibold text-gray-800">Total: {totalPrice} Kz</p>
@@ -127,11 +133,12 @@ const CheckoutPage: React.FC = () => {
 };
 
 const CheckoutPageWrapper: React.FC = () => {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <CheckoutPage />
-    </Suspense>
-  );
-};
-
-export default CheckoutPageWrapper;
+    return (
+      <Suspense fallback={<div>Loading...</div>}>
+        <CheckoutPage />
+      </Suspense>
+    );
+  };
+  
+  export default CheckoutPageWrapper;
+  

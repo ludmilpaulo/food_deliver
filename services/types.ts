@@ -125,4 +125,38 @@ export type OpeningHour = {
     is_approved: boolean;
     opening_hours: OpeningHourType[];
   };
-  
+
+
+  export interface AboutUsData {
+    id: number;
+    title: string;
+    logo: string;
+    back: string;
+    backgroundApp: string;
+    backgroundImage: string;
+    about: string;
+    born_date: string;
+    address: string;
+    phone: string;
+    email: string;
+    whatsapp: string;
+    linkedin: string | null;
+    facebook: string;
+    twitter: string;
+    instagram: string;
+  }
+
+
+  // types.ts
+export interface Career {
+  id: number;
+  title: string;
+  description: string;
+}
+
+export interface JobApplication {
+  career: number;
+  full_name: string;
+  email: string;
+  resume: File | null;
+}

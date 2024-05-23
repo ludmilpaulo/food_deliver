@@ -1,11 +1,42 @@
-import React from 'react'
+"use client";
+import Sidebar from './Sidebar';
+import dynamic from 'next/dynamic';
+import { useState } from 'react';
 
-type Props = {}
+const Users = dynamic(() => import('./user/Users'));
+const SiteInfo = dynamic(() => import('./info/SiteInfo'));
+const Orders = dynamic(() => import('./order/Orders'));
+const Restaurants = dynamic(() => import('./restaurant/Restaurants'));
+const Careers = dynamic(() => import('./carrer/Careers'));
 
-const page = (props: Props) => {
+const Dashboard = () => {
+  const [activeComponent, setActiveComponent] = useState('users');
+
+  const renderComponent = () => {
+    switch (activeComponent) {
+      case 'users':
+        return <Users />;
+      case 'site-info':
+        return <SiteInfo />;
+      case 'orders':
+        return <Orders />;
+      case 'restaurants':
+        return <Restaurants />;
+      case 'careers':
+        return <Careers />;
+      default:
+        return <Users />;
+    }
+  };
+
   return (
-    <div>page</div>
-  )
-}
+    <div className="flex">
+      <Sidebar setActiveComponent={setActiveComponent} />
+      <div className="flex-grow p-8">
+        {renderComponent()}
+      </div>
+    </div>
+  );
+};
 
-export default page
+export default Dashboard;

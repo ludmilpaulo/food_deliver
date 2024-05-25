@@ -80,7 +80,7 @@ const Navbar: React.FC = () => {
                 <IoIosSearch size={20} />
               </button>
             </form>
-            <Link href="/cart" className="relative">
+            <Link href="/CartPage" className="relative">
               <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
                 <IoMdCart size={20} className="mr-1" /> Carrinho
               </span>

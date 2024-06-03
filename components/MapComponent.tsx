@@ -21,7 +21,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ latitude, longitude, avatar
 
   return (
     <div className="relative bg-blue-300 h-60 mb-6">
-      <MapContainer center={[latitude, longitude]} zoom={14} style={{ height: "100%", width: "100%" }}>
+      <MapContainer center={[latitude, longitude]} zoom={10} style={{ height: "100%", width: "100%" }}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <Marker position={[latitude, longitude]} icon={icon}>
           <Popup>

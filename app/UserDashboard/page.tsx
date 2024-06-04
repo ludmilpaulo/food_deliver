@@ -27,7 +27,9 @@ const Dashboard: React.FC = () => {
   return (
     <div className="flex">
       <Sidebar setSelectedMenu={setSelectedMenu} />
-      <div className="flex-grow p-4">{renderComponent()}</div>
+      <div className="flex-grow p-4 bg-gradient-to-r from-yellow-400 to-blue-600">
+        {renderComponent()}
+      </div>
     </div>
   );
 };

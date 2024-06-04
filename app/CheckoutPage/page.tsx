@@ -4,15 +4,14 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUser, logoutUser } from '@/redux/slices/authSlice';
 import { selectCartItems, clearCart } from '@/redux/slices/basketSlice';
-import dynamic from 'next/dynamic'; // Import dynamic from Next.js for dynamic imports
-
-// Dynamically import components that use browser-specific APIs
-const MapComponent = dynamic(() => import('@/components/MapComponent'), { ssr: false });
-const AddressInput = dynamic(() => import('./AddressInput'), { ssr: false });
-const PaymentDetails = dynamic(() => import('./PaymentDetails'), { ssr: false });
-
+import dynamic from 'next/dynamic';
+import { Transition } from '@headlessui/react';
+import Image from 'next/image';
 import { fetchRestaurantDetails, fetchUserDetails, completeOrderRequest } from '@/services/checkoutService';
 import { baseAPI } from '@/services/types';
+
+const AddressInput = dynamic(() => import('./AddressInput'), { ssr: false });
+const PaymentDetails = dynamic(() => import('./PaymentDetails'), { ssr: false });
 
 const CheckoutPage: React.FC = () => {
   const [items, setItems] = useState<any[]>([]);
@@ -22,6 +21,8 @@ const CheckoutPage: React.FC = () => {
   const [userDetails, setUserDetails] = useState<any | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<string>("Entrega");
   const [useCurrentLocation, setUseCurrentLocation] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
   const restaurantId = searchParams.get('restaurant_id');
@@ -41,14 +42,16 @@ const CheckoutPage: React.FC = () => {
           .then(setRestaurant)
           .catch((error) => console.error('Error fetching restaurant details:', error));
       }
+        console.log('user id', user)
+      if (user?.user_id && user?.token) {
 
-      fetchUserDetails(user?.user_id, user?.token)
-        .then(setUserDetails)
-        .catch((error) => {
-          console.error('Error fetching user details:', error);
-          dispatch(logoutUser());
-        });
-
+        fetchUserDetails(user.user_id, user.token)
+          .then(setUserDetails)
+          .catch((error) => {
+            console.error('Error fetching user details:', error);
+            dispatch(logoutUser());
+          });
+      }
       getUserLocation();
     }
   }, [restaurantId, user?.user_id, user?.token, dispatch]);
@@ -72,6 +75,9 @@ const CheckoutPage: React.FC = () => {
   };
 
   const completeOrder = async () => {
+    console.log("order");
+    setLoading(true);
+    setError(null);
     const formattedCartItems = allCartItems.map((item) => ({
       meal_id: item.id,
       quantity: item.quantity,
@@ -86,20 +92,22 @@ const CheckoutPage: React.FC = () => {
       address: useCurrentLocation ? `${location.latitude},${location.longitude}` : userAddress,
       order_details: orderDetails,
     };
+    console.log("order data=>", orderData);
 
-    completeOrderRequest(orderData)
-      .then((responseData) => {
-        if (responseData.status === "success") {
-          dispatch(clearCart(parseInt(restaurantId))); // Dispatch clearCart with restaurant ID
-          router.push("/SuccessScreen");
-        } else {
-          alert(responseData.status);
-        }
-      })
-      .catch((error) => {
-        console.error('Error completing order:', error);
-        alert("An error occurred while completing the order.");
-      });
+    try {
+      const responseData = await completeOrderRequest(orderData);
+      if (responseData.status === "success") {
+        dispatch(clearCart(parseInt(restaurantId))); // Dispatch clearCart with restaurant ID
+        router.push("/SuccessScreen");
+      } else {
+        alert(responseData.status);
+      }
+    } catch (error) {
+      console.error('Error completing order:', error);
+      setError("An error occurred while completing the order.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const totalPrice = items.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -107,12 +115,16 @@ const CheckoutPage: React.FC = () => {
   return (
     <div className="container mx-auto p-6 bg-white rounded-lg shadow-md">
       {restaurant && (
-        <h1 className="text-3xl font-semibold mb-6 text-gray-800">Checkout - {restaurant.name}</h1>
+        <>
+          <h1 className="text-3xl font-semibold mb-6 text-gray-800">Checkout - {restaurant.name}</h1>
+          <div className="flex justify-center mb-6">
+            <Image src={restaurant.logo} alt={restaurant.name} width={200} height={200} className="rounded-lg" />
+          </div>
+        </>
       )}
 
       {typeof window !== "undefined" && (
         <>
-          <MapComponent latitude={location.latitude} longitude={location.longitude} avatarUrl={`${baseAPI}${userDetails?.avatar || "/path/to/default/image.png"}`} />
           <AddressInput useCurrentLocation={useCurrentLocation} setUseCurrentLocation={setUseCurrentLocation} userAddress={userAddress} setUserAddress={setUserAddress} />
           <PaymentDetails paymentMethod={paymentMethod} setPaymentMethod={setPaymentMethod} />
         </>
@@ -122,23 +134,39 @@ const CheckoutPage: React.FC = () => {
         <p className="text-lg font-semibold text-gray-800">Total: {totalPrice} Kz</p>
       </div>
 
-      <div
-        className="flex items-center justify-center w-full h-10 my-4 bg-blue-600 text-white font-semibold rounded-full cursor-pointer hover:bg-blue-700 transition duration-300"
-        onClick={completeOrder}
+      <Transition
+        show={loading}
+        enter="transition-opacity duration-300"
+        enterFrom="opacity-0"
+        enterTo="opacity-100"
+        leave="transition-opacity duration-300"
+        leaveFrom="opacity-100"
+        leaveTo="opacity-0"
       >
-        <p>FAÇA SEU PEDIDO</p>
-      </div>
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+          <div className="w-16 h-16 border-t-4 border-b-4 border-white rounded-full animate-spin"></div>
+        </div>
+      </Transition>
+
+      {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+
+      <button
+        className={`flex items-center justify-center w-full h-10 my-4 bg-blue-600 text-white font-semibold rounded-full ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700 transition duration-300'}`}
+        onClick={completeOrder}
+        disabled={loading}
+      >
+        FAÇA SEU PEDIDO
+      </button>
     </div>
   );
 };
 
 const CheckoutPageWrapper: React.FC = () => {
-    return (
-      <Suspense fallback={<div>Loading...</div>}>
-        <CheckoutPage />
-      </Suspense>
-    );
-  };
-  
-  export default CheckoutPageWrapper;
-  
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CheckoutPage />
+    </Suspense>
+  );
+};
+
+export default CheckoutPageWrapper;

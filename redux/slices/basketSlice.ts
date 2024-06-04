@@ -42,10 +42,13 @@ const basketSlice = createSlice({
     clearCart: (state, action: PayloadAction<number>) => { // Add clearCart reducer
       state.items = state.items.filter(item => item.restaurant !== action.payload);
     },
+    clearAllCart: (state) => {
+      state.items = [];
+    },
   },
 });
 
-export const { addItem, removeItem, clearCart } = basketSlice.actions;
+export const { addItem, removeItem, clearCart, clearAllCart } = basketSlice.actions;
 
 export const selectCartItems = (state: RootState) => state.basket.items;
 

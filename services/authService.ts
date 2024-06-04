@@ -1,5 +1,8 @@
 import { baseAPI } from "./types";
 
+import axios, { isAxiosError } from 'axios';
+const API_URL = baseAPI;
+
 export const loginUserService = async (username: string, password: string) => {
   const response = await fetch(`${baseAPI}/conta/login/`, {
     method: "POST",
@@ -58,4 +61,33 @@ export const signup = async (role: "client" | "restaurant", signupData: Record<s
 
   const data = await res.json();
   return { status: res.status, data };
+};
+
+
+export const resetPassword = async (uid: string, token: string, newPassword: string) => {
+  try {
+    const response = await axios.post(`${baseAPI}/conta/reset-password-confirm/`, { uid, token, newPassword });
+    return response.data;
+  } catch (error) {
+    if (isAxiosError(error)) {
+      throw error.response?.data;
+    }
+    throw error;
+  }
+};
+
+export const getCurrentUser = async (token: string) => {
+  try {
+    const response = await axios.get(`${API_URL}/profile/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    if (isAxiosError(error)) {
+      throw error.response?.data;
+    }
+    throw error;
+  }
 };

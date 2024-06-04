@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Transition } from '@headlessui/react';
@@ -12,6 +12,7 @@ import { loginUserService } from "@/services/authService";
 import { AxiosError } from "axios";
 import { loginUser } from "@/redux/slices/authSlice";
 import ForgotPasswordModal from "./ForgotPasswordModal";
+import { clearAllCart } from "@/redux/slices/basketSlice";
 
 const LoginScreenUser: React.FC = () => {
   const router = useRouter();
@@ -22,6 +23,10 @@ const LoginScreenUser: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState<boolean>(false);
+
+  useEffect(() => {
+    dispatch(clearAllCart());
+  }, [dispatch])
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -36,6 +41,7 @@ const LoginScreenUser: React.FC = () => {
         router.push("/HomeScreen");
       } else if (resJson.is_customer === false) {
         dispatch(loginUser(resJson));
+        alert("Você se conectou com sucesso!");
         router.push("/RestaurantDashboad");
       } else {
         alert(resJson.message);

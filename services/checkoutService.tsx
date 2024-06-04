@@ -1,37 +1,37 @@
 import { baseAPI } from "./types";
 
-// src/services/apiService.ts
 export const fetchUserDetails = async (userId: number, token: string) => {
-    const response = await fetch(`${baseAPI}api/customer/profile/`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ user_id: userId }),
-    });
-  
-    if (response.ok) {
-      const resJson = await response.json();
-      return resJson.customer_details;
-    } else {
-      throw new Error("Failed to fetch user details");
-    }
-  };
+  const response = await fetch(`${baseAPI}/customer/customer/profile/?user_id=${userId}`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (response.ok) {
+    const resJson = await response.json();
+    return resJson.customer_details;
+  } else {
+    throw new Error("Failed to fetch user details");
+  }
+};
+
   
   export const fetchRestaurantDetails = async (restaurantId: string) => {
-    const response = await fetch(`${baseAPI}/customer/customer/restaurants/${restaurantId}/`);
+    const response = await fetch(`${baseAPI}/order/restaurant/restaurants/${restaurantId}/`);
     if (response.ok) {
-      const resJson = await response.json();
-      return resJson.restaurant;
+        const resJson = await response.json();
+        return resJson;
     } else {
-      throw new Error("Failed to fetch restaurant details");
+        throw new Error("Failed to fetch restaurant details");
     }
-  };
+};
+
   
   export const completeOrderRequest = async (orderData: any) => {
-    const response = await fetch(`${baseAPI}api/customer/order/add/`, {
+    console.log('Sending order data:', orderData);
+    const response = await fetch(`${baseAPI}/order/orders/add/`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -41,6 +41,7 @@ export const fetchUserDetails = async (userId: number, token: string) => {
     });
   
     const responseData = await response.json();
+    console.log('Received response data:', responseData);
     return responseData;
   };
   

@@ -55,7 +55,7 @@ const Navbar: React.FC = () => {
                     <IoMdCart size={20} className="mr-1" /> Pedidos
                   </span>
                 </Link>
-                <Link href="/profile">
+                <Link href="/UserDashboard">
                   <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
                     <IoMdPerson size={20} className="mr-1" /> Perfil
                   </span>
@@ -91,7 +91,7 @@ const Navbar: React.FC = () => {
               )}
             </Link>
             {user ? (
-              <Link href="/profile">
+              <Link href="/UserDashboard">
                 <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
                   <IoMdPerson size={20} className="mr-1" /> Perfil
                 </span>
@@ -142,14 +142,10 @@ const Navbar: React.FC = () => {
                 <IoMdCart size={20} className="mr-1" /> Pedios
               </span>
             </Link>
-            <Link href="/profile">
-              <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer px-4">
-                <IoMdPerson size={20} className="mr-1" /> Perfil
-              </span>
-            </Link>
+           
             <Link href="/cart" className="relative px-4">
               <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
-                <IoMdCart size={20} className="mr-1" /> Carrinh
+                <IoMdCart size={20} className="mr-1" /> Carrinho
               </span>
               {cartQuantity > 0 && (
                 <span className="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
@@ -160,7 +156,7 @@ const Navbar: React.FC = () => {
             {!user && (
               <Link href="/LoginScreenUser">
                 <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer px-4">
-                  <IoMdPerson size={20} className="mr-1" /> Perfil
+                  <IoMdPerson size={20} className="mr-1" /> Entrar
                 </span>
               </Link>
             )}

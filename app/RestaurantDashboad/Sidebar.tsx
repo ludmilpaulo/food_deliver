@@ -49,7 +49,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
                       <div className="flex items-center space-x-4">
                           <div className="relative w-12 h-12">
                               <Image
-                                  src={fornecedor?.logo || "/path/to/default/image.png"}
+                                  src={fornecedor?.logo || "https://ludmil.pythonanywhere.com/media/logo/azul.png"}
                                   width={500}
                                   height={300}
                                   className="rounded-full"

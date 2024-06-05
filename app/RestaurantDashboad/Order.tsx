@@ -1,33 +1,33 @@
-import { useEffect, useState, useCallback } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { selectUser } from '@/redux/slices/authSlice';
-import { OrderTypes } from '@/services/types';
+import { baseAPI, OrderTypes } from '@/services/types';
 import { fetchOrders, updateOrderStatus } from '@/services/apiService';
 import { Transition } from '@headlessui/react';
+import { addOrder, updateOrder } from '@/redux/slices/orderSlice'; // Import these actions from your Redux slice
 
 const Order: React.FC = () => {
-  const [orders, setOrders] = useState<OrderTypes[]>([]);
   const [loading, setLoading] = useState(false);
   const user = useSelector(selectUser);
+  const orders = useSelector((state: any) => state.orders.orders);
+  const dispatch = useDispatch();
 
   const fetchOrderData = useCallback(async () => {
     setLoading(true);
-
     if (user?.user_id) {
       try {
         const data = await fetchOrders(user.user_id);
-        setOrders(data);
+        dispatch(addOrder(data));
       } catch (error) {
         console.error("An error occurred:", error);
       } finally {
         setLoading(false);
       }
     }
-  }, [user?.user_id]);
+  }, [user?.user_id, dispatch]);
 
   const handleStatus = async (orderId: number) => {
     const user_id = user?.user_id;
-
     if (!user_id) {
       alert("User ID not provided.");
       return;
@@ -37,7 +37,6 @@ const Order: React.FC = () => {
       try {
         await updateOrderStatus(user_id, orderId);
         alert("Driver called successfully!");
-        fetchOrderData();
       } catch (error) {
         console.error("Error updating order status:", error);
         alert("Failed to update order status. Please try again.");
@@ -48,10 +47,14 @@ const Order: React.FC = () => {
   useEffect(() => {
     fetchOrderData();
 
-    const intervalId = setInterval(fetchOrderData, 5000);
+    const eventSource = new EventSource(`${baseAPI}/sse?user_id=${user?.user_id}`);
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      dispatch(addOrder(data));
+    };
 
-    return () => clearInterval(intervalId);
-  }, [fetchOrderData]);
+    return () => eventSource.close();
+  }, [fetchOrderData, dispatch, user?.user_id]);
 
   return (
     <div className="container mx-auto px-4">
@@ -87,7 +90,7 @@ const Order: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {orders.map((order, index) => (
+                    {orders.map((order: OrderTypes, index: number) => (
                       <tr key={index}>
                         <td className="px-4 py-2 border">{order.id}</td>
                         <td className="px-4 py-2 border">

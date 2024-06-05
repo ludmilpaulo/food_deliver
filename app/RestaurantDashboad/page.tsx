@@ -2,13 +2,18 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/redux/slices/authSlice";
+import dynamic from "next/dynamic";
 import { Transition } from "@headlessui/react";
 import { fetchFornecedorData } from "@/services/apiService";
 import { FornecedorType } from "@/services/types";
 import { MdMenu } from "react-icons/md";
-
 import withAuth from "@/components/ProtectedPage";
-import Sidebar from "./Sidebar";
+
+// Dynamically import Sidebar to reduce initial bundle size
+const Sidebar = dynamic(() => import("./Sidebar"), {
+  ssr: false,
+  loading: () => <p>Loading...</p>,
+});
 
 const RestaurantDashboard: React.FC = () => {
   const user = useSelector(selectUser);
@@ -16,8 +21,6 @@ const RestaurantDashboard: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  console.log("usuario", user);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,11 +54,11 @@ const RestaurantDashboard: React.FC = () => {
         leaveFrom="opacity-100"
         leaveTo="opacity-0"
       >
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full">
-          <div className="w-32 h-32 border-t-2 border-b-2 border-blue-500 rounded-full animate-spin"></div>
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+          <div className="w-16 h-16 border-t-4 border-b-4 border-blue-500 rounded-full animate-spin"></div>
         </div>
       </Transition>
-      {error && <p>Error: {error}</p>}
+      {error && <p className="text-red-500">{error}</p>}
       {!loading && !error && (
         <>
           <div className="absolute top-0 left-0 md:hidden">

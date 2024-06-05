@@ -91,3 +91,14 @@ export const getCurrentUser = async (token: string) => {
     throw error;
   }
 };
+
+
+export const updateUserDetails = async (token: string, data: FormData) => {
+  const response = await axios.put(`${baseAPI}/profile/`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};

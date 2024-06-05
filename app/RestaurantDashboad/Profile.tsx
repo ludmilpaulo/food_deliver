@@ -4,7 +4,6 @@ import { selectUser } from "@/redux/slices/authSlice";
 import { getRestaurant, getOpeningHours } from "@/services/apiService";
 import { RestaurantType, OpeningHourType } from "@/services/types";
 
-import styles from './Profile.module.css'; // Import the CSS module
 import OpeningHour from "./OpeningHour";
 import OpeningHoursCalendar from "./OpeningHoursCalendar";
 import RestaurantProfile from "./RestaurantProfile";
@@ -13,6 +12,7 @@ const Profile: React.FC = () => {
   const user = useSelector(selectUser);
   const [restaurant, setRestaurant] = useState<RestaurantType | null>(null);
   const [openingHours, setOpeningHours] = useState<OpeningHourType[]>([]);
+  const [activeTab, setActiveTab] = useState<string>("perfil");
 
   useEffect(() => {
     const fetchRestaurant = async () => {
@@ -31,12 +31,38 @@ const Profile: React.FC = () => {
   }, [user]);
 
   return (
-    <div className={`p-6 bg-white rounded-lg shadow-md ${styles.profileContainer}`}>
+    <div className="p-6 bg-white rounded-lg shadow-md">
+      <div className="flex justify-around border-b mb-4">
+        <button
+          className={`py-2 px-4 ${activeTab === "perfil" ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-600"}`}
+          onClick={() => setActiveTab("perfil")}
+        >
+          Perfil do Restaurante
+        </button>
+        <button
+          className={`py-2 px-4 ${activeTab === "horario" ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-600"}`}
+          onClick={() => setActiveTab("horario")}
+        >
+          Horário de Funcionamento
+        </button>
+        <button
+          className={`py-2 px-4 ${activeTab === "calendario" ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-600"}`}
+          onClick={() => setActiveTab("calendario")}
+        >
+          Calendário
+        </button>
+      </div>
       {restaurant ? (
         <div>
-          <RestaurantProfile restaurant={restaurant} setRestaurant={setRestaurant} />
-          <OpeningHour restaurantId={restaurant.id} openingHours={openingHours} setOpeningHours={setOpeningHours} />
-          <OpeningHoursCalendar restaurantId={restaurant.id} /> {/* Add OpeningHoursCalendar component */}
+          {activeTab === "perfil" && (
+            <RestaurantProfile restaurant={restaurant} setRestaurant={setRestaurant} />
+          )}
+          {activeTab === "horario" && (
+            <OpeningHour restaurantId={restaurant.id} openingHours={openingHours} setOpeningHours={setOpeningHours} />
+          )}
+          {activeTab === "calendario" && (
+            <OpeningHoursCalendar restaurantId={restaurant.id} />
+          )}
         </div>
       ) : (
         <p>Carregando...</p>

@@ -9,6 +9,7 @@ const nextConfig = {
           clientsClaim: true,
           skipWaiting: true,
           swDest: 'public/sw.js',
+          maximumFileSizeToCacheInBytes: 20 * 1024 * 1024, // 20 MB
         })
       );
     }

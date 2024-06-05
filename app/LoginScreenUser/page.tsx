@@ -26,7 +26,7 @@ const LoginScreenUser: React.FC = () => {
 
   useEffect(() => {
     dispatch(clearAllCart());
-  }, [dispatch])
+  }, [dispatch]);
 
   const handleSubmit = async () => {
     setLoading(true);

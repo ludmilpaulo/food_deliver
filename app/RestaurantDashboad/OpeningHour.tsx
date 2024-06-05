@@ -2,6 +2,10 @@ import React, { useState, ChangeEvent } from "react";
 import { OpeningHourType } from "@/services/types";
 import { createOpeningHour } from "@/services/apiService";
 
+const validTimes = Array.from({ length: 24 }, (_, h) =>
+  [`${h % 12 === 0 ? 12 : h % 12 < 10 ? `0${h % 12}` : h % 12}:00 ${h < 12 ? 'AM' : 'PM'}`, `${h % 12 === 0 ? 12 : h % 12 < 10 ? `0${h % 12}` : h % 12}:30 ${h < 12 ? 'AM' : 'PM'}`]
+).flat();
+
 interface OpeningHourProps {
   restaurantId: number;
   openingHours: OpeningHourType[];
@@ -11,42 +15,27 @@ interface OpeningHourProps {
 const OpeningHour: React.FC<OpeningHourProps> = ({ restaurantId, openingHours, setOpeningHours }) => {
   const [newOpeningHour, setNewOpeningHour] = useState<OpeningHourType>({
     restaurant: restaurantId,
-    day: 1, // Set default to 1 (Monday)
+    day: 1,
     from_hour: "",
     to_hour: "",
     is_closed: false,
   });
 
-  const formatTime = (time: string): string => {
-    const [hour, minute] = time.split(':');
-    const hourNum = parseInt(hour, 10);
-    const minuteNum = parseInt(minute, 10);
-    const period = hourNum >= 12 ? 'PM' : 'AM';
-    const formattedHour = hourNum % 12 === 0 ? 12 : hourNum % 12;
-    return `${formattedHour.toString().padStart(2, '0')}:${minuteNum.toString().padStart(2, '0')} ${period}`;
-  };
-
-  const handleNewOpeningHourChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleNewOpeningHourChange = (e: ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
     const { name, value } = e.target;
     setNewOpeningHour((prev) => ({
       ...prev,
-      [name]: name.includes('hour') ? formatTime(value) : parseInt(value, 10),
+      [name]: value,
     }));
   };
 
   const handleAddOpeningHour = async () => {
     try {
-      const formattedOpeningHour = {
-        ...newOpeningHour,
-        from_hour: formatTime(newOpeningHour.from_hour),
-        to_hour: formatTime(newOpeningHour.to_hour),
-      };
-      console.log("Formatted opening hour data:", formattedOpeningHour);
-      const newHour = await createOpeningHour(restaurantId, formattedOpeningHour);
+      const newHour = await createOpeningHour(restaurantId, newOpeningHour);
       setOpeningHours([...openingHours, newHour]);
       setNewOpeningHour({
         restaurant: restaurantId,
-        day: 1, // Reset to default day (Monday)
+        day: 1,
         from_hour: "",
         to_hour: "",
         is_closed: false,
@@ -90,23 +79,31 @@ const OpeningHour: React.FC<OpeningHourProps> = ({ restaurantId, openingHours, s
           </div>
           <div>
             <label className="block text-sm font-medium">Hora de Início</label>
-            <input
-              type="time"
+            <select
               name="from_hour"
               value={newOpeningHour.from_hour}
               onChange={handleNewOpeningHourChange}
               className="mt-1 block w-full p-2 border rounded-md"
-            />
+            >
+              <option value="">Selecione uma hora</option>
+              {validTimes.map((time) => (
+                <option key={time} value={time}>{time}</option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="block text-sm font-medium">Hora de Término</label>
-            <input
-              type="time"
+            <select
               name="to_hour"
               value={newOpeningHour.to_hour}
               onChange={handleNewOpeningHourChange}
               className="mt-1 block w-full p-2 border rounded-md"
-            />
+            >
+              <option value="">Selecione uma hora</option>
+              {validTimes.map((time) => (
+                <option key={time} value={time}>{time}</option>
+              ))}
+            </select>
           </div>
           <div className="flex items-center space-x-2">
             <input

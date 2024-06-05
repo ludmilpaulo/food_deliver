@@ -4,7 +4,7 @@ import authReducer from "./slices/authSlice";
 import basketReducer from "./slices/basketSlice";
 import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from "redux-persist";
-import thunk from "redux-thunk";
+import orderReducer from './slices/orderSlice';
 
 const rootPersistConfig = {
   key: "root",
@@ -12,6 +12,7 @@ const rootPersistConfig = {
 };
 
 const rootReducer = combineReducers({
+  orders: orderReducer,
   basket: basketReducer,
   auth: authReducer,
 });

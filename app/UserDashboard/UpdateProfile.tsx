@@ -43,6 +43,7 @@ const UpdateProfile: React.FC = () => {
     setError(null);
     const formData = new FormData();
     formData.append('phone', phone);
+    formData.append('access_token', user?.token);
     formData.append('address', address);
     if (avatar) {
       formData.append('avatar', avatar);

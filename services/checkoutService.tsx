@@ -11,6 +11,7 @@ export const fetchUserDetails = async (userId: number, token: string) => {
 
   if (response.ok) {
     const resJson = await response.json();
+    console.log("user details=>", resJson)
     return resJson.customer_details;
   } else {
     throw new Error("Failed to fetch user details");

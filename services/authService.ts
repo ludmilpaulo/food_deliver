@@ -94,11 +94,12 @@ export const getCurrentUser = async (token: string) => {
 
 
 export const updateUserDetails = async (token: string, data: FormData) => {
-  const response = await axios.put(`${baseAPI}/profile/`, data, {
+  const response = await fetch(`${baseAPI}/customer/customer/profile/update/`, {
+    method: "POST",
     headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'multipart/form-data',
+      'Accept': 'application/json',
     },
+    body: data
   });
-  return response.data;
+  return response;
 };

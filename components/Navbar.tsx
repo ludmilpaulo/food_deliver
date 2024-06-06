@@ -56,13 +56,7 @@ const Navbar: React.FC = () => {
                       onChange={(e) => setSearchText(e.target.value)}
                       className="px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
                     />
-                    <button
-                      type="submit"
-                      aria-label="Search"
-                      className="absolute right-0 top-0 mt-2 mr-4 text-gray-600"
-                    >
-                      <IoIosSearch size={20} />
-                    </button>
+                 
                   </form>
                   <Link href="/HomeScreen">
                     <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
@@ -121,13 +115,7 @@ const Navbar: React.FC = () => {
                     onChange={(e) => setSearchText(e.target.value)}
                     className="w-full px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
                   />
-                  <button
-                    type="submit"
-                    aria-label="Search"
-                    className="absolute right-0 top-0 mt-2 mr-4 text-gray-600"
-                  >
-                    <IoIosSearch size={20} />
-                  </button>
+               
                 </form>
                 <Link href="/HomeScreen">
                   <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer px-4">

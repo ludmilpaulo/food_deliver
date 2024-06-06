@@ -8,7 +8,7 @@ import dynamic from 'next/dynamic';
 import { Transition } from '@headlessui/react';
 import Image from 'next/image';
 import { fetchRestaurantDetails, fetchUserDetails, completeOrderRequest } from '@/services/checkoutService';
-import { baseAPI } from '@/services/types';
+import ProfileModal from '@/components/ProfileModal';
 
 const AddressInput = dynamic(() => import('./AddressInput'), { ssr: false });
 const PaymentDetails = dynamic(() => import('./PaymentDetails'), { ssr: false });
@@ -20,6 +20,7 @@ const CheckoutPage: React.FC = () => {
   const [location, setLocation] = useState<{ latitude: number; longitude: number }>({ latitude: 0, longitude: 0 });
   const [userDetails, setUserDetails] = useState<any | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<string>("Entrega");
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState<boolean>(false);
   const [useCurrentLocation, setUseCurrentLocation] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,13 +43,17 @@ const CheckoutPage: React.FC = () => {
           .then(setRestaurant)
           .catch((error) => console.error('Error fetching restaurant details:', error));
       }
-        console.log('user id', user)
-      if (user?.user_id && user?.token) {
 
+      if (user?.user_id && user?.token) {
         fetchUserDetails(user.user_id, user.token)
-          .then(setUserDetails)
+          .then((details) => {
+            setUserDetails(details);
+            if (!details.avatar) {
+              setIsProfileModalOpen(true);
+            }
+          })
           .catch((error) => {
-            console.error('Error fetching user details:', error);
+            console.error('Erro ao buscar detalhes do usuário:', error);
             dispatch(logoutUser());
           });
       }
@@ -66,11 +71,11 @@ const CheckoutPage: React.FC = () => {
           });
         },
         () => {
-          alert("Unable to retrieve your location");
+          alert("Não foi possível obter sua localização");
         },
       );
     } else {
-      alert("Geolocation is not supported by your browser.");
+      alert("Geolocalização não é suportada pelo seu navegador.");
     }
   };
 
@@ -157,6 +162,12 @@ const CheckoutPage: React.FC = () => {
       >
         FAÇA SEU PEDIDO
       </button>
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        userDetails={userDetails}
+        onUpdate={(updatedDetails: any) => setUserDetails(updatedDetails)}
+      />
     </div>
   );
 };

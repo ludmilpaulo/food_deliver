@@ -97,7 +97,7 @@ export const fetchOrders = async (userId: number): Promise<OrderTypes[]> => {
     return response.json();
   };
 
-export const updateOrderStatus = async (userId: number, orderId: number): Promise<void> => {
+  export const updateOrderStatus = async (userId: number, orderId: number): Promise<void> => {
     console.log("order status");
     const response = await fetch(`${baseAPI}/restaurant/restaurant/status/`, {
       method: "PUT",

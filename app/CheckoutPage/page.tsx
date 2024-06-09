@@ -1,4 +1,5 @@
-"use client";
+'use client';
+
 import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
@@ -96,13 +97,19 @@ const CheckoutPage: React.FC = () => {
       restaurant_id: restaurantId,
       address: useCurrentLocation ? `${location.latitude},${location.longitude}` : userAddress,
       order_details: orderDetails,
+      payment_method: paymentMethod, // Ensure payment_method is included here
     };
     console.log("order data=>", orderData);
 
     try {
+      const startTime = performance.now();
       const responseData = await completeOrderRequest(orderData);
+      const endTime = performance.now();
+      console.log(`completeOrderRequest took ${(endTime - startTime) / 1000} seconds`);
+
       if (responseData.status === "success") {
         dispatch(clearCart(parseInt(restaurantId))); // Dispatch clearCart with restaurant ID
+        alert("Pedido Realizado com Sucesso!");
         router.push("/SuccessScreen");
       } else {
         alert(responseData.status);
@@ -149,7 +156,7 @@ const CheckoutPage: React.FC = () => {
         leaveTo="opacity-0"
       >
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div className="w-16 h-16 border-t-4 border-b-4 border-white rounded-full animate-spin"></div>
+          <div className="w-16 h-16 border-t-4 border-b-4 border-blue-500 rounded-full animate-spin"></div>
         </div>
       </Transition>
 

@@ -3,12 +3,16 @@ import { GenerateSW } from 'workbox-webpack-plugin';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack: (config, { isServer }) => {
+    // Ensure GenerateSW is only used on the client-side build
     if (!isServer) {
+      // Remove previous instances of GenerateSW to prevent duplicates
+      config.plugins = config.plugins.filter(plugin => !(plugin instanceof GenerateSW));
+
       config.plugins.push(
         new GenerateSW({
           clientsClaim: true,
           skipWaiting: true,
-          swDest: 'public/sw.js',
+          swDest: 'static/sw.js', // Correct path to avoid public folder conflicts
           maximumFileSizeToCacheInBytes: 20 * 1024 * 1024, // 20 MB
         })
       );

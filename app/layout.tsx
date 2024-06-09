@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
-import Head from 'next/head';
+import dynamic from 'next/dynamic';
 import { Inter } from "next/font/google";
 import "./globals.css";
-import StoreProvider from "@/redux/StoreProvider";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
+
+const StoreProvider = dynamic(() => import("@/redux/StoreProvider"), { ssr: false });
+const Navbar = dynamic(() => import("@/components/Navbar"), { ssr: false });
+const Footer = dynamic(() => import("@/components/Footer"), { ssr: false });
+
+
+
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -56,28 +61,11 @@ export default function RootLayout({
   return (
     <StoreProvider>
     <html lang="pt">
-    <Head>
-        <title>Kudya - Entrega de Comida Rápida e Fácil | Melhores Restaurantes, Refeições Favoritas</title>
-        <meta name="description" content="Encontre os melhores restaurantes e peça suas refeições favoritas com Kudya. Entrega de comida rápida, fácil e conveniente. Descubra a variedade gastronômica agora!" />
-        <meta name="keywords" content="Kudya, entrega de comida, restaurantes, refeições favoritas, comida rápida, entrega fácil, conveniência, pedidos online, variedade gastronômica" />
-        
-       
-        <meta property="og:title" content="Kudya - Entrega de Comida Rápida e Fácil" />
-        <meta property="og:description" content="Descubra os melhores restaurantes e peça suas refeições favoritas com Kudya. Entrega rápida, fácil e conveniente." />
-        <meta property="og:image" content="https://www.kudya.com/path/to/your/image.jpg" />
-        <meta property="og:url" content="https://www.kudya.com" />
-        <meta property="og:type" content="website" />
-        
-      
-        <meta name="twitter:title" content="Kudya - Entrega de Comida Rápida e Fácil" />
-        <meta name="twitter:description" content="Encontre os melhores restaurantes e peça suas refeições favoritas com Kudya. Entrega de comida rápida, fácil e conveniente." />
-        <meta name="twitter:image" content="https://www.kudya.com/path/to/your/image.jpg" />
-        <meta name="twitter:card" content="summary_large_image" />
-      </Head>
       <body className={inter.className}>
         <Navbar />
-        {children}</body>
+        {children}
         <Footer />
+        </body>
     </html>
     </StoreProvider>
   );

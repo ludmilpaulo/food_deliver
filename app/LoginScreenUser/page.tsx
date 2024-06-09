@@ -31,9 +31,11 @@ const LoginScreenUser: React.FC = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      const startTime = performance.now();
       const resJson = await loginUserService(username, password);
 
-      console.log("recebido", resJson);
+      const endTime = performance.now();
+      console.log(`completeOrderRequest took ${(endTime - startTime) / 1000} seconds`);
 
       if (resJson.is_customer === true) {
         dispatch(loginUser(resJson));

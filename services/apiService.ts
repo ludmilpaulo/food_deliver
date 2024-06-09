@@ -96,20 +96,21 @@ export const fetchOrders = async (userId: number): Promise<OrderTypes[]> => {
     }
     return response.json();
   };
-  
-  export const updateOrderStatus = async (userId: number, orderId: number): Promise<void> => {
+
+export const updateOrderStatus = async (userId: number, orderId: number): Promise<void> => {
+    console.log("order status");
     const response = await fetch(`${baseAPI}/restaurant/restaurant/status/`, {
-      method: "POST",
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ user_id: userId, id: orderId }),
     });
     if (!response.ok) {
-      throw new Error("Failed to update order status");
+      throw new Error("Falha ao atualizar o status do pedido");
     }
   };
-
+  
 
 
 const API_URL = baseAPI;

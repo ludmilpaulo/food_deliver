@@ -1,6 +1,8 @@
+'use client';
+
 import React, { useEffect, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { selectUser } from '@/redux/slices/authSlice'; // Assuming you're still using the auth slice to get the user
+import { selectUser } from '@/redux/slices/authSlice';
 import { baseAPI, OrderTypes } from '@/services/types';
 import { fetchOrders, updateOrderStatus } from '@/services/apiService';
 import { Transition } from '@headlessui/react';
@@ -17,28 +19,29 @@ const Order: React.FC = () => {
         const data = await fetchOrders(user.user_id);
         setOrders(data);
       } catch (error) {
-        console.error("An error occurred:", error);
+        console.error("Ocorreu um erro:", error);
       } finally {
         setLoading(false);
       }
     }
   }, [user?.user_id]);
 
-  const handleStatus = async (orderId: number) => {
+ const handleStatus = async (orderId: number) => {
     const user_id = user?.user_id;
     if (!user_id) {
-      alert("User ID not provided.");
+      alert("ID do usuário não fornecido.");
       return;
     }
 
-    if (window.confirm("Are you sure you want to call the driver?")) {
+    if (window.confirm("Tem certeza de que deseja chamar o motorista?")) {
       try {
+        console.log("sending")
         await updateOrderStatus(user_id, orderId);
-        alert("Driver called successfully!");
-        fetchOrderData(); // Optionally, you can refresh the orders
+        alert("Motorista chamado com sucesso!");
+        fetchOrderData(); // Opcionalmente, você pode atualizar os pedidos
       } catch (error) {
-        console.error("Error updating order status:", error);
-        alert("Failed to update order status. Please try again.");
+        console.error("Erro ao atualizar o status do pedido:", error);
+        alert("Falha ao atualizar o status do pedido. Por favor, tente novamente.");
       }
     }
   };

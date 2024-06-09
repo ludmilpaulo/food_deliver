@@ -20,7 +20,7 @@ useEffect(() => {
     if (user.is_customer === true) {
       router.push("/HomeScreen");
     } else if (user.fornecedor_id !== null) {
-      router.push("/RestaurantDashboard");
+      router.push("/RestaurantDashboad");
     } else {
       dispatch(clearAllCart());
       router.push("/LoginScreenUser");

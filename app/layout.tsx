@@ -8,9 +8,6 @@ const StoreProvider = dynamic(() => import("@/redux/StoreProvider"), { ssr: fals
 const Navbar = dynamic(() => import("@/components/Navbar"), { ssr: false });
 const Footer = dynamic(() => import("@/components/Footer"), { ssr: false });
 
-
-
-
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -28,7 +25,7 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     images: [
       {
-        url: "https://ludmil.pythonanywhere.com/media/logo/azul.png", // Substitua pelo caminho da sua imagem
+        url: "https://ludmil.pythonanywhere.com/media/logo/azul.png",
         width: 1200,
         height: 630,
         alt: "Kudya - Entrega de Comida Rápida e Fácil",
@@ -43,30 +40,27 @@ export const metadata: Metadata = {
     description: "Descubra os melhores restaurantes e peça suas refeições favoritas com Kudya. Entrega rápida, fácil e conveniente para sua conveniência.",
     images: [
       {
-        url: "https://ludmil.pythonanywhere.com/media/logo/azul.png",// Substitua pelo caminho da sua imagem
+        url: "https://ludmil.pythonanywhere.com/media/logo/azul.png",
         alt: "Kudya - Entrega de Comida Rápida e Fácil",
       },
     ],
   },
 };
 
-
-
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
+}>){
   return (
-    <StoreProvider>
     <html lang="pt">
       <body className={inter.className}>
-        <Navbar />
-        {children}
-        <Footer />
-        </body>
+        <StoreProvider>
+          <Navbar />
+          {children}
+          <Footer />
+        </StoreProvider>
+      </body>
     </html>
-    </StoreProvider>
   );
 }

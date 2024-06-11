@@ -78,4 +78,4 @@ function HomeScreen() {
   );
 }
 
-export default withAuth(HomeScreen);
+export default HomeScreen;

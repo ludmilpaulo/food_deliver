@@ -85,6 +85,7 @@ export type OpeningHour = {
     category?: Category;
     barnner: boolean;
     is_approved: boolean;
+    location: string;
     opening_hours: OpeningHour[];
   };
 

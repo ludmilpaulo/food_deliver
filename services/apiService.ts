@@ -19,7 +19,18 @@ export const fetchFornecedorData = async (userId: number): Promise<FornecedorTyp
     }
   };
 
-  // services/apiService.ts
+
+
+  export const updateLocation = async (userId: number, location: string) => {
+    try {
+      const response = await axios.put(`${baseAPI}/restaurant/update-location/${userId}/`, { location });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating location:", error);
+      throw error;
+    }
+  };
+  
 
 
 

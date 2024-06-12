@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { selectUser } from "@/redux/slices/authSlice";
 import dynamic from "next/dynamic";
 import { Transition } from "@headlessui/react";
-import { fetchFornecedorData } from "@/services/apiService";
+import { fetchFornecedorData, updateLocation } from "@/services/apiService";
 import { FornecedorType } from "@/services/types";
 import { MdMenu } from "react-icons/md";
 import withAuth from "@/components/ProtectedPage";
@@ -37,6 +37,26 @@ const RestaurantDashboard: React.FC = () => {
       }
     };
     fetchData();
+  }, [user]);
+
+  useEffect(() => {
+    const updateLocationPeriodically = () => {
+      if (user?.user_id) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            await updateLocation(user.user_id, `${latitude},${longitude}`);
+          },
+          (error) => {
+            console.error("Error fetching location:", error);
+          },
+          { enableHighAccuracy: true }
+        );
+      }
+    };
+
+    const intervalId = setInterval(updateLocationPeriodically, 5000);
+    return () => clearInterval(intervalId);
   }, [user]);
 
   const handleSidebarToggle = () => {

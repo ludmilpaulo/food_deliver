@@ -1,7 +1,7 @@
 "use client";
-import React from 'react';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import React from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 type OpeningHour = {
   day: string;
@@ -23,9 +23,10 @@ type RestaurantProps = {
     phone: string;
     address: string;
     logo: string;
-    category?: Category; // Mark category as optional
+    category?: Category;
     barnner: boolean;
     is_approved: boolean;
+    location: string;
     opening_hours: OpeningHour[];
   };
 };
@@ -39,7 +40,7 @@ const RestaurantCard: React.FC<RestaurantProps> = ({ restaurant }) => {
 
   const isOpen = () => {
     const today = new Date();
-    const currentDay = today.toLocaleString('pt-BR', { weekday: 'long' }).toLowerCase();
+    const currentDay = today.toLocaleString("pt-BR", { weekday: "long" }).toLowerCase();
     const currentTime = today.getHours() * 60 + today.getMinutes();
 
     const openingHour = restaurant.opening_hours.find(
@@ -51,12 +52,12 @@ const RestaurantCard: React.FC<RestaurantProps> = ({ restaurant }) => {
     }
 
     const parseTime = (time: string) => {
-      const [timePart, modifier] = time.split(' ');
-      let [hours, minutes] = timePart.split(':').map(Number);
+      const [timePart, modifier] = time.split(" ");
+      let [hours, minutes] = timePart.split(":").map(Number);
 
-      if (modifier === 'PM' && hours !== 12) {
+      if (modifier === "PM" && hours !== 12) {
         hours += 12;
-      } else if (modifier === 'AM' && hours === 12) {
+      } else if (modifier === "AM" && hours === 12) {
         hours = 0;
       }
 
@@ -79,7 +80,9 @@ const RestaurantCard: React.FC<RestaurantProps> = ({ restaurant }) => {
 
   return (
     <div
-      className={`bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 ${!isOpen() ? 'opacity-50' : ''}`}
+      className={`bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 ${
+        !isOpen() ? "opacity-50" : ""
+      }`}
       onClick={handleClick}
     >
       {restaurant.logo && (
@@ -106,8 +109,12 @@ const RestaurantCard: React.FC<RestaurantProps> = ({ restaurant }) => {
           </div>
         )}
         <div className="mt-2">
-          <span className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${isOpen() ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-            {isOpen() ? 'Aberto' : 'Fechado'}
+          <span
+            className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${
+              isOpen() ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            }`}
+          >
+            {isOpen() ? "Aberto" : "Fechado"}
           </span>
         </div>
       </div>

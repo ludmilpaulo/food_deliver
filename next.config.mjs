@@ -23,7 +23,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'ludmil.pythonanywhere.com',
+        hostname: 'www.kudya.shop',
         pathname: '/**',
       },
       {

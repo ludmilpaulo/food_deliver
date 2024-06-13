@@ -52,10 +52,10 @@ const HomePage = () => {
       </Transition>
       {!loading && headerData && (
         <Banner
-          title={headerData.title}
-          backgroundImage={headerData.backgroundImage}
-          backgroundApp={headerData.backgroundApp}
-          bottomImage={headerData.bottomImage}
+          title={headerData?.title}
+          backgroundImage={headerData?.backgroundImage}
+          backgroundApp={headerData?.backgroundApp}
+          bottomImage={headerData?.bottomImage}
           restaurants={restaurants}
         />
       )}

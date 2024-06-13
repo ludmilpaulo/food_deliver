@@ -23,11 +23,11 @@ useEffect(() => {
       router.push("/RestaurantDashboad");
     } else {
       dispatch(clearAllCart());
-      router.push("/HomeScreen");
+      router.push("/BannerPage");
     }
   } else {
     dispatch(clearAllCart());
-    router.push("/HomeScreen");
+    router.push("/BannerPage");
   }
 }, [router, user]);
 

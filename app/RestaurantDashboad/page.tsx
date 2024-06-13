@@ -39,13 +39,28 @@ const RestaurantDashboard: React.FC = () => {
     fetchData();
   }, [user]);
 
+  const updateLocationWithRetry = async (userId: number, location: string, retries: number = 3) => {
+    try {
+      await updateLocation(userId, location);
+    } catch (error) {
+      console.error("Error updating location:", error);
+      if (retries > 0) {
+        setTimeout(() => {
+          updateLocationWithRetry(userId, location, retries - 1);
+        }, 1000);
+      } else {
+        console.error("Failed to update location after multiple attempts");
+      }
+    }
+  };
+  
   useEffect(() => {
     const updateLocationPeriodically = () => {
       if (user?.user_id) {
         navigator.geolocation.getCurrentPosition(
           async (position) => {
             const { latitude, longitude } = position.coords;
-            await updateLocation(user.user_id, `${latitude},${longitude}`);
+            await updateLocationWithRetry(user.user_id, `${latitude},${longitude}`);
           },
           (error) => {
             console.error("Error fetching location:", error);
@@ -54,10 +69,11 @@ const RestaurantDashboard: React.FC = () => {
         );
       }
     };
-
-    const intervalId = setInterval(updateLocationPeriodically, 5000);
+  
+    const intervalId = setInterval(updateLocationPeriodically, 5000); // Update every 5 minutes
     return () => clearInterval(intervalId);
   }, [user]);
+  
 
   const handleSidebarToggle = () => {
     setIsSidebarOpen(!isSidebarOpen);

@@ -135,6 +135,7 @@ export type OpeningHour = {
     back: string;
     backgroundApp: string;
     backgroundImage: string;
+    bottomImage: string;
     about: string;
     born_date: string;
     address: string;

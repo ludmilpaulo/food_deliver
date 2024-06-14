@@ -197,7 +197,7 @@ const Products: React.FC = () => {
                   <td className="px-6 py-4 border-b border-gray-300">
                     <div className="relative w-16 h-16">
                       <Image
-                        src={product.image || "https://ludmil.pythonanywhere.com/media/logo/azul.png"}
+                        src={product.image || "https://www.kudya.shop/media/logo/azul.png"}
                         alt={product.name}
                         layout="fill"
                         className="object-cover rounded"

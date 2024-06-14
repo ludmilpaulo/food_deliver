@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     images: [
       {
-        url: "https://ludmil.pythonanywhere.com/media/logo/azul.png",
+        url: "https://www.kudya.shop/media/logo/azul.png",
         width: 1200,
         height: 630,
         alt: "Kudya - Entrega de Comida Rápida e Fácil",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     description: "Descubra os melhores restaurantes e peça suas refeições favoritas com Kudya. Entrega rápida, fácil e conveniente para sua conveniência.",
     images: [
       {
-        url: "https://ludmil.pythonanywhere.com/media/logo/azul.png",
+        url: "https://www.kudya.shop/media/logo/azul.png",
         alt: "Kudya - Entrega de Comida Rápida e Fácil",
       },
     ],

@@ -30,7 +30,7 @@ const RestaurantDashboard: React.FC = () => {
           const data = await fetchFornecedorData(user.user_id);
           setFornecedor(data);
         } catch (error) {
-          setError("An error occurred while fetching data");
+          setError("Ocorreu um erro ao buscar os dados");
         } finally {
           setLoading(false);
         }
@@ -41,7 +41,8 @@ const RestaurantDashboard: React.FC = () => {
 
   const updateLocationWithRetry = async (userId: number, location: string, retries: number = 3) => {
     try {
-      await updateLocation(userId, location);
+      const response = await updateLocation(userId, location);
+      console.log("Location update response:", response);
     } catch (error) {
       console.error("Error updating location:", error);
       if (retries > 0) {
@@ -53,14 +54,16 @@ const RestaurantDashboard: React.FC = () => {
       }
     }
   };
-  
+
   useEffect(() => {
     const updateLocationPeriodically = () => {
       if (user?.user_id) {
         navigator.geolocation.getCurrentPosition(
           async (position) => {
             const { latitude, longitude } = position.coords;
-            await updateLocationWithRetry(user.user_id, `${latitude},${longitude}`);
+            const location = `${latitude},${longitude}`;
+            console.log("Updating location to:", location);
+            await updateLocationWithRetry(user.user_id, location);
           },
           (error) => {
             console.error("Error fetching location:", error);
@@ -69,11 +72,10 @@ const RestaurantDashboard: React.FC = () => {
         );
       }
     };
-  
-    const intervalId = setInterval(updateLocationPeriodically, 5000); // Update every 5 minutes
+
+    const intervalId = setInterval(updateLocationPeriodically, 5000); // Update every 5 seconds for testing
     return () => clearInterval(intervalId);
   }, [user]);
-  
 
   const handleSidebarToggle = () => {
     setIsSidebarOpen(!isSidebarOpen);

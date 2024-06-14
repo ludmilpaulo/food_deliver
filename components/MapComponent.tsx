@@ -13,7 +13,7 @@ type MapComponentProps = {
 
 const MapComponent: React.FC<MapComponentProps> = ({ latitude, longitude, avatarUrl }) => {
   const icon = L.icon({
-    iconUrl:  "https://ludmil.pythonanywhere.com/media/logo/azul.png", // You can customize the marker icon
+    iconUrl:  "https://www.kudya.shop/media/logo/azul.png", // You can customize the marker icon
     iconSize: [25, 41],
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],

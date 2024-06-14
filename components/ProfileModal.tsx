@@ -100,7 +100,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, userDetail
       if (response.ok) {
         const data = await response.json();
         alert(data.status);
-        router.push('/HomeScreen');
+        onClose();
         onUpdate({
           ...userDetails,
           address,
@@ -179,7 +179,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, userDetail
             <div className="w-full">
               <input
                 className="border w-full mt-5 p-4 rounded"
-                placeholder="Último Nome"
+                placeholder={loading ? 'Atualizando...' : "Último Nome"}
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
               />
@@ -187,7 +187,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, userDetail
             <div className="w-full">
               <input
                 className="border w-full mt-5 p-4 rounded"
-                placeholder="Número de Telefone"
+                placeholder={loading ? 'Atualizando...' : "Número de Telefone"}
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
               />
@@ -195,14 +195,14 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, userDetail
             <div className="w-full">
               <input
                 className="border w-full mt-5 p-4 rounded"
-                placeholder="Endereço"
+                placeholder={loading ? 'Atualizando...' : 'Endereco'}
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
               />
             </div>
             <div>
               <button className="bg-blue-500 text-white p-4 rounded mt-5" onClick={userUpdate}>
-                Atualize seu Perfil
+              {loading ? 'Atualizando...' : 'Atualizar Perfil'}
               </button>
             </div>
           </div>

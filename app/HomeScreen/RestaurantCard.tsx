@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
@@ -26,13 +26,61 @@ type RestaurantProps = {
     category?: Category;
     barnner: boolean;
     is_approved: boolean;
-    location: string;
+    location: string; // Assumes location is a string with "latitude,longitude"
     opening_hours: OpeningHour[];
   };
 };
 
 const RestaurantCard: React.FC<RestaurantProps> = ({ restaurant }) => {
   const router = useRouter();
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [distance, setDistance] = useState<number | null>(null);
+  const [timeAway, setTimeAway] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (typeof navigator !== "undefined" && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.error("Error fetching user location:", error);
+        }
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    if (userLocation && restaurant.location) {
+      const [restaurantLat, restaurantLng] = restaurant.location.split(",").map(Number);
+
+      const distance = calculateDistance(
+        userLocation.latitude,
+        userLocation.longitude,
+        restaurantLat,
+        restaurantLng
+      );
+      setDistance(distance);
+
+      const walkingSpeedKmh = 5; // Average walking speed in km/h
+      const timeInMinutes = (distance / walkingSpeedKmh) * 60;
+      setTimeAway(timeInMinutes);
+    }
+  }, [userLocation, restaurant.location]);
+
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371; // Radius of the Earth in km
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Distance in km
+  };
 
   if (!restaurant) {
     return null; // Render nothing if the restaurant is undefined
@@ -115,6 +163,11 @@ const RestaurantCard: React.FC<RestaurantProps> = ({ restaurant }) => {
           >
             {isOpen() ? "Aberto" : "Fechado"}
           </span>
+          {timeAway && (
+            <div className="mt-2 text-sm text-gray-600">
+              Você está a aproximadamente {Math.round(timeAway)} minutos de distância
+            </div>
+          )}
         </div>
       </div>
     </div>

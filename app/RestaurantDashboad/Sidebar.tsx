@@ -15,11 +15,15 @@ import { useDispatch } from "react-redux";
 import { logoutUser } from "@/redux/slices/authSlice";
 import { motion } from "framer-motion";
 import { FornecedorType } from "@/services/types";
+
 import Order from "./Order";
 import Products from "./Products";
 import Profile from "./Profile"; // Import Profile component
 import { updateLocation } from "@/services/apiService"; // Import the location update function
 import { Transition } from "@headlessui/react";
+import CustomersList from "./CustomersList";
+import Report from "./Report";
+import DriverList from "./DriverList";
 
 interface SidebarProps {
   fornecedor: FornecedorType | null;
@@ -31,6 +35,10 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onToggle }) => {
   const [showProducts, setShowProducts] = useState(false);
   const [showOrders, setShowOrders] = useState(false);
+  const [showReport, setShowReport] = useState(false);
+  const [showServices, setShowServices] = useState(false);
+  const [listOfCustomer, setListOfCustomer] = useState(false);
+  const [listOfDriver, setListOfDriver] = useState(false);
   const [showProfile, setShowProfile] = useState(false); // State for profile view
   const [loading, setLoading] = useState(false); // State for loading
   const dispatch = useDispatch();
@@ -151,6 +159,12 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
                   onClick={() => {
                     onNavClick && onNavClick("Relatórios");
                     setShowProfile(false);
+                    setShowProducts(false);
+                    setShowOrders(false);
+                    setListOfCustomer(false);
+                    setListOfDriver(false);
+                    setShowServices(false);
+                    setShowReport(true);
                     onToggle();
                   }}
                 >
@@ -166,6 +180,12 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
                   onClick={() => {
                     onNavClick && onNavClick("Clientes");
                     setShowProfile(false);
+                    setShowProducts(false);
+                    setShowOrders(false);
+                    setShowReport(false); // Add this
+                    setListOfDriver(false);
+                    setListOfCustomer(true);
+                    setShowServices(false);
                     onToggle();
                   }}
                 >
@@ -181,6 +201,12 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
                   onClick={() => {
                     onNavClick && onNavClick("Motoristas");
                     setShowProfile(false);
+                    setShowProducts(false);
+                    setShowOrders(false);
+                    setShowReport(false); // Add this
+                    setListOfCustomer(false);
+                    setListOfDriver(true);
+                    setShowServices(false);
                     onToggle();
                   }}
                 >
@@ -237,6 +263,9 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
         {showProducts && <Products />}
         {showOrders && <Order />}
         {showProfile && <Profile />} {/* Show Profile when showProfile is true */}
+        {showReport && <Report />}
+        {listOfCustomer && <CustomersList />}
+        {listOfDriver && <DriverList />}{" "}
       </div>
     </>
   );

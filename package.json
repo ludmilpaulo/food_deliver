@@ -17,6 +17,7 @@
     "@reduxjs/toolkit": "^2.2.5",
     "@types/react-leaflet": "^3.0.0",
     "@types/react-map-gl": "^6.1.6",
+    "apexcharts": "^3.49.2",
     "axios": "^1.7.1",
     "date-fns": "^3.6.0",
     "framer-motion": "^11.2.4",

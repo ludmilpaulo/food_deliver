@@ -127,6 +127,10 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
                     setShowOrders(false);
                     setShowProducts(true);
                     setShowProfile(false);
+                    setListOfCustomer(false);
+                    setListOfDriver(false);
+                    setShowServices(false);
+                    setShowReport(false); 
                     onToggle();
                   }}
                 >
@@ -143,6 +147,10 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
                     setShowProducts(false);
                     setShowOrders(true);
                     setShowProfile(false);
+                    setListOfCustomer(false);
+                    setListOfDriver(false);
+                    setShowServices(false);
+                    setShowReport(false); 
                     onNavClick && onNavClick("Pedidos");
                     onToggle();
                   }}
@@ -223,6 +231,9 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
                     setShowProfile(true);
                     setShowProducts(false);
                     setShowOrders(false);
+                    setShowReport(false); 
+                    setListOfCustomer(false);
+                    setListOfDriver(false);
                     onNavClick && onNavClick("Conta");
                     onToggle();
                   }}

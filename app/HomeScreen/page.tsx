@@ -1,9 +1,8 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import withAuth from "@/components/ProtectedPage";
 import RestaurantCard from "./RestaurantCard"; // Adjust the import path if necessary
 import { useRouter } from "next/navigation";
-import { Transition } from "@headlessui/react";
 import { baseAPI, Restaurant, Category } from "@/services/types";
 import Image from "next/image";
 
@@ -12,13 +11,16 @@ type Restaurants = Restaurant[];
 function HomeScreen() {
   const [restaurants, setRestaurants] = useState<Restaurants>([]);
   const [filteredDataSource, setFilteredDataSource] = useState<Restaurants>([]);
+  const [nearbyRestaurants, setNearbyRestaurants] = useState<Restaurants>([]);
   const [masterDataSource, setMasterDataSource] = useState<Restaurants>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const router = useRouter();
 
   useEffect(() => {
+    // Fetching all approved restaurants from the API
     fetch(`${baseAPI}/customer/customer/restaurants/`)
       .then((response) => response.json())
       .then((data) => {
@@ -26,9 +28,9 @@ function HomeScreen() {
           (restaurant: Restaurant) => restaurant.is_approved
         );
         setMasterDataSource(approvedRestaurants);
-        setFilteredDataSource(approvedRestaurants);
         setLoading(false);
 
+        // Extract unique categories from the restaurants
         const uniqueCategories = Array.from(
           new Set(
             approvedRestaurants.map((restaurant: Restaurant) => restaurant.category?.name)
@@ -50,8 +52,44 @@ function HomeScreen() {
         console.error("Error fetching data:", error);
         setLoading(false);
       });
+
+    // Get user's current location
+    if (typeof navigator !== "undefined" && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.error("Error fetching user location:", error);
+        }
+      );
+    }
   }, []);
 
+  const filterNearbyRestaurants = useCallback(
+    (restaurants: Restaurant[], userLat: number, userLng: number, radius: number) => {
+      return restaurants.filter((restaurant) => {
+        const [restaurantLat, restaurantLng] = restaurant.location.split(",").map(Number);
+        const distance = getDistance(userLat, userLng, restaurantLat, restaurantLng);
+        return distance <= radius;
+      });
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (userLocation) {
+      const nearby = filterNearbyRestaurants(masterDataSource, userLocation.latitude, userLocation.longitude, 5);
+      const withinArea = filterNearbyRestaurants(masterDataSource, userLocation.latitude, userLocation.longitude, 3.47);
+      setNearbyRestaurants(nearby);
+      setFilteredDataSource(withinArea);
+    }
+  }, [userLocation, masterDataSource, filterNearbyRestaurants]);
+
+  // Filter restaurants by category
   const filterByCategory = (category: string | null) => {
     setSelectedCategory(category);
     if (category) {
@@ -62,6 +100,18 @@ function HomeScreen() {
     } else {
       setFilteredDataSource(masterDataSource);
     }
+  };
+
+  // Calculate distance between two coordinates
+  const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const R = 6371; // Radius of the Earth in km
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Distance in km
   };
 
   return (
@@ -89,32 +139,32 @@ function HomeScreen() {
           </div>
         ))}
       </div>
-      <div className="flex-grow px-4 py-6">
-        {loading ? (
-          <div className="flex justify-center items-center h-full">
-            <Transition
-              show={loading}
-              enter="transition-opacity duration-300"
-              enterFrom="opacity-0"
-              enterTo="opacity-100"
-              leave="transition-opacity duration-300"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
-            >
-              <div className="flex items-center justify-center space-x-2 animate-pulse">
-                <div className="w-6 h-6 bg-blue-500 rounded-full"></div>
-                <div className="w-6 h-6 bg-blue-500 rounded-full"></div>
-                <div className="w-6 h-6 bg-blue-500 rounded-full"></div>
-              </div>
-            </Transition>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredDataSource.map((restaurant) => (
+      <div className="px-4 py-6">
+        <h2 className="text-2xl font-semibold mb-4">Ofertas de Hoje</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredDataSource
+            .filter((restaurant) => restaurant.barnner)
+            .map((restaurant) => (
               <RestaurantCard key={restaurant.id} restaurant={restaurant} />
             ))}
-          </div>
-        )}
+        </div>
+
+        <h2 className="text-2xl font-semibold mt-8 mb-4">Restaurantes Próximos</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {userLocation &&
+            nearbyRestaurants.map(
+              (restaurant) => (
+                <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+              )
+            )}
+        </div>
+
+        <h2 className="text-2xl font-semibold mt-8 mb-4">Todos os Restaurantes</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredDataSource.map((restaurant) => (
+            <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+          ))}
+        </div>
       </div>
     </div>
   );

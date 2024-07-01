@@ -1,34 +1,11 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-
-type OpeningHour = {
-  day: string;
-  from_hour: string;
-  to_hour: string;
-  is_closed: boolean;
-};
-
-type Category = {
-  id: number;
-  name: string;
-  image: string | null;
-};
+import { Restaurant } from "@/services/types";
 
 type RestaurantProps = {
-  restaurant: {
-    id: number;
-    name: string;
-    phone: string;
-    address: string;
-    logo: string;
-    category?: Category;
-    barnner: boolean;
-    is_approved: boolean;
-    location: string; // Assumes location is a string with "latitude,longitude"
-    opening_hours: OpeningHour[];
-  };
+  restaurant: Restaurant;
 };
 
 const RestaurantCard: React.FC<RestaurantProps> = ({ restaurant }) => {
@@ -38,6 +15,7 @@ const RestaurantCard: React.FC<RestaurantProps> = ({ restaurant }) => {
   const [timeAway, setTimeAway] = useState<number | null>(null);
 
   useEffect(() => {
+    // Get user's current location
     if (typeof navigator !== "undefined" && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -54,6 +32,7 @@ const RestaurantCard: React.FC<RestaurantProps> = ({ restaurant }) => {
   }, []);
 
   useEffect(() => {
+    // Calculate distance and time away if user location and restaurant location are available
     if (userLocation && restaurant.location) {
       const [restaurantLat, restaurantLng] = restaurant.location.split(",").map(Number);
 
@@ -71,6 +50,7 @@ const RestaurantCard: React.FC<RestaurantProps> = ({ restaurant }) => {
     }
   }, [userLocation, restaurant.location]);
 
+  // Calculate distance between two coordinates
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     const R = 6371; // Radius of the Earth in km
     const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -86,6 +66,7 @@ const RestaurantCard: React.FC<RestaurantProps> = ({ restaurant }) => {
     return null; // Render nothing if the restaurant is undefined
   }
 
+  // Check if the restaurant is currently open
   const isOpen = () => {
     const today = new Date();
     const currentDay = today.toLocaleString("pt-BR", { weekday: "long" }).toLowerCase();
@@ -118,6 +99,7 @@ const RestaurantCard: React.FC<RestaurantProps> = ({ restaurant }) => {
     return currentTime >= openingTime && currentTime <= closingTime;
   };
 
+  // Handle click event on the restaurant card
   const handleClick = () => {
     if (!isOpen()) {
       alert(`O restaurante ${restaurant.name} está fechado de momento, tente mais tarde`);

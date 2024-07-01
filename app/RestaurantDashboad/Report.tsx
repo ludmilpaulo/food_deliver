@@ -10,7 +10,7 @@ const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 interface ReportData {
   revenue: number[];
   orders: number[];
-  products?: { labels: string[]; data: number[] };
+  meals?: { labels: string[]; data: number[] };
   drivers?: { labels: string[]; data: number[] };
   customers?: { labels: string[]; data: number[] };
 }
@@ -19,7 +19,7 @@ const Report: React.FC = () => {
   const [data, setData] = useState<ReportData>({
     revenue: [],
     orders: [],
-    products: { labels: [], data: [] },
+    meals: { labels: [], data: [] },
     drivers: { labels: [], data: [] },
     customers: { labels: [], data: [] },
   });
@@ -92,10 +92,10 @@ const Report: React.FC = () => {
             </h2>
           </div>
           <div className="p-4">
-            {data.products && (
+            {data.meals && (
               <Chart
-                options={{ labels: data.products.labels }}
-                series={[{ data: data.products.data }]}
+                options={{ labels: data.meals.labels }}
+                series={[{ data: data.meals.data }]}
                 type="pie"
               />
             )}

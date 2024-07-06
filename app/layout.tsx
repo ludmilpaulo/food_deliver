@@ -8,6 +8,9 @@ const StoreProvider = dynamic(() => import("@/redux/StoreProvider"), { ssr: fals
 const Navbar = dynamic(() => import("@/components/Navbar"), { ssr: false });
 const Footer = dynamic(() => import("@/components/Footer"), { ssr: false });
 
+console.log('Base API URL:', process.env.NEXT_PUBLIC_BASE_API);
+
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {

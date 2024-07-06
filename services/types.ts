@@ -1,9 +1,9 @@
 // src/services/types.ts
-export const baseAPI: string = process.env.NEXT_PUBLIC_BASE_API || 'https://ludmil.pythonanywhere.com';
+export const baseAPI: string = process.env.NEXT_PUBLIC_BASE_API || 'https://www.kudya.shop';
 
 
 
-//export const baseAPI = "https://ludmil.pythonanywhere.com";
+//export const baseAPI = "http://127.0.0.1";
 
 import { ReactNode } from "react";
 
@@ -125,6 +125,7 @@ export type OpeningHour = {
     barnner: boolean;
     is_approved: boolean;
     opening_hours: OpeningHourType[];
+    location: string; // Add location field
   };
 
 
@@ -161,4 +162,14 @@ export interface JobApplication {
   full_name: string;
   email: string;
   resume: File | null;
+}
+
+
+export interface Meal {
+  name: string;
+  short_description: string;
+  image: string;
+  original_price: number;
+  price_with_markup: number;
+  restaurant_name: string;
 }

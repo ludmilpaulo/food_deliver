@@ -31,10 +31,17 @@ export const deleteRestaurant = async (id: number) => {
 
 
 
-export const getMeals = async (): Promise<Meal[]> => {
+ 
+
+  export const getMeals = async (): Promise<Meal[]> => {
     try {
       const response = await axios.get<{ meals: Meal[] }>(`${baseAPI}/restaurant/api/meals/`);
-      return response.data.meals;
+      const meals = response.data.meals.map(meal => ({
+        ...meal,
+        original_price: Number(meal.original_price),
+        price_with_markup: Number(meal.price_with_markup),
+      }));
+      return meals;
     } catch (error) {
       console.error('Error fetching meals:', error);
       throw error;

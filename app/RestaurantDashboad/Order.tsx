@@ -17,6 +17,7 @@ const Order: React.FC = () => {
     if (user?.user_id) {
       try {
         const data = await fetchOrders(user.user_id);
+        console.log("order data", data)
         setOrders(data);
       } catch (error) {
         console.error("Ocorreu um erro:", error);
@@ -104,7 +105,7 @@ const Order: React.FC = () => {
                           ))}
                         </td>
                         <td className="px-4 py-2 border">{order.customer.name}</td>
-                        <td className="px-4 py-2 border">{order.driver}</td>
+                        <td className="px-4 py-2 border">{order.driver?.name}</td>
                         <td className="px-4 py-2 border">{order.total}</td>
                         <td className="px-4 py-2 border">{order.status}</td>
                         <td className="px-4 py-2 border">

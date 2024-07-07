@@ -44,7 +44,9 @@ export type UserDetails = {
     customer: {
       name: string;
     };
-    driver: string | null;
+    driver: {
+      name: string;
+    };
     total: number;
     status: string;
   }

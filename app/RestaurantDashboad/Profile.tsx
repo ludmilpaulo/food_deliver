@@ -30,7 +30,6 @@ const Profile: React.FC = () => {
     };
     fetchRestaurant();
   }, [user]);
-
   return (
     <div className="p-6 bg-white rounded-lg shadow-md">
       <div className="flex justify-around border-b mb-4">

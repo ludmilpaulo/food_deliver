@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Transition } from '@headlessui/react';
-import { Meal } from '@/services/types';
+import { baseAPI, Meal } from '@/services/types';
 import { getMeals } from '@/services/managerService';
 
 const MealList: React.FC = () => {
@@ -107,7 +107,7 @@ const MealList: React.FC = () => {
                   className="p-4 rounded shadow-lg hover:bg-blue-100 cursor-pointer bg-white"
                 >
                   <div className="flex flex-col items-center">
-                    <Image src={meal.image} alt={meal.name} width={100} height={100} className="rounded mb-2" />
+                    <Image src={`${baseAPI}${meal.image}`} alt={meal.name} width={100} height={100} className="rounded mb-2" />
                     <div className="text-center">
                       <h3 className="text-lg font-semibold">{meal.name}</h3>
                       <p className="text-gray-500">{meal.short_description}</p>

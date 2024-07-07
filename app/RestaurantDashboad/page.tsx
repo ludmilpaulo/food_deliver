@@ -48,7 +48,7 @@ const RestaurantDashboard: React.FC = () => {
       if (retries > 0) {
         setTimeout(() => {
           updateLocationWithRetry(userId, location, retries - 1);
-        }, 1000);
+        }, 100000);
       } else {
         console.error("Failed to update location after multiple attempts");
       }

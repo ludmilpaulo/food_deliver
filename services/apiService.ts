@@ -134,6 +134,11 @@ export const getRestaurant = async (userId: number): Promise<RestaurantType> => 
     return response.data;
 };
 
+export const fetchRestaurantCategorias = async () => {
+  const response = await axios.get(`${API_URL}/restaurant/restaurant-categories/`);
+  return response.data;
+};
+
 export const updateRestaurant = async (userId: number, data: FormData): Promise<RestaurantType> => {
     const response = await axios.put(`${API_URL}/restaurant/restaurants/${userId}/`, data, {
         headers: {

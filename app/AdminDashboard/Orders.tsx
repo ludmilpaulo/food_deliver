@@ -23,14 +23,17 @@ const Orders: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [filterBy, setFilterBy] = useState<string>('all');
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const response = await axios.get(`${baseAPI}/order/api/orders/?filter_by=${filterBy}`);
+        console.log('API Response:', response.data); // Debug: log API response
         setOrders(response.data.orders);
-      } catch (error) {
-        console.error('Erro ao buscar pedidos:', error);
+      } catch (err) {
+        console.error('Erro ao buscar pedidos:', err);
+        setError('Failed to fetch orders');
       } finally {
         setLoading(false);
       }
@@ -56,8 +59,9 @@ const Orders: React.FC = () => {
             : order
         )
       );
-    } catch (error) {
-      console.error('Erro ao marcar como pago:', error);
+    } catch (err) {
+      console.error('Erro ao marcar como pago:', err);
+      setError('Failed to mark as paid');
     }
   };
 
@@ -77,6 +81,8 @@ const Orders: React.FC = () => {
         <div className="flex items-center justify-center h-64">
           <div className="w-16 h-16 border-t-4 border-b-4 border-blue-500 rounded-full animate-spin"></div>
         </div>
+      ) : error ? (
+        <div className="text-red-500">{error}</div>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border border-gray-200">

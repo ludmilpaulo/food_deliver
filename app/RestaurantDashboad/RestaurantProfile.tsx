@@ -1,23 +1,36 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { MdEdit, MdSave, MdCancel } from "react-icons/md";
-import { Restaurant, RestaurantType } from "@/services/types";
-import { updateRestaurant } from "@/services/apiService";
-
+import { RestaurantType, CategoryType } from "@/services/types";
+import { updateRestaurant, fetchRestaurantCategorias } from "@/services/apiService";
 
 type RestaurantProfileProps = {
-    restaurant: RestaurantType;
-    setRestaurant: (restaurant: RestaurantType) => void;
-  };
+  restaurant: RestaurantType;
+  setRestaurant: (restaurant: RestaurantType) => void;
+};
 
 const RestaurantProfile: React.FC<RestaurantProfileProps> = ({ restaurant, setRestaurant }) => {
   const [editMode, setEditMode] = useState<boolean>(false);
+  const [categories, setCategories] = useState<CategoryType[]>([]);
   const [formData, setFormData] = useState({
     name: restaurant.name,
     phone: restaurant.phone,
     address: restaurant.address,
     logo: null as File | null,
     restaurant_license: null as File | null,
+    category: restaurant.category?.id || "", // Initialize with the restaurant's current category ID
   });
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const data = await fetchRestaurantCategorias();
+        setCategories(data);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    };
+    loadCategories();
+  }, []);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
@@ -41,6 +54,7 @@ const RestaurantProfile: React.FC<RestaurantProfileProps> = ({ restaurant, setRe
     updatedData.append("name", formData.name);
     updatedData.append("phone", formData.phone);
     updatedData.append("address", formData.address);
+    updatedData.append("category", String(formData.category)); // Add category to the form data
     if (formData.logo) {
       updatedData.append("logo", formData.logo);
     }
@@ -65,6 +79,7 @@ const RestaurantProfile: React.FC<RestaurantProfileProps> = ({ restaurant, setRe
       address: restaurant.address,
       logo: null,
       restaurant_license: null,
+      category: restaurant.category?.id || "", // Reset category
     });
   };
 
@@ -134,6 +149,23 @@ const RestaurantProfile: React.FC<RestaurantProfileProps> = ({ restaurant, setRe
             disabled={!editMode}
             className="mt-1 block w-full p-2 border rounded-md"
           />
+        </div>
+        <div>
+          <label className="block text-sm font-medium">Categoria</label>
+          <select
+            name="category"
+            value={formData.category}
+            onChange={handleInputChange}
+            disabled={!editMode}
+            className="mt-1 block w-full p-2 border rounded-md"
+          >
+            <option value="">Selecione uma categoria</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
     </div>

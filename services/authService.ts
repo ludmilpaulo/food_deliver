@@ -32,7 +32,7 @@ export const signup = async (role: "client" | "restaurant", signupData: Record<s
       username: signupData.username,
       email: signupData.email,
       password: signupData.password,
-      password2: signupData.password,
+      password2: signupData.password,  // Ensure this field is included
     });
   } else if (role === "restaurant") {
     const formData = new FormData();

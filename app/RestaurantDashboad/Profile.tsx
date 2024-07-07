@@ -19,6 +19,7 @@ const Profile: React.FC = () => {
       if (user?.user_id) {
         try {
           const data = await getRestaurant(user.user_id);
+          console.log("restaurant data==>", data)
           setRestaurant(data);
           const openingHoursData = await getOpeningHours(data.id);
           setOpeningHours(openingHoursData);

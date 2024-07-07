@@ -1,3 +1,4 @@
+import { baseAPI } from "@/services/types";
 import React, { useState } from "react";
 
 const DatabaseActions = () => {
@@ -5,7 +6,7 @@ const DatabaseActions = () => {
 
   const handleBackup = async () => {
     setLoading(true);
-    const response = await fetch('/api/backup/', { method: 'GET' });
+    const response = await fetch(`${baseAPI}/api/backup/`, { method: 'GET' });
     const data = await response.json();
     alert(data.message);
     setLoading(false);
@@ -13,7 +14,7 @@ const DatabaseActions = () => {
 
   const handleDelete = async () => {
     setLoading(true);
-    const response = await fetch('/api/delete/', { method: 'GET' });
+    const response = await fetch(`${baseAPI}/api/delete/`, { method: 'GET' });
     const data = await response.json();
     alert(data.message);
     setLoading(false);
@@ -21,7 +22,7 @@ const DatabaseActions = () => {
 
   const handleLoad = async () => {
     setLoading(true);
-    const response = await fetch('/api/load/', { method: 'GET' });
+    const response = await fetch(`${baseAPI}/api/load/`, { method: 'GET' });
     const data = await response.json();
     alert(data.message);
     setLoading(false);

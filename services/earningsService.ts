@@ -15,7 +15,11 @@ export const useEarnings = (type: string, id: string) => {
         const result = await response.json();
         setData(result);
       } catch (err) {
-        setError(err.message);
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('An unknown error occurred');
+        }
       } finally {
         setLoading(false);
       }
@@ -26,7 +30,6 @@ export const useEarnings = (type: string, id: string) => {
 
   return { data, loading, error };
 };
-
 
 export const getRestaurantEarnings = async (restaurantId: string) => {
   const response = await axios.get(`${API_URL}/restaurants/${restaurantId}/earnings`);

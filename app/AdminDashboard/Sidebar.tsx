@@ -1,18 +1,21 @@
+// app/AdminDashboard/Sidebar.tsx
 import React, { useState } from "react";
-import { MdMenu, MdClose, MdContacts, MdBarChart, MdTableBar, MdLogout, MdLocationOn, MdLaptop } from "react-icons/md";
+import { MdClose, MdContacts, MdBarChart, MdTableBar, MdLogout, MdLocationOn, MdLaptop } from "react-icons/md";
 import { motion } from "framer-motion";
 import { Transition } from "@headlessui/react";
 import Image from "next/image";
-import CustomersList from "../RestaurantDashboad/CustomersList";
-import Products from "../RestaurantDashboad/Products";
-import Report from "./Report";
-import DriverList from "./DriverList";
-import Orders from "./Orders";
-import Restaurant from "./Restaurant";
-import MealList from "./restaurant/MealList";
+import dynamic from "next/dynamic";
 
+const CustomersList = dynamic(() => import("./CustomersList"));
 
-const Sidebar: React.FC<{ isOpen: boolean, onToggle: () => void }> = ({ isOpen, onToggle }) => {
+const Report = dynamic(() => import("./Report"));
+const DriverList = dynamic(() => import("./DriverList"));
+const Orders = dynamic(() => import("./Orders"));
+const Restaurant = dynamic(() => import("./Restaurant"));
+const MealList = dynamic(() => import("./restaurant/MealList"));
+const DatabaseActions = dynamic(() => import("./DatabaseActions"));
+
+const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, onToggle }) => {
   const [showProducts, setShowProducts] = useState(false);
   const [showMeals, setShowMeals] = useState(false);
   const [showOrders, setShowOrders] = useState(false);
@@ -20,6 +23,7 @@ const Sidebar: React.FC<{ isOpen: boolean, onToggle: () => void }> = ({ isOpen, 
   const [showReport, setShowReport] = useState(false);
   const [listOfCustomer, setListOfCustomer] = useState(false);
   const [listOfDriver, setListOfDriver] = useState(false);
+  const [showDatabaseActions, setShowDatabaseActions] = useState(false);
   const [loading, setLoading] = useState(false);
 
   return (
@@ -33,8 +37,8 @@ const Sidebar: React.FC<{ isOpen: boolean, onToggle: () => void }> = ({ isOpen, 
         leaveFrom="opacity-100"
         leaveTo="opacity-0"
       >
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full">
-          <div className="w-32 h-32 border-t-2 border-b-2 border-blue-500 rounded-full animate-spin"></div>
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+          <div className="w-16 h-16 border-t-4 border-b-4 border-blue-500 rounded-full animate-spin"></div>
         </div>
       </Transition>
       <div className="flex h-full">
@@ -61,7 +65,7 @@ const Sidebar: React.FC<{ isOpen: boolean, onToggle: () => void }> = ({ isOpen, 
                 </div>
               </div>
             </div>
-            <div className="flex-1">
+            <div className="flex-1 overflow-y-auto">
               <ul className="space-y-4">
                 <li className="text-xs font-semibold tracking-wide uppercase">Painel</li>
                 <motion.li
@@ -76,6 +80,7 @@ const Sidebar: React.FC<{ isOpen: boolean, onToggle: () => void }> = ({ isOpen, 
                     setListOfCustomer(false);
                     setListOfDriver(false);
                     setShowMeals(false);
+                    setShowDatabaseActions(false);
                     onToggle();
                   }}
                 >
@@ -96,6 +101,7 @@ const Sidebar: React.FC<{ isOpen: boolean, onToggle: () => void }> = ({ isOpen, 
                     setListOfCustomer(false);
                     setListOfDriver(false);
                     setShowMeals(true);
+                    setShowDatabaseActions(false);
                     onToggle();
                   }}
                 >
@@ -116,6 +122,7 @@ const Sidebar: React.FC<{ isOpen: boolean, onToggle: () => void }> = ({ isOpen, 
                     setListOfCustomer(false);
                     setListOfDriver(false);
                     setShowMeals(false);
+                    setShowDatabaseActions(false);
                     onToggle();
                   }}
                 >
@@ -136,6 +143,7 @@ const Sidebar: React.FC<{ isOpen: boolean, onToggle: () => void }> = ({ isOpen, 
                     setListOfCustomer(false);
                     setListOfDriver(false);
                     setShowMeals(false);
+                    setShowDatabaseActions(false);
                     onToggle();
                   }}
                 >
@@ -156,6 +164,7 @@ const Sidebar: React.FC<{ isOpen: boolean, onToggle: () => void }> = ({ isOpen, 
                     setListOfCustomer(true);
                     setListOfDriver(false);
                     setShowMeals(false);
+                    setShowDatabaseActions(false);
                     onToggle();
                   }}
                 >
@@ -176,6 +185,7 @@ const Sidebar: React.FC<{ isOpen: boolean, onToggle: () => void }> = ({ isOpen, 
                     setListOfCustomer(false);
                     setListOfDriver(true);
                     setShowMeals(false);
+                    setShowDatabaseActions(false);
                     onToggle();
                   }}
                 >
@@ -196,12 +206,34 @@ const Sidebar: React.FC<{ isOpen: boolean, onToggle: () => void }> = ({ isOpen, 
                     setListOfCustomer(false);
                     setListOfDriver(false);
                     setShowMeals(false);
+                    setShowDatabaseActions(false);
                     onToggle();
                   }}
                 >
                   <div className="flex items-center space-x-3">
                     <MdContacts className="text-lg" />
                     <span>Paeceiros</span>
+                  </div>
+                </motion.li>
+                <motion.li
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="p-2 rounded hover:bg-blue-600 cursor-pointer"
+                  onClick={() => {
+                    setShowProducts(false);
+                    setShowOrders(false);
+                    setShowRestaurant(false);
+                    setShowReport(false);
+                    setListOfCustomer(false);
+                    setListOfDriver(false);
+                    setShowMeals(false);
+                    setShowDatabaseActions(true);
+                    onToggle();
+                  }}
+                >
+                  <div className="flex items-center space-x-3">
+                    <MdBarChart className="text-lg" />
+                    <span>Administração</span>
                   </div>
                 </motion.li>
               </ul>
@@ -230,14 +262,15 @@ const Sidebar: React.FC<{ isOpen: boolean, onToggle: () => void }> = ({ isOpen, 
             </div>
           </nav>
         </div>
-      </div>
-      <div className="flex-1 overflow-y-auto p-4 bg-gray-100">
-        {showMeals && <MealList />}
-        {showOrders && <Orders />}
-        {showRestaurant && <Restaurant />}
-        {showReport && <Report />}
-        {listOfCustomer && <CustomersList />}
-        {listOfDriver && <DriverList />}
+        <div className="flex-1 overflow-y-auto bg-gray-100">
+          {showMeals && <MealList />}
+          {showOrders && <Orders />}
+          {showRestaurant && <Restaurant />}
+          {showReport && <Report />}
+          {listOfCustomer && <CustomersList />}
+          {listOfDriver && <DriverList />}
+          {showDatabaseActions && <DatabaseActions />} {/* Render the DatabaseActions component */}
+        </div>
       </div>
     </>
   );

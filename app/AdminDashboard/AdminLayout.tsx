@@ -1,13 +1,12 @@
+// app/AdminDashboard/AdminLayout.tsx
 "use client";
+
 import React, { useState } from "react";
-import { MdMenu, MdClose, MdContacts, MdBarChart, MdTableBar, MdLogout, MdLocationOn } from "react-icons/md";
-import { motion } from "framer-motion";
+import { MdMenu } from "react-icons/md";
 import { Transition } from "@headlessui/react";
-import { useRouter } from "next/router";
-import Image from "next/image";
 import dynamic from "next/dynamic";
 
-const Sidebar = dynamic(() => import("./sidebar"), {
+const Sidebar = dynamic(() => import("./Sidebar"), {
   ssr: false,
   loading: () => <p>Carregando...</p>,
 });

@@ -97,7 +97,10 @@ const CheckoutPage: React.FC = () => {
       restaurant_id: restaurantId,
       address: useCurrentLocation ? `${location.latitude},${location.longitude}` : userAddress,
       order_details: orderDetails,
-      payment_method: paymentMethod, // Ensure payment_method is included here
+      payment_method: paymentMethod,
+      use_current_location: useCurrentLocation, // Send this flag to the backend
+      latitude: location.latitude, // Send latitude and longitude if current location is used
+      longitude: location.longitude
     };
     console.log("order data=>", orderData);
 
@@ -188,3 +191,4 @@ const CheckoutPageWrapper: React.FC = () => {
 };
 
 export default CheckoutPageWrapper;
+

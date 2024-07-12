@@ -1,4 +1,3 @@
-// src/components/AddressInput.tsx
 import React from 'react';
 
 type AddressInputProps = {
@@ -11,9 +10,7 @@ type AddressInputProps = {
 const AddressInput: React.FC<AddressInputProps> = ({ useCurrentLocation, setUseCurrentLocation, userAddress, setUserAddress }) => {
   return (
     <div className="mb-6">
-      <label className="block text-gray-700 mb-2">
-        Escolher o endereço de entrega:
-      </label>
+      <label className="block text-gray-700 mb-2">Escolher o endereço de entrega:</label>
       <div className="flex items-center mb-4">
         <input
           type="radio"

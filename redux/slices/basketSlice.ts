@@ -6,7 +6,7 @@ type Meal = {
   name: string;
   price: number;
   quantity: number;
-  restaurant: number; // Add restaurant property to the Meal type
+  restaurant: number;
 };
 
 type BasketState = {
@@ -39,7 +39,7 @@ const basketSlice = createSlice({
         }
       }
     },
-    clearCart: (state, action: PayloadAction<number>) => { // Add clearCart reducer
+    clearCart: (state, action: PayloadAction<number>) => {
       state.items = state.items.filter(item => item.restaurant !== action.payload);
     },
     clearAllCart: (state) => {
@@ -49,7 +49,5 @@ const basketSlice = createSlice({
 });
 
 export const { addItem, removeItem, clearCart, clearAllCart } = basketSlice.actions;
-
 export const selectCartItems = (state: RootState) => state.basket.items;
-
 export default basketSlice.reducer;

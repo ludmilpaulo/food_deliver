@@ -1,12 +1,15 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DownloadInvoice from './DownloadInvoice';
 import OrderHistory from './OrderHistory';
-import TrackOrders from './TrackOrders';
+//import TrackOrders from './TrackOrders';
 import UpdateProfile from './UpdateProfile';
 import Sidebar from './Sidebar';  // Importing your custom Sidebar component
+import dynamic from 'next/dynamic';
 
-const Dashboard: React.FC = () => {
+const TrackOrders = dynamic(() => import('./TrackOrders'), { ssr: false });
+
+const UserDashboard: React.FC = () => {
   const [selectedMenu, setSelectedMenu] = useState<string>('trackOrders');
 
   const renderComponent = () => {
@@ -34,4 +37,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard;
+export default UserDashboard;

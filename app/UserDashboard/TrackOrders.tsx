@@ -137,7 +137,7 @@ const TrackOrders: React.FC = () => {
         });
       });
     }
-  }, [user.token]);
+  }, [user.token, addresses]);
 
   const fetchChatMessages = useCallback((order: any) => {
     console.log('Fetching chat messages for order:', order.id);

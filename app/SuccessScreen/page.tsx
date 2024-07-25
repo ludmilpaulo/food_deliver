@@ -7,7 +7,7 @@ const SuccessScreen: React.FC = () => {
   const router = useRouter();
 
   const handleViewOrders = () => {
-    router.push('/order-history');
+    router.push('/UserDashboard');
   };
 
   const handleGoHome = () => {

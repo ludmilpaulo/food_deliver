@@ -16,7 +16,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setSelectedMenu }) => {
   const handleLogout = () => {
     dispatch(logoutUser());
     dispatch(clearAllCart());
-    router.push("/");
+    router.push("/LoginScreenUser");
   };
 
   return (

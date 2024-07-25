@@ -56,18 +56,14 @@ const Navbar: React.FC = () => {
                       onChange={(e) => setSearchText(e.target.value)}
                       className="px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
                     />
-                 
+
                   </form>
                   <Link href="/HomeScreen">
                     <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
                       <IoMdRestaurant size={20} className="mr-1" /> Restaurantes
                     </span>
                   </Link>
-                  <Link href="/orders">
-                    <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
-                      <IoMdCart size={20} className="mr-1" /> Pedidos
-                    </span>
-                  </Link>
+                 
                   <Link href="/CartPage" className="relative">
                     <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
                       <IoMdCart size={20} className="mr-1" /> Carrinho
@@ -122,11 +118,7 @@ const Navbar: React.FC = () => {
                     <IoMdRestaurant size={20} className="mr-1" /> Restaurantes
                   </span>
                 </Link>
-                <Link href="/orders">
-                  <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer px-4">
-                    <IoMdCart size={20} className="mr-1" /> Pedidos
-                  </span>
-                </Link>
+                
                 <Link href="/CartPage" className="relative px-4">
                   <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
                     <IoMdCart size={20} className="mr-1" /> Carrinho

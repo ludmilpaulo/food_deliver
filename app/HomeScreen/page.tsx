@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import withAuth from "@/components/ProtectedPage";
 import RestaurantCard from "./RestaurantCard"; // Adjust the import path if necessary
 import { useRouter } from "next/navigation";
@@ -19,40 +19,51 @@ function HomeScreen() {
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    // Fetching all approved restaurants from the API
-    fetch(`${baseAPI}/customer/customer/restaurants/`)
-      .then((response) => response.json())
-      .then((data) => {
-        const approvedRestaurants = data.restaurants.filter(
-          (restaurant: Restaurant) => restaurant.is_approved
+  const fetchData = useCallback(async () => {
+    try {
+      const response = await fetch(`${baseAPI}/customer/customer/restaurants/`);
+      const data = await response.json();
+      const approvedRestaurants = data.restaurants.filter(
+        (restaurant: Restaurant) => restaurant.is_approved
+      );
+      setMasterDataSource(approvedRestaurants);
+      setLoading(false);
+
+      // Extract unique categories from the restaurants
+      const uniqueCategories = Array.from(
+        new Set(
+          approvedRestaurants.map((restaurant: Restaurant) => restaurant.category?.name)
+        )
+      ).map((category) => {
+        const matchedRestaurant = approvedRestaurants.find(
+          (restaurant: Restaurant) => restaurant.category?.name === category
         );
-        setMasterDataSource(approvedRestaurants);
-        setLoading(false);
-
-        // Extract unique categories from the restaurants
-        const uniqueCategories = Array.from(
-          new Set(
-            approvedRestaurants.map((restaurant: Restaurant) => restaurant.category?.name)
-          )
-        ).map((category) => {
-          const matchedRestaurant = approvedRestaurants.find(
-            (restaurant: Restaurant) => restaurant.category?.name === category
-          );
-          return {
-            name: category as string,
-            id: matchedRestaurant?.category?.id as number,
-            image: matchedRestaurant?.category?.image || null,
-          };
-        });
-
-        setCategories(uniqueCategories);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        setLoading(false);
+        return {
+          name: category as string,
+          id: matchedRestaurant?.category?.id as number,
+          image: matchedRestaurant?.category?.image || null,
+        };
       });
 
+      setCategories(uniqueCategories);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Initial fetch
+    fetchData();
+
+    // Set interval to fetch data every 30 seconds
+    const intervalId = setInterval(fetchData, 3000);
+
+    // Clear interval on component unmount
+    return () => clearInterval(intervalId);
+  }, [fetchData]);
+
+  useEffect(() => {
     // Get user's current location
     if (typeof navigator !== "undefined" && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -90,7 +101,7 @@ function HomeScreen() {
   }, [userLocation, masterDataSource, filterNearbyRestaurants]);
 
   // Filter restaurants by category
-  const filterByCategory = (category: string | null) => {
+  const filterByCategory = useCallback((category: string | null) => {
     setSelectedCategory(category);
     if (category) {
       const filteredData = masterDataSource.filter(
@@ -100,7 +111,7 @@ function HomeScreen() {
     } else {
       setFilteredDataSource(masterDataSource);
     }
-  };
+  }, [masterDataSource]);
 
   // Calculate distance between two coordinates
   const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {

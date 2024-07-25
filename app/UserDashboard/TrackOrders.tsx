@@ -1,27 +1,18 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import { toggleWidget, deleteMessages, addResponseMessage } from 'react-chat-widget';
+import { deleteMessages, addResponseMessage } from 'react-chat-widget';
 import 'react-chat-widget/lib/styles.css';
 import { baseAPI } from '@/services/types';
 import { selectUser } from '@/redux/slices/authSlice';
 import { useSelector } from 'react-redux';
 import useLoadScript from '@/hooks/useLoadScript';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faComments } from '@fortawesome/free-solid-svg-icons';
+import 'tailwindcss/tailwind.css';
 
 interface LocationType {
   latitude: number;
   longitude: number;
-}
-
-interface RestaurantType {
-  id: number;
-  name: string;
-  phone: string;
-  address: string;
-  logo: string;
-  location: LocationType;
-  restaurant_license: string;
-  banner: string;
-  is_approved: boolean;
 }
 
 const toRadians = (degrees: number) => {
@@ -69,6 +60,8 @@ const TrackOrders: React.FC = () => {
   const [distances, setDistances] = useState<{ [key: number]: any }>({});
   const [addresses, setAddresses] = useState<{ [key: number]: string }>({});
   const [lastMessageId, setLastMessageId] = useState<number | null>(null);
+  const [newMessageCount, setNewMessageCount] = useState<number>(0);
+  const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
 
   const user = useSelector(selectUser);
 
@@ -78,7 +71,7 @@ const TrackOrders: React.FC = () => {
       const mapElement = document.getElementById('map');
       if (mapElement) {
         const map = new google.maps.Map(mapElement, {
-          center: { lat: location.latitude, lng: location.longitude },
+          center: { lat: location?.latitude, lng: location?.longitude },
           zoom: 15
         });
         new google.maps.Marker({
@@ -137,7 +130,7 @@ const TrackOrders: React.FC = () => {
         });
       });
     }
-  }, [user.token, addresses]);
+  }, [user?.token, addresses]);
 
   const fetchChatMessages = useCallback((order: any) => {
     console.log('Fetching chat messages for order:', order.id);
@@ -150,6 +143,7 @@ const TrackOrders: React.FC = () => {
           const latestMessage = newMessages[newMessages.length - 1];
           if (lastMessageId === null || latestMessage.id > lastMessageId) {
             setLastMessageId(latestMessage.id);
+            setNewMessageCount(prevCount => prevCount + 1);
             // Send notification if new message
             if (Notification.permission === "granted") {
               new Notification("New message", {
@@ -180,7 +174,8 @@ const TrackOrders: React.FC = () => {
     console.log('Order selected:', order.id);
     setCurrentOrder(order);
     fetchChatMessages(order);
-    toggleWidget();
+    setIsChatOpen(true);
+    setNewMessageCount(0);
   };
 
   const handleNewUserMessage = (newMessage: string) => {
@@ -235,41 +230,41 @@ const TrackOrders: React.FC = () => {
       {orders.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {orders.map((order) => (
-            <div key={order.id} className="bg-white p-6 rounded-lg shadow-md">
+            <div key={order.id} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
               <h2 className="text-xl font-semibold mb-2">Pedido ID: {order.id}</h2>
-              <p className="text-gray-700"><strong>Status:</strong> {order.status}</p>
+              <p className="text-gray-700 mb-1"><strong>Status:</strong> {order.status}</p>
               {orderLocations[order.id]?.driver_location ? (
                 <>
-                  <p className="text-gray-700"><strong>Endereço do Motorista:</strong> {addresses[order.id] || 'Carregando endereço...'}</p>
+                  <p className="text-gray-700 mb-1"><strong>Endereço do Motorista:</strong> {addresses[order.id] || 'Carregando endereço...'}</p>
                   {distances[order.id] ? (
                     <>
-                      <p className="text-gray-700"><strong>Distância:</strong> {distances[order.id].distance}</p>
-                      <p className="text-gray-700"><strong>Tempo Estimado:</strong> {distances[order.id].duration}</p>
+                      <p className="text-gray-700 mb-1"><strong>Distância:</strong> {distances[order.id].distance}</p>
+                      <p className="text-gray-700 mb-1"><strong>Tempo Estimado:</strong> {distances[order.id].duration}</p>
                     </>
                   ) : (
-                    <p className="text-gray-700">Calculando distância e tempo...</p>
+                    <p className="text-gray-700 mb-1">Calculando distância e tempo...</p>
                   )}
                   <button
                     onClick={() => openGoogleMaps(parseLocation(orderLocations[order.id].driver_location))}
-                    className="mt-2 w-full p-2 bg-green-500 text-white rounded hover:bg-green-600 transition duration-300"
+                    className="mt-2 w-full p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300"
                   >
                     Ver no Google Maps
                   </button>
                   <div id="map" className="h-64 w-full mt-4"></div>
                   <button
                     onClick={() => (window as any).initMap(parseLocation(orderLocations[order.id].driver_location))}
-                    className="mt-2 w-full p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition duration-300"
+                    className="mt-2 w-full p-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition duration-300"
                   >
                     Ver Mapa
                   </button>
                 </>
               ) : (
-                <p className="text-gray-700"><strong>O pedido está sendo preparado por:</strong> {orderLocations[order.id]?.restaurant}</p>
+                <p className="text-gray-700 mb-1"><strong>O pedido está sendo preparado por:</strong> {orderLocations[order.id]?.restaurant}</p>
               )}
-              <p className="text-gray-700"><strong>PIN Secreto:</strong> {orderLocations[order.id]?.secret_pin}</p>
+              <p className="text-gray-700 mb-1"><strong>PIN Secreto:</strong> {orderLocations[order.id]?.secret_pin}</p>
               <button
                 onClick={() => handleOrderSelection(order)}
-                className="mt-4 w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-300"
+                className="mt-4 w-full p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300"
               >
                 Ver Detalhes e Conversar com o Motorista
               </button>
@@ -279,30 +274,59 @@ const TrackOrders: React.FC = () => {
       ) : (
         <p className="text-center text-gray-700">Carregando informações dos pedidos...</p>
       )}
-      <div className={`chat-widget bg-white rounded-lg shadow-md mt-6 p-4 ${currentOrder ? 'block' : 'hidden'}`}>
-        <h2 className="text-2xl font-bold mb-4">Chat com o Motorista</h2>
-        <div className="chat-messages overflow-y-scroll h-64 p-4 rounded-lg shadow-inner mb-4 bg-gray-50">
-          {chatMessages.map((message, index) => (
-            <div
-              key={index}
-              className={`message mb-2 p-2 rounded-lg ${message.sender_username === 'driver' ? 'bg-blue-200 text-right' : 'bg-green-200 text-left'}`}
-            >
-              <strong>{message.sender_username}</strong>: {message.message}
-            </div>
-          ))}
-        </div>
-        <input
-          type="text"
-          className="w-full p-2 rounded-lg border border-gray-300"
-          placeholder="Digite sua mensagem..."
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && e.currentTarget.value.trim() !== '') {
-              handleNewUserMessage(e.currentTarget.value);
-              e.currentTarget.value = '';
-            }
-          }}
-        />
+      <div className="fixed bottom-4 right-4">
+        <button
+          onClick={() => setIsChatOpen(true)}
+          className="relative p-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition duration-300"
+        >
+          <FontAwesomeIcon icon={faComments} size="lg" />
+          {newMessageCount > 0 && (
+            <span className="absolute top-0 right-0 inline-block w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full text-center">
+              {newMessageCount}
+            </span>
+          )}
+        </button>
       </div>
+      {isChatOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg shadow-md p-6 w-full max-w-md mx-auto relative">
+            <button
+              onClick={() => setIsChatOpen(false)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+            >
+              &times;
+            </button>
+            <h2 className="text-2xl font-bold mb-4">Chat com o Motorista</h2>
+            <div className="chat-messages overflow-y-scroll h-64 p-4 rounded-lg shadow-inner mb-4 bg-gray-50">
+              {chatMessages.map((message, index) => (
+                <div
+                  key={index}
+                  className={`message mb-2 p-2 rounded-lg ${message.sender_username === 'driver' ? 'bg-blue-200 text-right' : 'bg-green-200 text-left'}`}
+                >
+                  <strong>{message.sender_username}</strong>: {message.message}
+                </div>
+              ))}
+            </div>
+            <input
+              type="text"
+              className="w-full p-2 rounded-lg border border-gray-300"
+              placeholder="Digite sua mensagem..."
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && e.currentTarget.value.trim() !== '') {
+                  handleNewUserMessage(e.currentTarget.value);
+                  e.currentTarget.value = '';
+                }
+              }}
+            />
+            <button
+              onClick={() => setIsChatOpen(false)}
+              className="mt-4 w-full p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300"
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

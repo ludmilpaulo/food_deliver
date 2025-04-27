@@ -1,9 +1,9 @@
 // src/services/types.ts
-export const baseAPI: string = process.env.NEXT_PUBLIC_BASE_API || 'https://www.kudya.shop';
+//export const baseAPI: string = process.env.NEXT_PUBLIC_BASE_API || 'https://www.kudya.shop';
 
 
 
-//export const baseAPI = "http://127.0.0.1";
+export const baseAPI = "http://127.0.0.1:8000";
 
 import { ReactNode } from "react";
 

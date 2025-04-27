@@ -3,7 +3,7 @@
 
 
 
-export const baseAPI = "http://127.0.0.1:8000";
+export const baseAPI = "https://kudya.pythonanywhere.com";
 
 import { ReactNode } from "react";
 

@@ -1,28 +1,18 @@
-import type { Metadata } from "next";
-import dynamic from 'next/dynamic';
-import { Inter } from "next/font/google";
-import "./globals.css";
-import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import LayoutWrapper from '@/components/LayoutWrapper';
 
-const StoreProvider = dynamic(() => import("@/redux/StoreProvider"), { ssr: false });
-const Navbar = dynamic(() => import("@/components/Navbar"), { ssr: false });
-const Footer = dynamic(() => import("@/components/Footer"), { ssr: false });
-
-console.log('Base API URL:', process.env.NEXT_PUBLIC_BASE_API);
-
-
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: "Kudya - Entrega de Comida Rápida e Fácil | Melhores Restaurantes, Refeições Favoritas",
   description: "Descubra os melhores restaurantes e peça suas refeições favoritas com Kudya. Entrega rápida, fácil e conveniente para sua conveniência.",
   keywords: "Kudya, entrega de comida, restaurantes, refeições favoritas, comida rápida, entrega fácil, conveniência, pedidos online, variedade gastronômica",
-  authors: [
-    { name: "Kudya", url: "https://www.sdkudya.com" },
-  ],
+  authors: [{ name: "Kudya", url: "https://www.sdkudya.com" }],
   openGraph: {
     title: "Kudya - Entrega de Comida Rápida e Fácil | Melhores Restaurantes, Refeições Favoritas",
-    description: "Descubra os melhores restaurantes e peça suas refeições favoritas com Kudya. Entrega rápida, fácil e conveniente para sua conveniência.",
+    description: "Descubra os melhores restaurantes e peça suas refeições favoritas com Kudya.",
     url: "https://www.kudya.com",
     type: "website",
     locale: "pt_BR",
@@ -39,8 +29,8 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@kudya",
     creator: "@kudya",
-    title: "Kudya - Entrega de Comida Rápida e Fácil | Melhores Restaurantes, Refeições Favoritas",
-    description: "Descubra os melhores restaurantes e peça suas refeições favoritas com Kudya. Entrega rápida, fácil e conveniente para sua conveniência.",
+    title: "Kudya - Entrega de Comida Rápida e Fácil",
+    description: "Descubra os melhores restaurantes e peça suas refeições favoritas com Kudya.",
     images: [
       {
         url: "https://www.kudya.shop/media/logo/azul.png",
@@ -50,19 +40,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>){
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt">
       <body className={inter.className}>
-        <StoreProvider>
-          <Navbar />
-          {children}
-          <Footer />
-        </StoreProvider>
+        <LayoutWrapper>{children}</LayoutWrapper>
       </body>
     </html>
   );

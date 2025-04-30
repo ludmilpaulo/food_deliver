@@ -1,7 +1,7 @@
 // src/services/types.ts
 //export const baseAPI: string = process.env.NEXT_PUBLIC_BASE_API || 'https://www.kudya.shop';
 
-
+//export const baseAPI = "http://0.0.0.0:8000";
 
 export const baseAPI = "https://kudya.pythonanywhere.com";
 
@@ -11,7 +11,7 @@ export type UserDetails = {
     // customer_detais: string;
     address: string;
     avatar: string;
-    id: number;
+    id: number; 
     phone: number;
   };
   

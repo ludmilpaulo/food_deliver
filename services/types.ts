@@ -1,9 +1,9 @@
 // src/services/types.ts
 //export const baseAPI: string = process.env.NEXT_PUBLIC_BASE_API || 'https://www.kudya.shop';
 
-export const baseAPI = "http://127.0.0.1:8000"
+//export const baseAPI = "http://0.0.0.0:8000";
 
-//export const baseAPI = "https://kudya.pythonanywhere.com";
+export const baseAPI = "https://kudya.pythonanywhere.com";
 
 import { ReactNode } from "react";
 
@@ -11,7 +11,7 @@ export type UserDetails = {
     // customer_detais: string;
     address: string;
     avatar: string;
-    id: number;
+    id: number; 
     phone: number;
   };
   
@@ -78,7 +78,7 @@ export type OpeningHour = {
     image: string | null;
   };
   
-  export type store = {
+  export type Restaurant = {
     id: number;
     name: string;
     phone: string;
@@ -100,7 +100,7 @@ export type OpeningHour = {
 
   export interface OpeningHourType {
     id?: number;
-    store: number;
+    restaurant: number;
     day: number;
     from_hour: string;
     to_hour: string;
@@ -117,7 +117,7 @@ export type OpeningHour = {
     image: string | null;
   };
   
-  export type storeType = {
+  export type RestaurantType = {
     id: number;
     name: string;
     phone: string;
@@ -167,25 +167,11 @@ export interface JobApplication {
 }
 
 
-export interface StoreType {
-  id: number;
+export interface Meal {
   name: string;
-  description?: string;
-  icon?: string | null; 
+  short_description: string;
+  image: string;
+  original_price: number;
+  price_with_markup: number;
+  restaurant_name: string;
 }
-
-export interface Store {
-  id: number;
-  store_type: number;
-  category: number;
-  name: string;
-  phone: string;
-  address: string;
-  logo: string;
-  location?: string;
-  banner?: boolean;
-  is_approved?: boolean;
-}
-
-
-

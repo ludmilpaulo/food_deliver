@@ -9,7 +9,7 @@ interface BannerProps {
   backgroundImage: string;
   backgroundApp: string;
   bottomImage: string;
-  restaurants: { location: string; name: string; logo: string }[];
+  stores: { location: string; name: string; logo: string }[];
 }
 
 const containerStyle = {
@@ -17,7 +17,7 @@ const containerStyle = {
   height: '400px',
 };
 
-const Banner: FC<BannerProps> = ({ title, backgroundImage, backgroundApp, restaurants, bottomImage }) => {
+const Banner: FC<BannerProps> = ({ title, backgroundImage, backgroundApp, stores, bottomImage }) => {
   const [center, setCenter] = useState({ lat: -25.747868, lng: 28.229271 });
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!, // Add your API key here

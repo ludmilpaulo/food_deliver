@@ -2,13 +2,13 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Restaurant } from "@/services/types";
+import { store } from "@/services/types";
 
-type RestaurantProps = {
-  restaurant: Restaurant;
+type storeProps = {
+  store: store;
 };
 
-const RestaurantCard: React.FC<RestaurantProps> = ({ restaurant }) => {
+const storeCard: React.FC<storeProps> = ({ store }) => {
   const router = useRouter();
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [distance, setDistance] = useState<number | null>(null);
@@ -32,15 +32,15 @@ const RestaurantCard: React.FC<RestaurantProps> = ({ restaurant }) => {
   }, []);
 
   useEffect(() => {
-    // Calculate distance and time away if user location and restaurant location are available
-    if (userLocation && restaurant.location) {
-      const [restaurantLat, restaurantLng] = restaurant.location.split(",").map(Number);
+    // Calculate distance and time away if user location and store location are available
+    if (userLocation && store.location) {
+      const [storeLat, storeLng] = store.location.split(",").map(Number);
 
       const distance = calculateDistance(
         userLocation.latitude,
         userLocation.longitude,
-        restaurantLat,
-        restaurantLng
+        storeLat,
+        storeLng
       );
       setDistance(distance);
 
@@ -48,7 +48,7 @@ const RestaurantCard: React.FC<RestaurantProps> = ({ restaurant }) => {
       const timeInMinutes = (distance / walkingSpeedKmh) * 60;
       setTimeAway(timeInMinutes);
     }
-  }, [userLocation, restaurant.location]);
+  }, [userLocation, store.location]);
 
   // Calculate distance between two coordinates
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
@@ -62,17 +62,17 @@ const RestaurantCard: React.FC<RestaurantProps> = ({ restaurant }) => {
     return R * c; // Distance in km
   };
 
-  if (!restaurant) {
-    return null; // Render nothing if the restaurant is undefined
+  if (!store) {
+    return null; // Render nothing if the store is undefined
   }
 
-  // Check if the restaurant is currently open
+  // Check if the store is currently open
   const isOpen = () => {
     const today = new Date();
     const currentDay = today.toLocaleString("pt-BR", { weekday: "long" }).toLowerCase();
     const currentTime = today.getHours() * 60 + today.getMinutes();
 
-    const openingHour = restaurant.opening_hours.find(
+    const openingHour = store.opening_hours.find(
       (hour) => hour.day.toLowerCase() === currentDay
     );
 
@@ -99,12 +99,12 @@ const RestaurantCard: React.FC<RestaurantProps> = ({ restaurant }) => {
     return currentTime >= openingTime && currentTime <= closingTime;
   };
 
-  // Handle click event on the restaurant card
+  // Handle click event on the store card
   const handleClick = () => {
     if (!isOpen()) {
-      alert(`O restaurante ${restaurant.name} está fechado de momento, tente mais tarde`);
+      alert(`O storee ${store.name} está fechado de momento, tente mais tarde`);
     } else {
-      router.push(`/RestaurantMenuPage?restaurant_id=${restaurant.id}`);
+      router.push(`/storeMenuPage?store_id=${store.id}`);
     }
   };
 
@@ -115,24 +115,24 @@ const RestaurantCard: React.FC<RestaurantProps> = ({ restaurant }) => {
       }`}
       onClick={handleClick}
     >
-      {restaurant.logo && (
+      {store.logo && (
         <Image
-          src={restaurant.logo}
-          alt={restaurant.name}
+          src={store.logo}
+          alt={store.name}
           width={400}
           height={300}
           className="w-full h-48 object-cover"
         />
       )}
       <div className="p-4">
-        <h2 className="text-2xl font-semibold text-gray-800">{restaurant.name}</h2>
+        <h2 className="text-2xl font-semibold text-gray-800">{store.name}</h2>
         
-        {restaurant.category && (
+        {store.category && (
           <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 mt-2 rounded-full">
-            {restaurant.category.name}
+            {store.category.name}
           </span>
         )}
-        {restaurant.barnner && (
+        {store.barnner && (
           <div className="mt-4 bg-gradient-to-r from-yellow-400 to-blue-600 p-2 rounded text-white text-center">
             Ver o Menu
           </div>
@@ -156,4 +156,4 @@ const RestaurantCard: React.FC<RestaurantProps> = ({ restaurant }) => {
   );
 };
 
-export default RestaurantCard;
+export default storeCard;

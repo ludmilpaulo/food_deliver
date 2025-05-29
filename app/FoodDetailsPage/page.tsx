@@ -14,7 +14,7 @@ type Meal = {
   price: number;
   quantity: number;
   category: string;
-  restaurant: number;
+  store: number;
 };
 
 const FoodDetailsPage: React.FC = () => {

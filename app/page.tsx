@@ -15,29 +15,6 @@ export default function Home() {
   const user = useSelector(selectUser);
   console.log("user==>>", user)
 
-  console.log('Base API URL:', process.env.NEXT_PUBLIC_BASE_API);
-
-
-useEffect(() => {
-  if (user !== null && typeof user === 'object') {
-    if (user.is_customer === true) {
-      router.push("/HomeScreen");
-    } else if (user.fornecedor_id !== null) {
-      router.push("/RestaurantDashboad");
-    } else {
-      dispatch(clearAllCart());
-      router.push("/BannerPage");
-    }
-  } else {
-    dispatch(clearAllCart());
-    router.push("/BannerPage");
-  }
-}, [router, user]);
-
-
-
-  console.log("user==>>", user)
-
 
   return (
     <>

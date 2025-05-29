@@ -7,17 +7,17 @@ import { addDays, format, startOfWeek } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 interface OpeningHoursCalendarProps {
-  restaurantId: number;
+  storeId: number;
 }
 
-const OpeningHoursCalendar: React.FC<OpeningHoursCalendarProps> = ({ restaurantId }) => {
+const OpeningHoursCalendar: React.FC<OpeningHoursCalendarProps> = ({ storeId }) => {
   const [openingHours, setOpeningHours] = useState<OpeningHourType[]>([]);
   const [highlightedDates, setHighlightedDates] = useState<Date[]>([]);
 
   useEffect(() => {
     const fetchOpeningHours = async () => {
       try {
-        const data = await getOpeningHours(restaurantId);
+        const data = await getOpeningHours(storeId);
         setOpeningHours(data);
         const closedDays = data.filter(hour => hour.is_closed).map(hour => getDateFromDay(hour.day));
         setHighlightedDates(closedDays);
@@ -26,7 +26,7 @@ const OpeningHoursCalendar: React.FC<OpeningHoursCalendarProps> = ({ restaurantI
       }
     };
     fetchOpeningHours();
-  }, [restaurantId]);
+  }, [storeId]);
 
   const getDateFromDay = (day: number): Date => {
     const now = new Date();

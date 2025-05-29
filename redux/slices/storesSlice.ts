@@ -1,0 +1,48 @@
+// redux/slices/storesSlice.ts
+
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { Store } from '@/services/types'; // Adjust path as needed
+import API from '@/services/api';         // Adjust path as needed
+
+interface StoresState {
+  data: Store[];
+  loading: boolean;
+  error: string | null;
+}
+
+const initialState: StoresState = {
+  data: [],
+  loading: false,
+  error: null,
+};
+
+export const fetchStoresByType = createAsyncThunk<Store[], number>(
+  'stores/fetchByType',
+  async (storeTypeId) => {
+    const response = await API.get(`/store/stores/?store_type=${storeTypeId}`);
+    return response.data;
+  }
+);
+
+const storesSlice = createSlice({
+  name: 'stores',
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchStoresByType.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchStoresByType.fulfilled, (state, action) => {
+        state.data = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchStoresByType.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to fetch stores';
+      });
+  },
+});
+
+export default storesSlice.reducer;

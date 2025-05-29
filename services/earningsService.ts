@@ -31,8 +31,8 @@ export const useEarnings = (type: string, id: string) => {
   return { data, loading, error };
 };
 
-export const getRestaurantEarnings = async (restaurantId: string) => {
-  const response = await axios.get(`${API_URL}/restaurants/${restaurantId}/earnings`);
+export const getstoreEarnings = async (storeId: string) => {
+  const response = await axios.get(`${API_URL}/stores/${storeId}/earnings`);
   return response.data;
 };
 

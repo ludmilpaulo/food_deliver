@@ -22,7 +22,7 @@ const Sidebar: FC<SidebarProps> = ({ setActiveComponent }) => {
               <span className="text-lg cursor-pointer" onClick={() => setActiveComponent('orders')}>Orders</span>
             </li>
             <li className="mb-4">
-              <span className="text-lg cursor-pointer" onClick={() => setActiveComponent('restaurants')}>Restaurants</span>
+              <span className="text-lg cursor-pointer" onClick={() => setActiveComponent('stores')}>stores</span>
             </li>
             <li className="mb-4">
               <span className="text-lg cursor-pointer" onClick={() => setActiveComponent('careers')}>Careers</span>

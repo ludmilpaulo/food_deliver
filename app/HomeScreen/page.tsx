@@ -1,18 +1,18 @@
 "use client";
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import withAuth from "@/components/ProtectedPage";
-import RestaurantCard from "./RestaurantCard"; // Adjust the import path if necessary
+import storeCard from "./storeCard"; // Adjust the import path if necessary
 import { useRouter } from "next/navigation";
-import { baseAPI, Restaurant, Category } from "@/services/types";
+import { baseAPI, store, Category } from "@/services/types";
 import Image from "next/image";
 
-type Restaurants = Restaurant[];
+type stores = store[];
 
 function HomeScreen() {
-  const [restaurants, setRestaurants] = useState<Restaurants>([]);
-  const [filteredDataSource, setFilteredDataSource] = useState<Restaurants>([]);
-  const [nearbyRestaurants, setNearbyRestaurants] = useState<Restaurants>([]);
-  const [masterDataSource, setMasterDataSource] = useState<Restaurants>([]);
+  const [stores, setstores] = useState<stores>([]);
+  const [filteredDataSource, setFilteredDataSource] = useState<stores>([]);
+  const [nearbystores, setNearbystores] = useState<stores>([]);
+  const [masterDataSource, setMasterDataSource] = useState<stores>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -21,27 +21,27 @@ function HomeScreen() {
 
   const fetchData = useCallback(async () => {
     try {
-      const response = await fetch(`${baseAPI}/customer/customer/restaurants/`);
+      const response = await fetch(`${baseAPI}/customer/customer/stores/`);
       const data = await response.json();
-      const approvedRestaurants = data.restaurants.filter(
-        (restaurant: Restaurant) => restaurant.is_approved
+      const approvedstores = data.stores.filter(
+        (store: store) => store.is_approved
       );
-      setMasterDataSource(approvedRestaurants);
+      setMasterDataSource(approvedstores);
       setLoading(false);
 
-      // Extract unique categories from the restaurants
+      // Extract unique categories from the stores
       const uniqueCategories = Array.from(
         new Set(
-          approvedRestaurants.map((restaurant: Restaurant) => restaurant.category?.name)
+          approvedstores.map((store: store) => store.category?.name)
         )
       ).map((category) => {
-        const matchedRestaurant = approvedRestaurants.find(
-          (restaurant: Restaurant) => restaurant.category?.name === category
+        const matchedstore = approvedstores.find(
+          (store: store) => store.category?.name === category
         );
         return {
           name: category as string,
-          id: matchedRestaurant?.category?.id as number,
-          image: matchedRestaurant?.category?.image || null,
+          id: matchedstore?.category?.id as number,
+          image: matchedstore?.category?.image || null,
         };
       });
 
@@ -80,11 +80,11 @@ function HomeScreen() {
     }
   }, []);
 
-  const filterNearbyRestaurants = useCallback(
-    (restaurants: Restaurant[], userLat: number, userLng: number, radius: number) => {
-      return restaurants.filter((restaurant) => {
-        const [restaurantLat, restaurantLng] = restaurant.location.split(",").map(Number);
-        const distance = getDistance(userLat, userLng, restaurantLat, restaurantLng);
+  const filterNearbystores = useCallback(
+    (stores: store[], userLat: number, userLng: number, radius: number) => {
+      return stores.filter((store) => {
+        const [storeLat, storeLng] = store.location.split(",").map(Number);
+        const distance = getDistance(userLat, userLng, storeLat, storeLng);
         return distance <= radius;
       });
     },
@@ -93,19 +93,19 @@ function HomeScreen() {
 
   useEffect(() => {
     if (userLocation) {
-      const nearby = filterNearbyRestaurants(masterDataSource, userLocation.latitude, userLocation.longitude, 5);
-      const withinArea = filterNearbyRestaurants(masterDataSource, userLocation.latitude, userLocation.longitude, 3.47);
-      setNearbyRestaurants(nearby);
+      const nearby = filterNearbystores(masterDataSource, userLocation.latitude, userLocation.longitude, 5);
+      const withinArea = filterNearbystores(masterDataSource, userLocation.latitude, userLocation.longitude, 3.47);
+      setNearbystores(nearby);
       setFilteredDataSource(withinArea);
     }
-  }, [userLocation, masterDataSource, filterNearbyRestaurants]);
+  }, [userLocation, masterDataSource, filterNearbystores]);
 
-  // Filter restaurants by category
+  // Filter stores by category
   const filterByCategory = useCallback((category: string | null) => {
     setSelectedCategory(category);
     if (category) {
       const filteredData = masterDataSource.filter(
-        (restaurant) => restaurant.category?.name === category
+        (store) => store.category?.name === category
       );
       setFilteredDataSource(filteredData);
     } else {
@@ -154,26 +154,26 @@ function HomeScreen() {
         <h2 className="text-2xl font-semibold mb-4">Ofertas de Hoje</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredDataSource
-            .filter((restaurant) => restaurant.barnner)
-            .map((restaurant) => (
-              <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+            .filter((store) => store.barnner)
+            .map((store) => (
+              <storeCard key={store.id} store={store} />
             ))}
         </div>
 
-        <h2 className="text-2xl font-semibold mt-8 mb-4">Restaurantes Próximos</h2>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">storees Próximos</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {userLocation &&
-            nearbyRestaurants.map(
-              (restaurant) => (
-                <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+            nearbystores.map(
+              (store) => (
+                <storeCard key={store.id} store={store} />
               )
             )}
         </div>
 
-        <h2 className="text-2xl font-semibold mt-8 mb-4">Todos os Restaurantes</h2>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">Todos os storees</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredDataSource.map((restaurant) => (
-            <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+          {filteredDataSource.map((store) => (
+            <storeCard key={store.id} store={store} />
           ))}
         </div>
       </div>

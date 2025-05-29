@@ -1,11 +1,11 @@
-const Restaurants = () => {
+const stores = () => {
     return (
       <div>
-        <h1 className="text-2xl font-bold mb-4">Restaurants</h1>
-        {/* Restaurants component content */}
+        <h1 className="text-2xl font-bold mb-4">stores</h1>
+        {/* stores component content */}
       </div>
     );
   };
   
-  export default Restaurants;
+  export default stores;
   

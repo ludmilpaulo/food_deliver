@@ -29,7 +29,7 @@ const Report: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${baseAPI}/report/restaurant/${user.user_id}/`);
+        const response = await fetch(`${baseAPI}/report/store/${user.user_id}/`);
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }

@@ -16,25 +16,25 @@ type Meal = {
   price: number;
   quantity: number;
   category: string;
-  restaurant: number;
+  store: number;
 };
 
 type Category = string;
 
-const RestaurantMenu: React.FC = () => {
+const storeMenu: React.FC = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [meals, setMeals] = useState<Meal[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const restaurant_id = searchParams.get('restaurant_id');
+  const store_id = searchParams.get('store_id');
   const dispatch = useDispatch();
   const cartItems = useAppSelector((state) => state.basket.items);
 
   useEffect(() => {
-    if (restaurant_id) {
-      fetch(`${baseAPI}/customer/customer/meals/${restaurant_id}/`)
+    if (store_id) {
+      fetch(`${baseAPI}/customer/customer/meals/${store_id}/`)
         .then((response) => response.json())
         .then((data) => {
           setMeals(data.meals);
@@ -47,7 +47,7 @@ const RestaurantMenu: React.FC = () => {
           setLoading(false);
         });
     }
-  }, [restaurant_id]);
+  }, [store_id]);
 
   const filteredMeals = selectedCategory
     ? meals.filter((meal) => meal.category === selectedCategory)
@@ -163,12 +163,12 @@ const RestaurantMenu: React.FC = () => {
   );
 };
 
-const RestaurantMenuPage: React.FC = () => {
+const storeMenuPage: React.FC = () => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <RestaurantMenu />
+      <storeMenu />
     </Suspense>
   );
 };
 
-export default RestaurantMenuPage;
+export default storeMenuPage;

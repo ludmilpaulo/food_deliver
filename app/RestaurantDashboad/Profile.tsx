@@ -1,34 +1,34 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/redux/slices/authSlice";
-import { getRestaurant, getOpeningHours } from "@/services/apiService";
-import { RestaurantType, OpeningHourType } from "@/services/types";
+import { getstore, getOpeningHours } from "@/services/apiService";
+import { storeType, OpeningHourType } from "@/services/types";
 
 import OpeningHour from "./OpeningHour";
 import OpeningHoursCalendar from "./OpeningHoursCalendar";
-import RestaurantProfile from "./RestaurantProfile";
+import storeProfile from "./storeProfile";
 
 const Profile: React.FC = () => {
   const user = useSelector(selectUser);
-  const [restaurant, setRestaurant] = useState<RestaurantType | null>(null);
+  const [store, setstore] = useState<storeType | null>(null);
   const [openingHours, setOpeningHours] = useState<OpeningHourType[]>([]);
   const [activeTab, setActiveTab] = useState<string>("perfil");
 
   useEffect(() => {
-    const fetchRestaurant = async () => {
+    const fetchstore = async () => {
       if (user?.user_id) {
         try {
-          const data = await getRestaurant(user.user_id);
-          console.log("restaurant data==>", data)
-          setRestaurant(data);
+          const data = await getstore(user.user_id);
+          console.log("store data==>", data)
+          setstore(data);
           const openingHoursData = await getOpeningHours(data.id);
           setOpeningHours(openingHoursData);
         } catch (error) {
-          console.error("Error fetching restaurant data", error);
+          console.error("Error fetching store data", error);
         }
       }
     };
-    fetchRestaurant();
+    fetchstore();
   }, [user]);
   return (
     <div className="p-6 bg-white rounded-lg shadow-md">
@@ -37,7 +37,7 @@ const Profile: React.FC = () => {
           className={`py-2 px-4 ${activeTab === "perfil" ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-600"}`}
           onClick={() => setActiveTab("perfil")}
         >
-          Perfil do Restaurante
+          Perfil do storee
         </button>
         <button
           className={`py-2 px-4 ${activeTab === "horario" ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-600"}`}
@@ -52,16 +52,16 @@ const Profile: React.FC = () => {
           Calendário
         </button>
       </div>
-      {restaurant ? (
+      {store ? (
         <div>
           {activeTab === "perfil" && (
-            <RestaurantProfile restaurant={restaurant} setRestaurant={setRestaurant} />
+            <storeProfile store={store} setstore={setstore} />
           )}
           {activeTab === "horario" && (
-            <OpeningHour restaurantId={restaurant.id} openingHours={openingHours} setOpeningHours={setOpeningHours} />
+            <OpeningHour storeId={store.id} openingHours={openingHours} setOpeningHours={setOpeningHours} />
           )}
           {activeTab === "calendario" && (
-            <OpeningHoursCalendar restaurantId={restaurant.id} />
+            <OpeningHoursCalendar storeId={store.id} />
           )}
         </div>
       ) : (

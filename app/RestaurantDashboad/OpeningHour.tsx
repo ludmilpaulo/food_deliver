@@ -7,14 +7,14 @@ const validTimes = Array.from({ length: 24 }, (_, h) =>
 ).flat();
 
 interface OpeningHourProps {
-  restaurantId: number;
+  storeId: number;
   openingHours: OpeningHourType[];
   setOpeningHours: React.Dispatch<React.SetStateAction<OpeningHourType[]>>;
 }
 
-const OpeningHour: React.FC<OpeningHourProps> = ({ restaurantId, openingHours, setOpeningHours }) => {
+const OpeningHour: React.FC<OpeningHourProps> = ({ storeId, openingHours, setOpeningHours }) => {
   const [newOpeningHour, setNewOpeningHour] = useState<OpeningHourType>({
-    restaurant: restaurantId,
+    store: storeId,
     day: 1,
     from_hour: "",
     to_hour: "",
@@ -31,10 +31,10 @@ const OpeningHour: React.FC<OpeningHourProps> = ({ restaurantId, openingHours, s
 
   const handleAddOpeningHour = async () => {
     try {
-      const newHour = await createOpeningHour(restaurantId, newOpeningHour);
+      const newHour = await createOpeningHour(storeId, newOpeningHour);
       setOpeningHours([...openingHours, newHour]);
       setNewOpeningHour({
-        restaurant: restaurantId,
+        store: storeId,
         day: 1,
         from_hour: "",
         to_hour: "",

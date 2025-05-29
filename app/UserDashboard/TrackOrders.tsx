@@ -259,7 +259,7 @@ const TrackOrders: React.FC = () => {
                   </button>
                 </>
               ) : (
-                <p className="text-gray-700 mb-1"><strong>O pedido está sendo preparado por:</strong> {orderLocations[order.id]?.restaurant}</p>
+                <p className="text-gray-700 mb-1"><strong>O pedido está sendo preparado por:</strong> {orderLocations[order.id]?.store}</p>
               )}
               <p className="text-gray-700 mb-1"><strong>PIN Secreto:</strong> {orderLocations[order.id]?.secret_pin}</p>
               <button

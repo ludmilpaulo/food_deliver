@@ -9,7 +9,7 @@ const MealList: React.FC = () => {
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [selectedRestaurant, setSelectedRestaurant] = useState<string>('');
+  const [selectedstore, setSelectedstore] = useState<string>('');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000]); // Updated range to ensure wide coverage
 
   useEffect(() => {
@@ -30,13 +30,13 @@ const MealList: React.FC = () => {
 
   const filteredMeals = meals.filter(meal => {
     const matchesSearch = meal.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRestaurant = selectedRestaurant === '' || meal.restaurant_name === selectedRestaurant;
+    const matchesstore = selectedstore === '' || meal.store_name === selectedstore;
     const matchesPrice = meal.price_with_markup >= priceRange[0] && meal.price_with_markup <= priceRange[1];
 
-    return matchesSearch && matchesRestaurant && matchesPrice;
+    return matchesSearch && matchesstore && matchesPrice;
   });
 
-  const uniqueRestaurants = Array.from(new Set(meals.map(meal => meal.restaurant_name)));
+  const uniquestores = Array.from(new Set(meals.map(meal => meal.store_name)));
 
   console.log('Filtered Meals:', filteredMeals); // Debugging log
 
@@ -67,14 +67,14 @@ const MealList: React.FC = () => {
               className="p-2 border border-gray-300 rounded mb-2 md:mb-0 md:mr-2"
             />
             <select
-              value={selectedRestaurant}
-              onChange={(e) => setSelectedRestaurant(e.target.value)}
+              value={selectedstore}
+              onChange={(e) => setSelectedstore(e.target.value)}
               className="p-2 border border-gray-300 rounded mb-2 md:mb-0 md:mr-2"
             >
-              <option value="">Todos os restaurantes</option>
-              {uniqueRestaurants.map((restaurant, index) => (
-                <option key={index} value={restaurant}>
-                  {restaurant}
+              <option value="">Todos os storees</option>
+              {uniquestores.map((store, index) => (
+                <option key={index} value={store}>
+                  {store}
                 </option>
               ))}
             </select>
@@ -111,7 +111,7 @@ const MealList: React.FC = () => {
                     <div className="text-center">
                       <h3 className="text-lg font-semibold">{meal.name}</h3>
                       <p className="text-gray-500">{meal.short_description}</p>
-                      <p className="text-gray-700">Restaurante: {meal.restaurant_name}</p>
+                      <p className="text-gray-700">storee: {meal.store_name}</p>
                       <p className="text-gray-700">Preço Original: {meal.original_price.toFixed(2)} Kz</p>
                       <p className="text-gray-900 font-bold">Preço com Acréscimo: {meal.price_with_markup.toFixed(2)} Kz</p>
                     </div>

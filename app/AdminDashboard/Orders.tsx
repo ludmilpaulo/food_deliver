@@ -8,12 +8,12 @@ import { baseAPI } from '@/services/types';
 interface Order {
   id: number;
   customer: string;
-  restaurant: string;
+  store: string;
   status: string;
   total: number;
   created_at: string;
   invoice_pdf: string | null;
-  payment_status_restaurant: string;
+  payment_status_store: string;
   payment_status_driver: string;
   original_price: number;
   driver_commission: number;
@@ -46,15 +46,15 @@ const Orders: React.FC = () => {
     setFilterBy(event.target.value);
   };
 
-  const handleMarkAsPaid = async (orderId: number, type: 'restaurant' | 'driver') => {
+  const handleMarkAsPaid = async (orderId: number, type: 'store' | 'driver') => {
     try {
       const url = `${baseAPI}/order/api/mark_as_paid/${type}/${orderId}/`;
       await axios.post(url);
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
           order.id === orderId
-            ? type === 'restaurant'
-              ? { ...order, payment_status_restaurant: 'paid' }
+            ? type === 'store'
+              ? { ...order, payment_status_store: 'paid' }
               : { ...order, payment_status_driver: 'paid' }
             : order
         )
@@ -90,12 +90,12 @@ const Orders: React.FC = () => {
               <tr>
                 <th className="py-2 px-4">ID</th>
                 <th className="py-2 px-4">Cliente</th>
-                <th className="py-2 px-4">Restaurante</th>
+                <th className="py-2 px-4">storee</th>
                 <th className="py-2 px-4">Status</th>
                 <th className="py-2 px-4">Total</th>
                 <th className="py-2 px-4">Data</th>
                 <th className="py-2 px-4">Fatura</th>
-                <th className="py-2 px-4">Pagamento Restaurante</th>
+                <th className="py-2 px-4">Pagamento storee</th>
                 <th className="py-2 px-4">Pagamento Motorista</th>
               </tr>
             </thead>
@@ -104,7 +104,7 @@ const Orders: React.FC = () => {
                 <tr key={order.id} className="border-t">
                   <td className="py-2 px-4">{order.id}</td>
                   <td className="py-2 px-4">{order.customer}</td>
-                  <td className="py-2 px-4">{order.restaurant}</td>
+                  <td className="py-2 px-4">{order.store}</td>
                   <td className="py-2 px-4">{order.status}</td>
                   <td className="py-2 px-4">{order.total} Kz</td>
                   <td className="py-2 px-4">{new Date(order.created_at).toLocaleString()}</td>
@@ -118,12 +118,12 @@ const Orders: React.FC = () => {
                     )}
                   </td>
                   <td className="py-2 px-4">
-                    <p>Status: {order.payment_status_restaurant}</p>
+                    <p>Status: {order.payment_status_store}</p>
                     <p>Valor: {order.original_price} Kz</p>
-                    <UploadProofOfPayment orderId={order.id} uploadUrl={`${baseAPI}/order/api/upload_proof_of_payment/restaurant/${order.id}/`} />
-                    {order.payment_status_restaurant === 'unpaid' && (
+                    <UploadProofOfPayment orderId={order.id} uploadUrl={`${baseAPI}/order/api/upload_proof_of_payment/store/${order.id}/`} />
+                    {order.payment_status_store === 'unpaid' && (
                       <button
-                        onClick={() => handleMarkAsPaid(order.id, 'restaurant')}
+                        onClick={() => handleMarkAsPaid(order.id, 'store')}
                         className="mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                       >
                         Marcar como Pago

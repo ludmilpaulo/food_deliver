@@ -17,7 +17,7 @@ type OrderDetail = {
 
 type Order = {
   id: number;
-  restaurant: {
+  store: {
     id: number;
     name: string;
     phone: string;
@@ -86,7 +86,7 @@ const OrderHistory: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold">{order.restaurant.name}</h2>
+                  <h2 className="text-xl font-semibold">{order.store.name}</h2>
                   <p className="text-gray-600">{new Date(order.picked_at).toLocaleString()}</p>
                 </div>
               </div>

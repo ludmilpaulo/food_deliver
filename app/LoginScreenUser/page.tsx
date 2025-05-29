@@ -44,7 +44,7 @@ const LoginScreenUser: React.FC = () => {
       } else if (resJson.is_customer === false) {
         dispatch(loginUser(resJson));
         alert("Você se conectou com sucesso!");
-        router.push("/RestaurantDashboad");
+        router.push("/storeDashboad");
       } else {
         alert(resJson.message);
       }

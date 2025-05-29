@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { IoMdMenu, IoMdClose, IoIosSearch, IoMdCart, IoMdPerson, IoMdRestaurant } from 'react-icons/io';
+import { IoMdMenu, IoMdClose, IoIosSearch, IoMdCart, IoMdPerson, IoMdstore } from 'react-icons/io';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import logo from '@/assets/azul.png';
@@ -51,7 +51,7 @@ const Navbar: React.FC = () => {
                   <form onSubmit={handleSearch} className="relative">
                     <input
                       type="text"
-                      placeholder="Search food or restaurants"
+                      placeholder="Search food or stores"
                       value={searchText}
                       onChange={(e) => setSearchText(e.target.value)}
                       className="px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
@@ -60,7 +60,7 @@ const Navbar: React.FC = () => {
                   </form>
                   <Link href="/HomeScreen">
                     <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer">
-                      <IoMdRestaurant size={20} className="mr-1" /> Restaurantes
+                      <IoMdstore size={20} className="mr-1" /> storees
                     </span>
                   </Link>
                  
@@ -106,7 +106,7 @@ const Navbar: React.FC = () => {
                 <form onSubmit={handleSearch} className="relative px-4">
                   <input
                     type="text"
-                    placeholder="Search food or restaurants"
+                    placeholder="Search food or stores"
                     value={searchText}
                     onChange={(e) => setSearchText(e.target.value)}
                     className="w-full px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
@@ -115,7 +115,7 @@ const Navbar: React.FC = () => {
                 </form>
                 <Link href="/HomeScreen">
                   <span className="flex items-center text-gray-800 hover:text-blue-600 transition duration-300 cursor-pointer px-4">
-                    <IoMdRestaurant size={20} className="mr-1" /> Restaurantes
+                    <IoMdstore size={20} className="mr-1" /> storees
                   </span>
                 </Link>
                 

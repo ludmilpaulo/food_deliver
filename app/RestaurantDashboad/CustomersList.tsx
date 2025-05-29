@@ -31,7 +31,7 @@ const CustomersList: React.FC = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        `${baseAPI}/report/restaurant/customers/${user.user_id}/`,
+        `${baseAPI}/report/store/customers/${user.user_id}/`,
       );
       setCustomers(response.data);
     } catch (error) {

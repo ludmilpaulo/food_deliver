@@ -2,32 +2,32 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/redux/slices/authSlice";
 
-import { RestaurantType } from "@/services/types";
-import RestaurantCard from "./restaurant/RestaurantCard";
+import { storeType } from "@/services/types";
+import storeCard from "./store/storeCard";
 import { Transition } from '@headlessui/react';
-import useLoadScript from "./restaurant//useLoadScript";
-import { getRestaurants, activateRestaurant, updateRestaurant, deactivateRestaurant, deleteRestaurant } from "@/services/managerService";
+import useLoadScript from "./store//useLoadScript";
+import { getstores, activatestore, updatestore, deactivatestore, deletestore } from "@/services/managerService";
 
 declare global {
   interface Window {
-    initMap: (restaurant: RestaurantType) => void;
+    initMap: (store: storeType) => void;
   }
 }
 
-const Restaurant: React.FC = () => {
+const store: React.FC = () => {
   const user = useSelector(selectUser);
-  const [restaurants, setRestaurants] = useState<RestaurantType[]>([]);
+  const [stores, setstores] = useState<storeType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<string>("restaurantes");
-  const [editData, setEditData] = useState<Partial<RestaurantType> | null>(null);
-  const [selectedRestaurant, setSelectedRestaurant] = useState<RestaurantType | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("storees");
+  const [editData, setEditData] = useState<Partial<storeType> | null>(null);
+  const [selectedstore, setSelectedstore] = useState<storeType | null>(null);
   const [showMap, setShowMap] = useState<boolean>(false);
 
   useLoadScript(
     `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}&callback=initMap`,
     () => {
-      window.initMap = (restaurant: RestaurantType) => {
-        const [latitude, longitude] = restaurant.location.split(',').map(Number);
+      window.initMap = (store: storeType) => {
+        const [latitude, longitude] = store.location.split(',').map(Number);
         const mapElement = document.getElementById('map');
         if (mapElement) {
           const map = new google.maps.Map(mapElement, {
@@ -37,7 +37,7 @@ const Restaurant: React.FC = () => {
           new google.maps.Marker({
             position: { lat: latitude, lng: longitude },
             map: map,
-            title: restaurant.name
+            title: store.name
           });
         } else {
           console.error('Map element not found');
@@ -47,31 +47,31 @@ const Restaurant: React.FC = () => {
   );
 
   useEffect(() => {
-    const fetchRestaurants = async () => {
+    const fetchstores = async () => {
       setLoading(true);
       try {
-        const data = await getRestaurants();
-        setRestaurants(data);
+        const data = await getstores();
+        setstores(data);
       } catch (error) {
-        console.error("Error fetching restaurants data", error);
+        console.error("Error fetching stores data", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchRestaurants();
+    fetchstores();
   }, [user]);
 
   const handleActivate = async (id: number) => {
     setLoading(true);
     try {
-      await activateRestaurant(id);
-      setRestaurants((prev) =>
-        prev.map((restaurant) =>
-          restaurant.id === id ? { ...restaurant, is_approved: true } : restaurant
+      await activatestore(id);
+      setstores((prev) =>
+        prev.map((store) =>
+          store.id === id ? { ...store, is_approved: true } : store
         )
       );
     } catch (error) {
-      console.error("Error activating restaurant", error);
+      console.error("Error activating store", error);
     } finally {
       setLoading(false);
     }
@@ -80,36 +80,36 @@ const Restaurant: React.FC = () => {
   const handleDeactivate = async (id: number) => {
     setLoading(true);
     try {
-      await deactivateRestaurant(id);
-      setRestaurants((prev) =>
-        prev.map((restaurant) =>
-          restaurant.id === id ? { ...restaurant, is_approved: false } : restaurant
+      await deactivatestore(id);
+      setstores((prev) =>
+        prev.map((store) =>
+          store.id === id ? { ...store, is_approved: false } : store
         )
       );
     } catch (error) {
-      console.error("Error deactivating restaurant", error);
+      console.error("Error deactivating store", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleEdit = (restaurant: RestaurantType) => {
-    setEditData(restaurant);
+  const handleEdit = (store: storeType) => {
+    setEditData(store);
   };
 
   const handleUpdate = async () => {
     if (editData && editData.id) {
       setLoading(true);
       try {
-        const updatedRestaurant = await updateRestaurant(editData.id, editData);
-        setRestaurants((prev) =>
-          prev.map((restaurant) =>
-            restaurant.id === editData.id ? updatedRestaurant : restaurant
+        const updatedstore = await updatestore(editData.id, editData);
+        setstores((prev) =>
+          prev.map((store) =>
+            store.id === editData.id ? updatedstore : store
           )
         );
         setEditData(null);
       } catch (error) {
-        console.error("Error updating restaurant", error);
+        console.error("Error updating store", error);
       } finally {
         setLoading(false);
       }
@@ -119,34 +119,34 @@ const Restaurant: React.FC = () => {
   const handleDelete = async (id: number) => {
     setLoading(true);
     try {
-      await deleteRestaurant(id);
-      setRestaurants((prev) => prev.filter((restaurant) => restaurant.id !== id));
+      await deletestore(id);
+      setstores((prev) => prev.filter((store) => store.id !== id));
     } catch (error) {
-      console.error("Error deleting restaurant", error);
+      console.error("Error deleting store", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleShowMap = (restaurant: RestaurantType) => {
-    setSelectedRestaurant(restaurant);
+  const handleShowMap = (store: storeType) => {
+    setSelectedstore(store);
     setShowMap(true);
   };
 
   useEffect(() => {
-    if (showMap && selectedRestaurant) {
-      window.initMap(selectedRestaurant);
+    if (showMap && selectedstore) {
+      window.initMap(selectedstore);
     }
-  }, [showMap, selectedRestaurant]);
+  }, [showMap, selectedstore]);
 
   return (
     <div className="relative p-6 bg-white rounded-lg shadow-md">
       <div className="flex justify-around border-b mb-4">
         <button
-          className={`py-2 px-4 ${activeTab === "restaurantes" ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-600"}`}
-          onClick={() => setActiveTab("restaurantes")}
+          className={`py-2 px-4 ${activeTab === "storees" ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-600"}`}
+          onClick={() => setActiveTab("storees")}
         >
-          Restaurantes
+          storees
         </button>
         <button
           className={`py-2 px-4 ${activeTab === "pagamentos" ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-600"}`}
@@ -174,12 +174,12 @@ const Restaurant: React.FC = () => {
           <div className="w-16 h-16 border-t-4 border-b-4 border-blue-500 rounded-full animate-spin"></div>
         </div>
       </Transition>
-      {activeTab === "restaurantes" && (
+      {activeTab === "storees" && (
         <div>
-          {restaurants.map((restaurant) => (
-            <RestaurantCard
-              key={restaurant.id}
-              restaurant={restaurant}
+          {stores.map((store) => (
+            <storeCard
+              key={store.id}
+              store={store}
               onActivate={handleActivate}
               onDeactivate={handleDeactivate}
               onEdit={handleEdit}
@@ -190,22 +190,22 @@ const Restaurant: React.FC = () => {
       )}
       {activeTab === "localizacao" && (
         <div>
-          {restaurants.map((restaurant) => (
-            <div key={restaurant.id} className="mb-4 p-4 border rounded-lg">
-              <h2 className="text-xl font-bold">{restaurant.name}</h2>
-              <p>{restaurant.address}</p>
+          {stores.map((store) => (
+            <div key={store.id} className="mb-4 p-4 border rounded-lg">
+              <h2 className="text-xl font-bold">{store.name}</h2>
+              <p>{store.address}</p>
               <button
                 className="py-2 px-4 bg-blue-500 text-white rounded-lg mt-2"
-                onClick={() => handleShowMap(restaurant)}
+                onClick={() => handleShowMap(store)}
               >
                 Mostrar no mapa
               </button>
             </div>
           ))}
-          {showMap && selectedRestaurant && (
+          {showMap && selectedstore && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
               <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl">
-                <h2 className="text-xl font-bold mb-4">Localização de {selectedRestaurant.name}</h2>
+                <h2 className="text-xl font-bold mb-4">Localização de {selectedstore.name}</h2>
                 <div id="map" style={{ height: '400px' }}></div>
                 <button
                   className="py-2 px-4 bg-gray-500 text-white mt-4 rounded-lg"
@@ -221,7 +221,7 @@ const Restaurant: React.FC = () => {
       {editData && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Editar Restaurante</h2>
+            <h2 className="text-xl font-bold mb-4">Editar storee</h2>
             <input
               type="text"
               placeholder="Nome"
@@ -265,4 +265,4 @@ const Restaurant: React.FC = () => {
   );
 };
 
-export default Restaurant;
+export default store;

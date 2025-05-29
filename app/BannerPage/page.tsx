@@ -1,30 +1,30 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { fetchAboutUsData } from '@/services/information';
-import { AboutUsData, baseAPI, Restaurant } from '@/services/types';
+import { AboutUsData, baseAPI, store } from '@/services/types';
 import Banner from './Banner';
 import { Transition } from '@headlessui/react';
 
 const HomePage = () => {
   const [headerData, setHeaderData] = useState<AboutUsData | null>(null);
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [stores, setstores] = useState<store[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [header, restaurantResponse] = await Promise.all([
+        const [header, storeResponse] = await Promise.all([
           fetchAboutUsData(),
-          fetch(`${baseAPI}/customer/customer/restaurants/`)
+          fetch(`${baseAPI}/customer/customer/stores/`)
             .then((response) => response.json())
         ]);
 
-        const approvedRestaurants = restaurantResponse.restaurants.filter(
-          (restaurant: Restaurant) => restaurant.is_approved
+        const approvedstores = storeResponse.stores.filter(
+          (store: store) => store.is_approved
         );
 
         setHeaderData(header);
-        setRestaurants(approvedRestaurants);
+        setstores(approvedstores);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -56,7 +56,7 @@ const HomePage = () => {
           backgroundImage={headerData.backgroundImage}
           backgroundApp={headerData.backgroundApp}
           bottomImage={headerData.bottomImage}
-          restaurants={restaurants}
+          stores={stores}
         />
       )}
     </div>

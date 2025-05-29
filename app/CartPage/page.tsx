@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { baseAPI } from '@/services/types';
 
-type Restaurant = {
+type store = {
   id: number;
   name: string;
   is_approved: boolean;
@@ -19,24 +19,24 @@ type Meal = {
   price: number;
   quantity: number;
   image_url: string;
-  restaurant: number;
+  store: number;
 };
 
 const CartPage: React.FC = () => {
   const cartItems = useAppSelector((state) => state.basket.items as Meal[]);
   const dispatch = useDispatch();
   const router = useRouter();
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [stores, setstores] = useState<store[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${baseAPI}/customer/customer/restaurants/`)
+    fetch(`${baseAPI}/customer/customer/stores/`)
       .then((response) => response.json())
       .then((data) => {
-        const approvedRestaurants = data.restaurants.filter(
-          (restaurant: Restaurant) => restaurant.is_approved
+        const approvedstores = data.stores.filter(
+          (store: store) => store.is_approved
         );
-        setRestaurants(approvedRestaurants);
+        setstores(approvedstores);
         setLoading(false);
       })
       .catch((error) => {
@@ -63,17 +63,17 @@ const CartPage: React.FC = () => {
   };
 
   const groupedItems = cartItems.reduce((acc: { [key: number]: Meal[] }, item: Meal) => {
-    if (!acc[item.restaurant]) {
-      acc[item.restaurant] = [];
+    if (!acc[item.store]) {
+      acc[item.store] = [];
     }
-    acc[item.restaurant].push(item);
+    acc[item.store].push(item);
     return acc;
   }, {});
 
-  const handleCheckout = (restaurantId: number) => {
-    const items = groupedItems[restaurantId];
+  const handleCheckout = (storeId: number) => {
+    const items = groupedItems[storeId];
     sessionStorage.setItem('checkoutItems', JSON.stringify(items));
-    router.push(`/CheckoutPage?restaurant_id=${restaurantId}`);
+    router.push(`/CheckoutPage?store_id=${storeId}`);
   };
 
   if (loading) {
@@ -90,13 +90,13 @@ const CartPage: React.FC = () => {
       {cartItems.length === 0 ? (
         <p className="text-gray-600">Seu carrinho está vazio.</p>
       ) : (
-        Object.entries(groupedItems).map(([restaurantId, items]) => {
-          const restaurant = restaurants.find((res) => res.id === parseInt(restaurantId));
-          const restaurantName = restaurant ? restaurant.name : `Restaurante ${restaurantId}`;
+        Object.entries(groupedItems).map(([storeId, items]) => {
+          const store = stores.find((res) => res.id === parseInt(storeId));
+          const storeName = store ? store.name : `storee ${storeId}`;
           const totalPrice = items.reduce((total, item) => total + item.price * item.quantity, 0);
           return (
-            <div key={restaurantId}>
-              <h2 className="text-2xl font-semibold text-gray-800 mb-4">{restaurantName}</h2>
+            <div key={storeId}>
+              <h2 className="text-2xl font-semibold text-gray-800 mb-4">{storeName}</h2>
               <div className="grid grid-cols-1 gap-6 mb-6">
                 {items.map((item) => (
                   <div key={item.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -135,7 +135,7 @@ const CartPage: React.FC = () => {
                 <p className="text-lg font-semibold text-gray-800">Total: {totalPrice} Kz</p>
                 <button
                   className="px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700"
-                  onClick={() => handleCheckout(parseInt(restaurantId))}
+                  onClick={() => handleCheckout(parseInt(storeId))}
                 >
                   Finalizar Compra
                 </button>

@@ -8,7 +8,7 @@ import { selectCartItems, clearCart } from '@/redux/slices/basketSlice'; // Impo
 import dynamic from 'next/dynamic'; // Import dynamic for lazy loading components
 import { Transition } from '@headlessui/react'; // Import Transition component from Headless UI
 import Image from 'next/image'; // Import Image component from Next.js
-import { fetchRestaurantDetails, fetchUserDetails, completeOrderRequest, validateCouponRequest, checkUserCoupon } from '@/services/checkoutService'; // Import service functions
+import { fetchstoreDetails, fetchUserDetails, completeOrderRequest, validateCouponRequest, checkUserCoupon } from '@/services/checkoutService'; // Import service functions
 import ProfileModal from '@/components/ProfileModal'; // Import ProfileModal component
 import { getDistance } from 'geolib'; // Import getDistance function from geolib
 
@@ -17,7 +17,7 @@ const PaymentDetails = dynamic(() => import('./PaymentDetails'), { ssr: false })
 
 const CheckoutPage: React.FC = () => {
   const [items, setItems] = useState<any[]>([]); // State for cart items
-  const [restaurant, setRestaurant] = useState<any | null>(null); // State for restaurant details
+  const [store, setstore] = useState<any | null>(null); // State for store details
   const [userAddress, setUserAddress] = useState<string>(""); // State for user address
   const [location, setLocation] = useState<{ latitude: number; longitude: number }>({ latitude: 0, longitude: 0 }); // State for user location
   const [userDetails, setUserDetails] = useState<any | null>(null); // State for user details
@@ -31,7 +31,7 @@ const CheckoutPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null); // State for error message
   const router = useRouter(); // Router instance for navigation
   const searchParams = useSearchParams(); // Hook for accessing search params
-  const restaurantId = searchParams.get('restaurant_id'); // Get restaurant_id from search params
+  const storeId = searchParams.get('store_id'); // Get store_id from search params
   const dispatch = useDispatch(); // Redux dispatch function
   const user = useSelector(selectUser); // Selector for user state
   const allCartItems = useSelector(selectCartItems); // Selector for cart items
@@ -43,10 +43,10 @@ const CheckoutPage: React.FC = () => {
         setItems(JSON.parse(storedItems)); // Set items state from stored items
       }
 
-      if (restaurantId) {
-        fetchRestaurantDetails(restaurantId)
-          .then(setRestaurant) // Fetch and set restaurant details
-          .catch((error) => console.error('Erro ao buscar detalhes do restaurante:', error)); // Handle errors
+      if (storeId) {
+        fetchstoreDetails(storeId)
+          .then(setstore) // Fetch and set store details
+          .catch((error) => console.error('Erro ao buscar detalhes do storee:', error)); // Handle errors
       }
 
       if (user?.user_id && user?.token) {
@@ -73,7 +73,7 @@ const CheckoutPage: React.FC = () => {
       }
       getUserLocation(); // Get user location
     }
-  }, [restaurantId, user?.user_id, user?.token, dispatch]); // Dependency array for useEffect
+  }, [storeId, user?.user_id, user?.token, dispatch]); // Dependency array for useEffect
 
   const getUserLocation = async () => {
     if (typeof window !== "undefined" && navigator.geolocation) {
@@ -94,11 +94,11 @@ const CheckoutPage: React.FC = () => {
   };
 
   const calculateDeliveryFee = () => {
-    if (!restaurant || !location.latitude || !location.longitude) return 100; // Return minimum fee if data is missing
+    if (!store || !location.latitude || !location.longitude) return 100; // Return minimum fee if data is missing
 
     const userLocation = { latitude: location.latitude, longitude: location.longitude }; // User location
-    const restaurantLocation = { latitude: parseFloat(restaurant.location.split(',')[0]), longitude: parseFloat(restaurant.location.split(',')[1]) }; // Restaurant location
-    const distance = getDistance(userLocation, restaurantLocation) / 1000; // Calculate distance in kilometers
+    const storeLocation = { latitude: parseFloat(store.location.split(',')[0]), longitude: parseFloat(store.location.split(',')[1]) }; // store location
+    const distance = getDistance(userLocation, storeLocation) / 1000; // Calculate distance in kilometers
 
     const additionalFee = distance * 20; // 20 Kz per km
     return additionalFee < 20 ? 100 : 100 + additionalFee; // Ensure minimum fee is 100 Kz
@@ -130,14 +130,14 @@ const CheckoutPage: React.FC = () => {
       meal_id: item.id,
       quantity: item.quantity,
     })); // Format cart items for order
-    const resId = allCartItems.map(({ restaurant }) => restaurant);
-    const restaurantId = resId[0].toString(); // Get restaurant ID
+    const resId = allCartItems.map(({ store }) => store);
+    const storeId = resId[0].toString(); // Get store ID
     const orderDetails = formattedCartItems; // Set order details
     const deliveryFee = calculateDeliveryFee(); // Calculate delivery fee
 
     const orderData = {
       access_token: user.token,
-      restaurant_id: restaurantId,
+      store_id: storeId,
       address: useCurrentLocation ? `${location.latitude},${location.longitude}` : userAddress,
       order_details: orderDetails,
       payment_method: paymentMethod,
@@ -152,7 +152,7 @@ const CheckoutPage: React.FC = () => {
       const responseData = await completeOrderRequest(orderData); // Complete order request
 
       if (responseData.status === "success") {
-        dispatch(clearCart(parseInt(restaurantId))); // Clear cart if successful
+        dispatch(clearCart(parseInt(storeId))); // Clear cart if successful
         alert("Pedido Realizado com Sucesso!"); // Show success message
         router.push("/SuccessScreen"); // Navigate to success screen
       } else {
@@ -172,11 +172,11 @@ const CheckoutPage: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6 bg-white rounded-lg shadow-md">
-      {restaurant && (
+      {store && (
         <>
-          <h1 className="text-3xl font-semibold mb-6 text-gray-800">Checkout - {restaurant.name}</h1>
+          <h1 className="text-3xl font-semibold mb-6 text-gray-800">Checkout - {store.name}</h1>
           <div className="flex justify-center mb-6">
-            <Image src={restaurant.logo} alt={restaurant.name} width={200} height={200} className="rounded-lg" />
+            <Image src={store.logo} alt={store.name} width={200} height={200} className="rounded-lg" />
           </div>
         </>
       )}

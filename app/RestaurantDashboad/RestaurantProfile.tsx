@@ -1,29 +1,29 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { MdEdit, MdSave, MdCancel } from "react-icons/md";
-import { RestaurantType, CategoryType } from "@/services/types";
-import { updateRestaurant, fetchRestaurantCategorias } from "@/services/apiService";
+import { storeType, CategoryType } from "@/services/types";
+import { updatestore, fetchstoreCategorias } from "@/services/apiService";
 
-type RestaurantProfileProps = {
-  restaurant: RestaurantType;
-  setRestaurant: (restaurant: RestaurantType) => void;
+type storeProfileProps = {
+  store: storeType;
+  setstore: (store: storeType) => void;
 };
 
-const RestaurantProfile: React.FC<RestaurantProfileProps> = ({ restaurant, setRestaurant }) => {
+const storeProfile: React.FC<storeProfileProps> = ({ store, setstore }) => {
   const [editMode, setEditMode] = useState<boolean>(false);
   const [categories, setCategories] = useState<CategoryType[]>([]);
   const [formData, setFormData] = useState({
-    name: restaurant.name,
-    phone: restaurant.phone,
-    address: restaurant.address,
+    name: store.name,
+    phone: store.phone,
+    address: store.address,
     logo: null as File | null,
-    restaurant_license: null as File | null,
-    category: restaurant.category?.id || "", // Initialize with the restaurant's current category ID
+    store_license: null as File | null,
+    category: store.category?.id || "", // Initialize with the store's current category ID
   });
 
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const data = await fetchRestaurantCategorias();
+        const data = await fetchstoreCategorias();
         setCategories(data);
       } catch (error) {
         console.error("Failed to fetch categories:", error);
@@ -58,35 +58,35 @@ const RestaurantProfile: React.FC<RestaurantProfileProps> = ({ restaurant, setRe
     if (formData.logo) {
       updatedData.append("logo", formData.logo);
     }
-    if (formData.restaurant_license) {
-      updatedData.append("restaurant_license", formData.restaurant_license);
+    if (formData.store_license) {
+      updatedData.append("store_license", formData.store_license);
     }
 
     try {
-      const updatedRestaurant = await updateRestaurant(restaurant.id, updatedData);
-      setRestaurant(updatedRestaurant);
+      const updatedstore = await updatestore(store.id, updatedData);
+      setstore(updatedstore);
       setEditMode(false);
     } catch (error) {
-      console.error("Error updating restaurant data", error);
+      console.error("Error updating store data", error);
     }
   };
 
   const handleCancel = () => {
     setEditMode(false);
     setFormData({
-      name: restaurant.name,
-      phone: restaurant.phone,
-      address: restaurant.address,
+      name: store.name,
+      phone: store.phone,
+      address: store.address,
       logo: null,
-      restaurant_license: null,
-      category: restaurant.category?.id || "", // Reset category
+      store_license: null,
+      category: store.category?.id || "", // Reset category
     });
   };
 
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Perfil do Restaurante</h2>
+        <h2 className="text-2xl font-bold">Perfil do storee</h2>
         {editMode ? (
           <div className="flex space-x-2">
             <button onClick={handleSave} className="text-green-500"><MdSave size={24} /></button>
@@ -98,7 +98,7 @@ const RestaurantProfile: React.FC<RestaurantProfileProps> = ({ restaurant, setRe
       </div>
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium">Nome do Restaurante</label>
+          <label className="block text-sm font-medium">Nome do storee</label>
           <input
             type="text"
             name="name"
@@ -109,7 +109,7 @@ const RestaurantProfile: React.FC<RestaurantProfileProps> = ({ restaurant, setRe
           />
         </div>
         <div>
-          <label className="block text-sm font-medium">Telefone do Restaurante</label>
+          <label className="block text-sm font-medium">Telefone do storee</label>
           <input
             type="text"
             name="phone"
@@ -120,7 +120,7 @@ const RestaurantProfile: React.FC<RestaurantProfileProps> = ({ restaurant, setRe
           />
         </div>
         <div>
-          <label className="block text-sm font-medium">Endereço do Restaurante</label>
+          <label className="block text-sm font-medium">Endereço do storee</label>
           <input
             type="text"
             name="address"
@@ -131,7 +131,7 @@ const RestaurantProfile: React.FC<RestaurantProfileProps> = ({ restaurant, setRe
           />
         </div>
         <div>
-          <label className="block text-sm font-medium">Logotipo do Restaurante</label>
+          <label className="block text-sm font-medium">Logotipo do storee</label>
           <input
             type="file"
             name="logo"
@@ -141,10 +141,10 @@ const RestaurantProfile: React.FC<RestaurantProfileProps> = ({ restaurant, setRe
           />
         </div>
         <div>
-          <label className="block text-sm font-medium">Licença do Restaurante</label>
+          <label className="block text-sm font-medium">Licença do storee</label>
           <input
             type="file"
-            name="restaurant_license"
+            name="store_license"
             onChange={handleFileChange}
             disabled={!editMode}
             className="mt-1 block w-full p-2 border rounded-md"
@@ -172,4 +172,4 @@ const RestaurantProfile: React.FC<RestaurantProfileProps> = ({ restaurant, setRe
   );
 };
 
-export default RestaurantProfile;
+export default storeProfile;

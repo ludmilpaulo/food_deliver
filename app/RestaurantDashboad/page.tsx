@@ -15,7 +15,7 @@ const Sidebar = dynamic(() => import("./Sidebar"), {
   loading: () => <p>Loading...</p>,
 });
 
-const RestaurantDashboard: React.FC = () => {
+const storeDashboard: React.FC = () => {
   const user = useSelector(selectUser);
   const [fornecedor, setFornecedor] = useState<FornecedorType | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -114,4 +114,4 @@ const RestaurantDashboard: React.FC = () => {
   );
 };
 
-export default withAuth(RestaurantDashboard);
+export default withAuth(storeDashboard);

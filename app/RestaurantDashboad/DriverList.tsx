@@ -31,7 +31,7 @@ const DriverList: React.FC = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        `${baseAPI}/report/restaurant/drivers/${user.user_id}/`,
+        `${baseAPI}/report/store/drivers/${user.user_id}/`,
       );
       console.log("driver==>", response.data)
       setDrivers(response.data);

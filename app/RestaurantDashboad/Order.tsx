@@ -50,7 +50,7 @@ const Order: React.FC = () => {
   useEffect(() => {
     fetchOrderData();
 
-    const eventSource = new EventSource(`${baseAPI}/restaurant/sse?user_id=${user?.user_id}`);
+    const eventSource = new EventSource(`${baseAPI}/store/sse?user_id=${user?.user_id}`);
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
       setOrders(data);

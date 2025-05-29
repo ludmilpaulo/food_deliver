@@ -22,19 +22,19 @@ const SignupScreen = () => {
     phone: "",
     address: "",
     logo: null as File | null,
-    restaurant_license: null as File | null,
+    store_license: null as File | null,
   });
 
   const [loading, setLoading] = useState(false);
   const [logoLoading, setLogoLoading] = useState(false);
   const [licencaLoading, setLicencaLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState<"client" | "restaurant">("client");
+  const [role, setRole] = useState<"client" | "store">("client");
 
   const dispatch = useDispatch();
 
   const handleRoleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setRole(e.target.value as "client" | "restaurant");
+    setRole(e.target.value as "client" | "store");
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,7 +51,7 @@ const SignupScreen = () => {
           setSignupData((prevState) => ({ ...prevState, [name]: files[0] }));
           setLogoLoading(false);
         }, 2000);
-      } else if (name === "restaurant_license") {
+      } else if (name === "store_license") {
         setLicencaLoading(true);
         setTimeout(() => {
           setSignupData((prevState) => ({ ...prevState, [name]: files[0] }));
@@ -71,8 +71,8 @@ const SignupScreen = () => {
       if (status === 201 || data.status === "201") {
         dispatch(loginUser(data));
         alert("Você se conectou com sucesso. Agora você pode saborear sua refeição.");
-        if (role === "restaurant") {
-          router.push("/RestaurantDashboad"); // Redirect to Dashboard
+        if (role === "store") {
+          router.push("/storeDashboad"); // Redirect to Dashboard
         } else {
           router.push("/HomeScreen");
         }
@@ -147,8 +147,8 @@ const SignupScreen = () => {
                 <input
                   type="radio"
                   name="role"
-                  value="restaurant"
-                  checked={role === "restaurant"}
+                  value="store"
+                  checked={role === "store"}
                   onChange={handleRoleChange}
                   className="mr-1"
                 />
@@ -202,7 +202,7 @@ const SignupScreen = () => {
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
-                {role === "restaurant" && (
+                {role === "store" && (
                   <>
                     <input
                       name="name"
@@ -240,7 +240,7 @@ const SignupScreen = () => {
                     <div className="relative">
                       <input
                         type="file"
-                        name="restaurant_license"
+                        name="store_license"
                         onChange={handleFileChange}
                         className="absolute w-full h-full p-2 border rounded opacity-0 cursor-pointer"
                       />

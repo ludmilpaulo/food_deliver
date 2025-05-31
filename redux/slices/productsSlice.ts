@@ -1,8 +1,8 @@
 // redux/slices/productsSlice.ts
 
+import { Product } from '@/services/types';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import API from '../../services/api';
-import type { Product } from '../../services/types';
+import API from '@/services/api'; // Adjust the import path as necessary
 
 interface ProductsState {
   data: Product[];
@@ -16,13 +16,14 @@ const initialState: ProductsState = {
   error: null,
 };
 
-export const fetchProductsByStore = createAsyncThunk(
+export const fetchProductsByStore = createAsyncThunk<Product[], number>(
   'products/fetchByStore',
-  async (storeId: number): Promise<Product[]> => {
+  async (storeId: number) => {
     const resp = await API.get(`/store/products/by_store/?store=${storeId}`);
     return resp.data;
   }
 );
+
 
 const productsSlice = createSlice({
   name: 'products',

@@ -3,8 +3,6 @@
 
 //export const baseAPI = "http://0.0.0.0:8000";
 
-export const baseAPI = "https://kudya.pythonanywhere.com";
-
 import { ReactNode } from "react";
 
 export type UserDetails = {
@@ -107,7 +105,12 @@ export type OpeningHour = {
     is_closed: boolean;
   }
   
-  
+  export interface StoreType {
+  id: number;
+  name: string;
+  description?: string;
+  icon?: string;
+}
   
 
 
@@ -167,11 +170,15 @@ export interface JobApplication {
 }
 
 
-export interface Meal {
+export interface Store {
+  id: number;
+  store_type: number;
+  category: number;
   name: string;
-  short_description: string;
-  image: string;
-  original_price: number;
-  price_with_markup: number;
-  restaurant_name: string;
+  phone: string;
+  address: string;
+  logo: string;
+  location?: string;
+  banner?: boolean;
+  is_approved?: boolean;
 }

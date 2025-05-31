@@ -1,0 +1,426 @@
+"use client";
+
+import React, { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/redux/store";
+import { fetchProductsByStore } from "@/redux/slices/productsSlice";
+import { addItem, removeItem, selectCartItems } from "@/redux/slices/basketSlice";
+import { t } from "@/configs/i18n";
+import Image from "next/image";
+import { Carousel } from "react-responsive-carousel";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+import { getCurrencyForCountry, formatCurrency } from "@/utils/currency";
+import { Product } from "@/services/types";
+
+export default function ProductsPage() {
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Get from query string
+  const storeId = Number(searchParams.get("storeId"));
+  const storeName = searchParams.get("storeName") || t("Stores");
+
+  // Redux state
+  const products = useAppSelector((state) => state.products.data);
+  const loading = useAppSelector((state) => state.products.loading);
+  const error = useAppSelector((state) => state.products.error);
+  const cartItems = useAppSelector(selectCartItems);
+
+  // Local UI state
+  const [activeCartProductId, setActiveCartProductId] = useState<number | null>(null);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+
+  // Fetch products when storeId changes
+  useEffect(() => {
+    if (typeof storeId === "number" && !Number.isNaN(storeId)) {
+      dispatch(fetchProductsByStore(storeId));
+    }
+  }, [storeId, dispatch]);
+
+  // Category pills
+  const categories = useMemo(() => {
+    const cats = Array.from(new Set(products.map((p) => p.category).filter(Boolean)));
+    return ["all", ...cats];
+  }, [products]);
+
+  // Filtered products
+  const filteredProducts = useMemo(() => {
+    let filtered = products;
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter((p) => p.category === selectedCategory);
+    }
+    if (search.trim()) {
+      filtered = filtered.filter(
+        (p) =>
+          p.name.toLowerCase().includes(search.trim().toLowerCase()) ||
+          (p.description ?? "").toLowerCase().includes(search.trim().toLowerCase())
+      );
+    }
+    return filtered;
+  }, [products, search, selectedCategory]);
+
+  // On-sale for banners
+  const onSaleProducts = useMemo(
+    () => products.filter((p) => p.on_sale && p.discount_percentage > 0),
+    [products]
+  );
+  const promoBanners = onSaleProducts.slice(0, 5).map((product) => ({
+    id: product.id,
+    name: product.name,
+    subtitle: product.discount_percentage > 0 ? `-${product.discount_percentage}%` : "SALE",
+    image:
+      product.images?.[0]?.image?.startsWith("/media/")
+        ? `${process.env.NEXT_PUBLIC_BASE_API}${product.images[0].image}`
+        : product.images?.[0]?.image || "/no-image.png",
+  }));
+
+  // Currency helpers
+  const language =
+    typeof window !== "undefined" ? navigator.language.split("-")[0] : "en";
+  const regionCode =
+    typeof window !== "undefined" ? navigator.language.split("-")[1] || "ZA" : "ZA";
+  const currencyCode = getCurrencyForCountry(regionCode);
+
+  // Cart helpers
+  const getCartItem = (productId: number, size: string | null) =>
+    cartItems.find(
+      (item: any) => item.id === productId && (item.size || "") === (size || "")
+    );
+
+  const handleAddToCart = (product: Product) => {
+    setActiveCartProductId(product.id);
+    setSelectedSize(null);
+  };
+
+  const handleSelectSize = (size: string) => {
+    setSelectedSize(size);
+    if (activeCartProductId !== null) {
+      const product = products.find((p) => p.id === activeCartProductId);
+      if (product) {
+        dispatch(
+          addItem({
+            id: product.id,
+            name: product.name,
+            price:
+              product.on_sale && product.discount_percentage > 0
+                ? product.price - (product.price * product.discount_percentage) / 100
+                : product.price,
+            image: product.images?.[0]?.image,
+            size,
+            store: storeId,
+            quantity: 1,
+          })
+        );
+      }
+    }
+  };
+
+  const handleChangeQuantity = (
+    change: 1 | -1,
+    product: Product,
+    size: string | null
+  ) => {
+    const cartItem = getCartItem(product.id, size);
+    if (change === 1) {
+      if (cartItem && cartItem.quantity >= product.stock) {
+        alert(
+          `${t("stockLimitReached")}\n${t("only")} ${product.stock} ${t("itemsAvailable")}.`
+        );
+        return;
+      }
+      dispatch(
+        addItem({
+          id: product.id,
+          name: product.name,
+          price:
+            product.on_sale && product.discount_percentage > 0
+              ? product.price - (product.price * product.discount_percentage) / 100
+              : product.price,
+          image: product.images?.[0]?.image,
+          size: size || "",
+          store: storeId,
+          quantity: 1,
+        })
+      );
+    } else if (cartItem) {
+      if (cartItem.quantity === 1) {
+        dispatch(removeItem({ id: product.id, size: size || "" }));
+        setActiveCartProductId(null);
+        setSelectedSize(null);
+      } else {
+        dispatch(removeItem({ id: product.id, size: size || "" }));
+      }
+    }
+  };
+
+  const isProductInCart = (product: Product) => {
+    if (product.sizes && product.sizes.length > 0) {
+      return cartItems.some((item: any) => item.id === product.id);
+    }
+    return cartItems.some(
+      (item: any) => item.id === product.id && (!item.size || item.size === "")
+    );
+  };
+
+  // --- RENDER ---
+  return (
+    <div className="relative min-h-screen bg-gradient-to-br from-yellow-300 via-yellow-200 to-blue-400">
+      {/* Carousel: Sales Banners */}
+      {promoBanners.length > 0 && (
+        <div className="mb-6 px-4">
+          <Carousel
+            autoPlay
+            infiniteLoop
+            showThumbs={false}
+            showStatus={false}
+            showIndicators={true}
+            interval={4000}
+          >
+            {promoBanners.map((item) => (
+              <div
+                key={item.id}
+                className="relative rounded-xl overflow-hidden h-44 cursor-pointer"
+                onClick={() => router.push(`/product/${item.id}`)}
+              >
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  fill
+                  className="object-cover rounded-xl"
+                />
+                <div className="absolute inset-0 bg-black/40 flex flex-col justify-center px-4">
+                  <h3 className="text-white text-lg font-bold">{item.name}</h3>
+                  <p className="text-white text-sm mt-1 font-semibold">{item.subtitle}</p>
+                </div>
+              </div>
+            ))}
+          </Carousel>
+        </div>
+      )}
+
+      {/* Header */}
+      <h2 className="text-3xl font-bold mb-3 text-white px-4 drop-shadow">{storeName}</h2>
+
+      {/* Search Bar */}
+      <div className="flex items-center bg-gray-100 rounded-full px-4 py-3 shadow mx-4 mb-4">
+        <span className="text-gray-400 mr-3">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <circle cx={11} cy={11} r={8}></circle>
+            <line x1={21} y1={21} x2={16.65} y2={16.65}></line>
+          </svg>
+        </span>
+        <input
+          className="flex-1 text-base text-black bg-transparent outline-none"
+          placeholder={t("search")}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
+
+      {/* Category Pills */}
+      <div className="flex overflow-x-auto pl-4 pr-2 pb-2 mb-4 gap-2">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setSelectedCategory(cat)}
+            className={`px-4 py-2 rounded-full border mr-2 whitespace-nowrap ${
+              selectedCategory === cat
+                ? "bg-black border-black text-white"
+                : "bg-white border-gray-300 text-gray-800"
+            } text-sm font-semibold`}
+          >
+            {cat === "all" ? t("Categories") : cat}
+          </button>
+        ))}
+      </div>
+
+      {/* Error/Loading/Empty states */}
+      {loading && (
+        <div className="flex flex-col items-center justify-center w-full py-12">
+          <span className="loader mb-3"></span>
+          <p className="text-gray-700">{t("loading")}</p>
+        </div>
+      )}
+      {!loading && error && (
+        <div className="bg-red-500/70 text-white text-center w-full py-3 rounded-xl mx-4">
+          {t("error")}
+        </div>
+      )}
+      {!loading && !error && filteredProducts.length === 0 && (
+        <p className="text-center text-white/90 mt-16 w-full">{t("noStores")}</p>
+      )}
+
+      {/* Product Grid */}
+      <div className="flex flex-wrap gap-4 px-4">
+        {!loading &&
+          !error &&
+          filteredProducts.map((product) => {
+            const hasSale = product.on_sale && product.discount_percentage > 0;
+            const price = hasSale
+              ? product.price - (product.price * product.discount_percentage) / 100
+              : product.price;
+
+            // Stock status
+            let stockLabel = "";
+            let stockBadgeColor = "";
+            let disableAddToCart = false;
+            if (product.stock <= 0) {
+              stockLabel = t("outOfStock");
+              stockBadgeColor = "#EF4444";
+              disableAddToCart = true;
+            } else if (product.stock === 1) {
+              stockLabel = t("lastOne");
+              stockBadgeColor = "#F59E42";
+              disableAddToCart = true;
+            } else if (product.stock < 10) {
+              stockLabel = t("lowStock");
+              stockBadgeColor = "#FCD34D";
+            }
+
+            // Cart logic
+            const isActive =
+              activeCartProductId === product.id ||
+              !!getCartItem(product.id, selectedSize);
+            const cartItem =
+              getCartItem(product.id, selectedSize) ||
+              (product.sizes?.length
+                ? getCartItem(product.id, selectedSize)
+                : getCartItem(product.id, ""));
+            const alreadyInCart = isProductInCart(product);
+
+            return (
+              <div
+                key={product.id}
+                className="bg-white rounded-2xl p-3 shadow-md relative w-full sm:w-[calc(50%-1rem)] md:w-[calc(33%-1rem)] lg:w-[calc(25%-1rem)] mb-4"
+              >
+                <div
+                  className="relative cursor-pointer"
+                  onClick={() => router.push(`/product/${product.id}`)}
+                >
+                  <div className="w-full h-40 rounded-lg bg-gray-200 overflow-hidden mb-2 relative">
+                    <Image
+                      src={
+                        product.images?.[0]?.image
+                          ? product.images[0].image.startsWith("/media/")
+                            ? `${process.env.NEXT_PUBLIC_BASE_API}${product.images[0].image}`
+                            : product.images[0].image
+                          : "/no-image.png"
+                      }
+                      alt={product.name}
+                      fill
+                      className="object-cover rounded-lg"
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                    />
+                    {hasSale && (
+                      <div className="absolute top-2 right-2 bg-blue-500 rounded-lg px-2 py-1 flex items-center">
+                        <span className="text-white text-xs font-bold">
+                          -{product.discount_percentage}%
+                        </span>
+                      </div>
+                    )}
+                    {stockLabel && (
+                      <div
+                        className="absolute top-2 left-2 rounded-lg px-2 py-1"
+                        style={{ backgroundColor: stockBadgeColor }}
+                      >
+                        <span className="text-white text-xs font-bold">
+                          {stockLabel}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="truncate font-bold text-gray-800 mt-1">{product.name}</div>
+                </div>
+                <div className="flex items-center mt-2 mb-2">
+                  {hasSale && (
+                    <span className="text-gray-400 line-through text-xs mr-2">
+                      {formatCurrency(product.price, currencyCode, language)}
+                    </span>
+                  )}
+                  <span className="text-blue-700 font-semibold text-base">
+                    {formatCurrency(price, currencyCode, language)}
+                  </span>
+                </div>
+
+                {/* Add to Cart Flow */}
+                {!alreadyInCart && !disableAddToCart && (
+                  <>
+                    {/* 1. Button */}
+                    {!isActive && (
+                      <button
+                        className="bg-green-600 w-full py-2 rounded-lg text-white font-bold mt-1"
+                        onClick={() => handleAddToCart(product)}
+                        disabled={disableAddToCart}
+                      >
+                        {t("addToCart")}
+                      </button>
+                    )}
+
+                    {/* 2. Select Size */}
+                    {isActive &&
+                      product.sizes &&
+                      product.sizes.length > 0 &&
+                      !selectedSize && (
+                        <div className="flex flex-wrap mt-2 gap-2">
+                          {product.sizes.map((size) => (
+                            <button
+                              key={size}
+                              className={`px-4 py-2 rounded-full border m-1 font-bold ${
+                                selectedSize === size
+                                  ? "bg-black border-black text-white"
+                                  : "bg-white border-gray-300 text-gray-800"
+                              }`}
+                              onClick={() => handleSelectSize(size)}
+                            >
+                              {size}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                    {/* 3. Plus/Minus Quantity */}
+                    {isActive &&
+                      ((product.sizes && product.sizes.length > 0 && selectedSize) ||
+                        (!product.sizes || product.sizes.length === 0)) && (
+                        <div className="flex items-center justify-center mt-2">
+                          <button
+                            className="bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center"
+                            onClick={() => handleChangeQuantity(-1, product, selectedSize)}
+                            disabled={!cartItem || cartItem.quantity <= 0}
+                          >
+                            <span className="text-xl font-bold">-</span>
+                          </button>
+                          <span className="mx-6 text-lg font-bold">
+                            {cartItem?.quantity || 1}
+                          </span>
+                          <button
+                            className="bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center"
+                            onClick={() => handleChangeQuantity(1, product, selectedSize)}
+                            disabled={!cartItem || cartItem.quantity >= product.stock}
+                          >
+                            <span className="text-xl font-bold">+</span>
+                          </button>
+                        </div>
+                      )}
+                  </>
+                )}
+
+                {/* Show "Go to Cart" if in cart */}
+                {alreadyInCart && (
+                  <button
+                    className="bg-blue-600 w-full py-2 rounded-lg text-white font-bold mt-1"
+                    onClick={() => router.push("/cart")}
+                  >
+                    {t("goToCart")}
+                  </button>
+                )}
+              </div>
+            );
+          })}
+      </div>
+    </div>
+  );
+}

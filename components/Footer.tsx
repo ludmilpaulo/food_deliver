@@ -1,25 +1,36 @@
 "use client";
-import React, { useEffect, useState } from 'react';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 import Link from "next/link";
 import { SocialIcon } from "react-social-icons";
 import { motion } from "framer-motion";
-import Image from 'next/image';
-import { fetchAboutUsData } from '@/services/information';
-import { AboutUsData } from '@/services/types';
+import { useGetAboutUsQuery } from '@/redux/slices/aboutApi';
+import Image from "next/image";
+
 
 const currentYear = new Date().getFullYear();
 
 const Footer: React.FC = () => {
-  const [headerData, setHeaderData] = useState<AboutUsData | null>(null);
+  const { data: headerData, isLoading, isError } = useGetAboutUsQuery();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await fetchAboutUsData();
-      setHeaderData(data);
-    };
-    fetchData();
-  }, []);
+  if (isLoading) {
+    return (
+      <footer className="bg-gradient-to-r from-yellow-400 to-blue-600 text-white">
+        <div className="container mx-auto px-4 py-8 text-center">
+          <p>Carregando dados...</p>
+        </div>
+      </footer>
+    );
+  }
+
+  if (isError) {
+    return (
+      <footer className="bg-gradient-to-r from-yellow-400 to-blue-600 text-white">
+        <div className="container mx-auto px-4 py-8 text-center">
+          <p>Erro ao carregar dados de contato.</p>
+        </div>
+      </footer>
+    );
+  }
 
   return (
     <footer className="bg-gradient-to-r from-yellow-400 to-blue-600 text-white">
@@ -46,7 +57,7 @@ const Footer: React.FC = () => {
             <div className="space-y-2">
               <p className="flex items-center justify-center md:justify-start space-x-2">
                 <FaEnvelope className="w-5 h-5" />
-               <span className="font-bold text-black">{headerData?.email}</span>
+                <span className="font-bold text-black">{headerData?.email}</span>
               </p>
               <p className="flex items-center justify-center md:justify-start space-x-2">
                 <FaPhone className="w-5 h-5" />

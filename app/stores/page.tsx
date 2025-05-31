@@ -3,10 +3,11 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/store";
 import { fetchStoresByType } from "@/redux/slices/storesSlice";
-import { Store } from "@/services/types";
+
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { t } from "@/utils/i18n";
+import { t } from "@/configs/i18n";
+
 
 // Util for distance calculation (Haversine formula)
 function getDistanceFromLatLonInKm(

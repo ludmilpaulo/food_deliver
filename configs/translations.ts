@@ -78,6 +78,8 @@ export const translationKeys = [
   'thankYouPurchase',
  
   'simulatePayment',
+  'away',
+  'changeLanguage',
 
 ] as const;
 export type TranslationKey = typeof translationKeys[number];
@@ -160,6 +162,8 @@ const translations: Record<SupportedLocale, Record<TranslationKey, string>> = {
     thankYouPurchase: "Thank you for your purchase!",
    
     simulatePayment: "Simulate Payment",
+    away: "away",
+    changeLanguage: "Change language",
 
   },
   pt: {
@@ -240,6 +244,8 @@ const translations: Record<SupportedLocale, Record<TranslationKey, string>> = {
     thankYouPurchase: "Obrigado pela sua compra!",
    
     simulatePayment: "Simular Pagamento",
+    away: "distância",
+    changeLanguage: "Alterar idioma",
 
   },
 };

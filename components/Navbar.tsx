@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import logo from "@/assets/azul.png";
 import { selectUser } from "@/redux/slices/authSlice";
-import { useSelector } from "react-redux";
 import { useAppSelector } from "@/redux/store";
 import { t, setLanguage, setLanguageFromBrowser, getLanguage } from "@/configs/i18n";
 import { SupportedLocale } from "@/configs/translations";
@@ -20,7 +19,7 @@ const LANGUAGES: { value: SupportedLocale; label: string }[] = [
 const Navbar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
-  const [lang, setLang] = useState(getLanguage());
+  const [lang, setLang] = useState<SupportedLocale>(getLanguage());
   const router = useRouter();
 
   // System language detection on mount (only client-side)
@@ -35,7 +34,7 @@ const Navbar: React.FC = () => {
     setLang(getLanguage());
   };
 
-  const user = useSelector(selectUser);
+  const user = useAppSelector(selectUser);
   const cartItems = useAppSelector((state) => state.basket.items);
   const cartQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -56,7 +55,7 @@ const Navbar: React.FC = () => {
       <form onSubmit={handleSearch} className="relative flex-1 max-w-xs">
         <input
           type="text"
-          placeholder={t("search", "Search food or stores")}
+          placeholder={t("search")}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           className="w-full px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
@@ -64,7 +63,7 @@ const Navbar: React.FC = () => {
         />
       </form>
       <Link href="/HomeScreen" className="flex items-center text-gray-800 hover:text-blue-600 font-semibold transition px-2 py-1">
-        <MdStore size={20} className="mr-1" /> {t("stores", "Stores")}
+        <MdStore size={20} className="mr-1" /> {t("Stores")}
       </Link>
       <Link
         href="/CartPage"
@@ -78,15 +77,15 @@ const Navbar: React.FC = () => {
             </span>
           )}
         </span>
-        <span className="ml-1">{t("cart", "Cart")}</span>
+        <span className="ml-1">{t("Cart")}</span>
       </Link>
       {user ? (
         <Link href="/UserDashboard" className="flex items-center text-gray-800 hover:text-blue-600 font-semibold transition px-2 py-1">
-          <IoMdPerson size={20} className="mr-1" /> {t("profile", "Profile")}
+          <IoMdPerson size={20} className="mr-1" /> {t("Profile")}
         </Link>
       ) : (
         <Link href="/LoginScreenUser" className="flex items-center text-gray-800 hover:text-blue-600 font-semibold transition px-2 py-1">
-          <IoMdPerson size={20} className="mr-1" /> {t("login", "Login")}
+          <IoMdPerson size={20} className="mr-1" /> {t("login")}
         </Link>
       )}
     </>
@@ -114,7 +113,7 @@ const Navbar: React.FC = () => {
               className="p-1 rounded bg-white/80 border border-gray-300 text-gray-800 font-semibold text-sm shadow"
               value={lang}
               onChange={handleLanguageChange}
-              aria-label={t("changeLanguage", "Change language")}
+              aria-label={t("changeLanguage")}
             >
               {LANGUAGES.map((langOpt) => (
                 <option key={langOpt.value} value={langOpt.value}>

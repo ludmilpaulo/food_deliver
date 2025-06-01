@@ -1,24 +1,26 @@
 "use client";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
-import { selectUser } from "@/redux/slices/authSlice";
-import {clearAllCart } from "@/redux/slices/basketSlice";
-
-
-
+import { useEffect, useState } from "react";
+import { useAppDispatch } from "@/redux/store"; // Only use these!
+import { getLanguage, setLanguageFromBrowser } from "@/configs/i18n";
+import { fetchStoreTypes } from "@/redux/slices/storeTypeSlice";
 
 export default function Home() {
-  const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
-  const user = useSelector(selectUser);
-  console.log("user==>>", user)
+  const [searchTerm, setSearchTerm] = useState("");
+  const [lang, setLang] = useState(getLanguage());
 
+
+
+  useEffect(() => {
+    dispatch(fetchStoreTypes());
+    setLanguageFromBrowser();
+    setLang(getLanguage());
+  }, [dispatch]);
 
   return (
     <>
+      {/* Your UI here */}
     </>
-
   );
 }

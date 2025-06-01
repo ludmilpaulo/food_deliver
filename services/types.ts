@@ -184,16 +184,25 @@ export interface JobApplication {
 
 export interface Store {
   id: number;
-  store_type: number;
-  category: number;
   name: string;
   phone: string;
   address: string;
-  logo: string;
+  logo: string | null;
+  images?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  bank?: string;
+  account_number?: string;
+  iban?: string;
   location?: string;
+  license?: string | null;
   banner?: boolean;
   is_approved?: boolean;
+  category?: number | null;
+  store_type?: number | null;
+  distance?: number | null; // Calculated client-side
 }
+
 
 export interface CartItem {
   id: number;            // productId

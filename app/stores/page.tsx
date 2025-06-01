@@ -127,9 +127,9 @@ export default function StoresPage() {
                 className="bg-white/90 hover:bg-blue-50 transition rounded-2xl shadow-lg w-full sm:w-[48%] md:w-[31%] p-5 flex flex-col items-center mb-4 cursor-pointer"
                 onClick={() => router.push(`/products?storeId=${store.id}&storeName=${encodeURIComponent(store.name)}`)}
               >
-                {store.image ? (
+                {store.images ? (
                   <Image
-                    src={store.image}
+                    src={store.images}
                     alt={store.name}
                     width={90}
                     height={90}

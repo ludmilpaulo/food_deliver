@@ -1,7 +1,7 @@
 // redux/slices/basketSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
-import { CartItem } from "../../services/types"; // Adjust path as needed
+import { CartItem } from "../../services/types";
 
 type BasketState = {
   items: CartItem[];
@@ -18,22 +18,34 @@ const basketSlice = createSlice({
   initialState,
   reducers: {
     addItem: (state, action: PayloadAction<AddItemPayload>) => {
-      const { id, size } = action.payload;
+      const { id, size, color } = action.payload;
       const existingItem = state.items.find(
-        (item) => item.id === id && item.size === size
+        (item) =>
+          item.id === id &&
+          (item.size || "") === (size || "") &&
+          (item.color || "") === (color || "")
       );
       if (existingItem) {
         existingItem.quantity += action.payload.quantity || 1;
       } else {
         state.items.push({
           ...action.payload,
+          size: size || "",
+          color: color || "",
           quantity: action.payload.quantity || 1,
         });
       }
     },
-    removeItem: (state, action: PayloadAction<{ id: number; size: string }>) => {
+    removeItem: (
+      state,
+      action: PayloadAction<{ id: number; size?: string; color?: string }>
+    ) => {
+      const { id, size = "", color = "" } = action.payload;
       const index = state.items.findIndex(
-        (item) => item.id === action.payload.id && item.size === action.payload.size
+        (item) =>
+          item.id === id &&
+          (item.size || "") === size &&
+          (item.color || "") === color
       );
       if (index !== -1) {
         if (state.items[index].quantity > 1) {

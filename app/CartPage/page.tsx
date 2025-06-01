@@ -1,148 +1,214 @@
 "use client";
-import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { useAppSelector } from '@/redux/store';
-import { addItem, removeItem } from '@/redux/slices/basketSlice';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { baseAPI } from '@/services/types';
+import React, { useEffect, useState } from "react";
+import { useAppSelector, useAppDispatch } from "@/redux/store";
+import { removeItem, clearAllCart, addItem } from "@/redux/slices/basketSlice";
+import { selectUser } from "@/redux/slices/authSlice";
+import Image from "next/image";
+import { formatCurrency, getCurrencyForCountry } from "@/utils/currency";
+import { t, setLanguageFromBrowser, setLanguage, getLanguage } from "@/configs/i18n";
+import { SupportedLocale } from "@/configs/translations";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { CartItem } from "@/services/types";
+import { FaTrash, FaShoppingCart, FaImage } from "react-icons/fa";
+import { MdRemoveShoppingCart } from "react-icons/md";
+import { IoMdClose } from "react-icons/io";
 
-type store = {
-  id: number;
-  name: string;
-  is_approved: boolean;
-};
-
-type Meal = {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
-  image_url: string;
-  store: number;
-};
+const LANGUAGES: { value: SupportedLocale; label: string }[] = [
+  { value: "en", label: "🇬🇧 English" },
+  { value: "pt", label: "🇵🇹 Português" },
+];
 
 const CartPage: React.FC = () => {
-  const cartItems = useAppSelector((state) => state.basket.items as Meal[]);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const router = useRouter();
-  const [stores, setstores] = useState<store[]>([]);
-  const [loading, setLoading] = useState(true);
 
+  // System language detection on mount (client-only)
+  const [lang, setLangState] = useState(getLanguage());
   useEffect(() => {
-    fetch(`${baseAPI}/customer/customer/stores/`)
-      .then((response) => response.json())
-      .then((data) => {
-        const approvedstores = data.stores.filter(
-          (store: store) => store.is_approved
-        );
-        setstores(approvedstores);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-        setLoading(false);
-      });
+    setLanguageFromBrowser();
+    setLangState(getLanguage());
   }, []);
-
-  const handleAddToCart = (meal: Meal) => {
-    dispatch(addItem(meal));
+  const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setLanguage(e.target.value as SupportedLocale);
+    setLangState(getLanguage());
   };
 
-  const handleRemoveFromCart = (mealId: number) => {
-    dispatch(removeItem(mealId));
+  // Redux state
+  const items: CartItem[] = useAppSelector((state) => state.basket.items);
+  const user = useAppSelector(selectUser);
+
+  // Locale/currency
+  const language = lang || "en";
+  const regionCode =
+    typeof window !== "undefined"
+      ? navigator.language.split("-")[1] || "ZA"
+      : "ZA";
+  const currencyCode = getCurrencyForCountry(regionCode);
+
+  // Totals
+  const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+  // Cart logic
+  const handleRemove = (itemId: number, size?: string) => {
+    dispatch(removeItem({ id: itemId, size: size || "" }));
   };
 
-  const handleRemoveItemCompletely = (mealId: number) => {
-    const item = cartItems.find((item) => item.id === mealId);
-    if (item) {
-      for (let i = 0; i < item.quantity; i++) {
-        dispatch(removeItem(mealId));
-      }
+  const handleQuantityChange = (item: CartItem, diff: 1 | -1) => {
+    if (diff === 1) {
+      dispatch(
+        addItem({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          image: item.image,
+          size: item.size,
+          store: item.store,
+          quantity: 1,
+        })
+      );
+    } else {
+      dispatch(removeItem({ id: item.id, size: item.size || "" }));
     }
   };
 
-  const groupedItems = cartItems.reduce((acc: { [key: number]: Meal[] }, item: Meal) => {
-    if (!acc[item.store]) {
-      acc[item.store] = [];
+  // Confirm clear cart
+  const confirmClearCart = () => {
+    if (window.confirm(t("Are you sure you want to remove all items from your cart?", "Tem certeza que deseja remover todos os itens do carrinho?"))) {
+      dispatch(clearAllCart());
     }
-    acc[item.store].push(item);
-    return acc;
-  }, {});
-
-  const handleCheckout = (storeId: number) => {
-    const items = groupedItems[storeId];
-    sessionStorage.setItem('checkoutItems', JSON.stringify(items));
-    router.push(`/CheckoutPage?store_id=${storeId}`);
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center w-full h-full">
-        <div className="w-32 h-32 border-t-2 border-b-2 border-blue-500 rounded-full animate-spin"></div>
-      </div>
-    );
-  }
+  // Require login to checkout
+  const handleCheckout = () => {
+    if (!user) {
+      router.push("/LoginScreenUser");
+      return;
+    }
+    router.push("/Checkout");
+  };
 
   return (
-    <div className="container mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-3xl font-semibold mb-6">Carrinho de Compras</h1>
-      {cartItems.length === 0 ? (
-        <p className="text-gray-600">Seu carrinho está vazio.</p>
-      ) : (
-        Object.entries(groupedItems).map(([storeId, items]) => {
-          const store = stores.find((res) => res.id === parseInt(storeId));
-          const storeName = store ? store.name : `storee ${storeId}`;
-          const totalPrice = items.reduce((total, item) => total + item.price * item.quantity, 0);
-          return (
-            <div key={storeId}>
-              <h2 className="text-2xl font-semibold text-gray-800 mb-4">{storeName}</h2>
-              <div className="grid grid-cols-1 gap-6 mb-6">
-                {items.map((item) => (
-                  <div key={item.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
-                    <div className="flex items-center p-4">
-                      <Image src={item.image_url} alt={item.name} width={100} height={100} className="w-24 h-24 object-cover" />
-                      <div className="ml-4 flex-grow">
-                        <h2 className="text-xl font-semibold text-gray-800">{item.name}</h2>
-                        <p className="text-gray-800 font-bold">Preço: {item.price} Kz</p>
-                        <div className="flex items-center mt-4">
-                          <button
-                            className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700"
-                            onClick={() => handleAddToCart(item)}
-                          >
-                            +
-                          </button>
-                          <span className="mx-4 text-gray-800 font-semibold">{item.quantity}</span>
-                          <button
-                            className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700"
-                            onClick={() => handleRemoveFromCart(item.id)}
-                          >
-                            -
-                          </button>
-                        </div>
-                      </div>
-                      <button
-                        className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700"
-                        onClick={() => handleRemoveItemCompletely(item.id)}
-                      >
-                        Remover
-                      </button>
-                    </div>
+    <div className="min-h-screen bg-gradient-to-tr from-blue-50 via-yellow-50 to-blue-100 flex flex-col">
+      <header className="sticky top-0 z-30 bg-white/80 border-b border-blue-200 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between px-4 py-3">
+        <div className="flex items-center gap-2">
+          <FaShoppingCart className="text-blue-700 text-2xl" />
+          <h1 className="text-xl font-extrabold text-blue-900 drop-shadow"> {t("Your Cart", "Seu carrinho")}</h1>
+        </div>
+        <select
+          className="p-1 rounded bg-white/80 border border-gray-300 text-gray-800 font-semibold text-sm shadow ml-auto mt-2 md:mt-0"
+          value={lang}
+          onChange={handleLanguageChange}
+          aria-label={t("changeLanguage", "Change language")}
+        >
+          {LANGUAGES.map((langOpt) => (
+            <option key={langOpt.value} value={langOpt.value}>
+              {langOpt.label}
+            </option>
+          ))}
+        </select>
+      </header>
+
+      <main className="flex-1 w-full max-w-3xl mx-auto px-2 sm:px-6 py-8">
+        {items.length === 0 ? (
+          <div className="flex flex-col items-center justify-center mt-20 mb-24">
+            <MdRemoveShoppingCart className="text-6xl text-gray-300 mb-2" />
+            <div className="text-lg text-gray-400 font-semibold mb-4">{t("Your cart is empty", "Seu carrinho está vazio")}</div>
+            <Link href="/HomeScreen">
+              <button className="bg-blue-600 hover:bg-blue-700 px-8 py-3 rounded-full text-white font-semibold shadow transition">
+                {t("Go Shopping", "Comprar agora")}
+              </button>
+            </Link>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4 mb-36">
+            {items.map((item, idx) => (
+              <div
+                key={`${item.id}-${item.size || ""}-${item.store}-${idx}`}
+                className="bg-white rounded-2xl flex flex-col sm:flex-row items-center p-4 shadow-md gap-4 relative"
+              >
+                <div className="w-20 h-20 relative bg-gray-100 flex-shrink-0 rounded-xl overflow-hidden flex items-center justify-center">
+                  {item.image ? (
+                    <Image
+                      src={item.image}
+                      alt={item.name}
+                      fill
+                      className="object-cover rounded-xl"
+                    />
+                  ) : (
+                    <FaImage className="text-gray-400 text-3xl" />
+                  )}
+                </div>
+                <div className="flex-1 flex flex-col w-full min-w-0">
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-bold truncate">{item.name}</span>
+                    <button
+                      className="ml-2 p-1 hover:bg-red-100 rounded"
+                      onClick={() => handleRemove(item.id, item.size)}
+                      aria-label={t("Remove", "Remover")}
+                    >
+                      <IoMdClose className="text-red-500 text-lg" />
+                    </button>
                   </div>
-                ))}
+                  {!!item.size && (
+                    <div className="text-xs text-gray-500 mt-1">{t("Size", "Tamanho")}: {item.size}</div>
+                  )}
+                  <div className="flex items-center gap-2 mt-2">
+                    <button
+                      className="bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center text-xl font-bold hover:bg-blue-100 transition"
+                      onClick={() => handleQuantityChange(item, -1)}
+                      aria-label={t("Decrease quantity", "Diminuir quantidade")}
+                      disabled={item.quantity <= 1}
+                    >-</button>
+                    <span className="mx-2 text-lg font-semibold">{item.quantity}</span>
+                    <button
+                      className="bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center text-xl font-bold hover:bg-blue-100 transition"
+                      onClick={() => handleQuantityChange(item, 1)}
+                      aria-label={t("Increase quantity", "Aumentar quantidade")}
+                    >+</button>
+                  </div>
+                </div>
+                <div className="flex flex-col items-end min-w-[5rem]">
+                  <span className="text-base font-extrabold text-blue-700">
+                    {formatCurrency(item.price * item.quantity, currencyCode, language)}
+                  </span>
+                  <button
+                    className="mt-3 text-xs text-red-500 font-semibold hover:underline"
+                    onClick={() => handleRemove(item.id, item.size)}
+                  >
+                    {t("Remove", "Remover")}
+                  </button>
+                </div>
               </div>
-              <div className="flex justify-between items-center mb-6">
-                <p className="text-lg font-semibold text-gray-800">Total: {totalPrice} Kz</p>
-                <button
-                  className="px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700"
-                  onClick={() => handleCheckout(parseInt(storeId))}
-                >
-                  Finalizar Compra
-                </button>
-              </div>
+            ))}
+          </div>
+        )}
+      </main>
+
+      {/* Sticky total bar */}
+      {items.length > 0 && (
+        <footer className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-2xl z-50">
+          <div className="max-w-3xl mx-auto px-4 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-lg font-extrabold text-gray-800">{t("Total:", "Total:")}</span>
+              <span className="text-xl font-extrabold text-blue-700">{formatCurrency(total, currencyCode, language)}</span>
             </div>
-          );
-        })
+            <div className="flex gap-3">
+              <button
+                className="bg-blue-600 hover:bg-blue-700 py-3 px-8 rounded-xl text-white font-bold shadow transition"
+                onClick={handleCheckout}
+              >
+                {t("Proceed to Checkout", "Finalizar Compra")}
+              </button>
+              <button
+                className="bg-red-100 text-red-500 hover:bg-red-200 py-3 px-5 rounded-xl font-semibold transition"
+                onClick={confirmClearCart}
+              >
+                {t("Clear Cart", "Esvaziar carrinho")}
+              </button>
+            </div>
+          </div>
+        </footer>
       )}
     </div>
   );

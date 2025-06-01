@@ -1,7 +1,8 @@
-// src/services/types.ts
+
 //export const baseAPI: string = process.env.NEXT_PUBLIC_BASE_API || 'https://www.kudya.shop';
 
-//export const baseAPI = "http://0.0.0.0:8000";
+export const baseAPI: string = process.env.NEXT_PUBLIC_BASE_API || "http://127.0.0.1:8000";
+
 
 import { ReactNode } from "react";
 
@@ -49,17 +50,28 @@ export type UserDetails = {
     status: string;
   }
   
+export interface ProductImage {
+  id: number;
+  image: string;
+}
+export interface Product {
+  id: number;
+  store_id: number;
+  name: string;
+  category?: string;
+  description?: string;
+  price: number;
+  stock: number;
+  on_sale: boolean;
+  bulk_sale: boolean;
+  discount_percentage: number;
+  season?: string;
+  images?: ProductImage[];
+  gender?: string;
+  colors?: string[];
+  sizes?: string[];
 
-  export type Product = {
-    user_id?: number;
-    id?: number;
-    name: string;
-    short_description: string;
-    image: string;
-    price: string;
-    category: string | number;
-    // Add other fields if necessary...
-  };
+}
   
  // @/services/types.ts
 
@@ -181,4 +193,16 @@ export interface Store {
   location?: string;
   banner?: boolean;
   is_approved?: boolean;
+}
+
+export interface CartItem {
+  id: number;            // productId
+  name: string;
+  price: number;
+  image?: string;
+  size: string;
+  color: string;
+  quantity: number;
+  store: number;  
+     // storeId
 }

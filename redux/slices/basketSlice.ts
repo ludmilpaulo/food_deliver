@@ -1,4 +1,3 @@
-// redux/slices/basketSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { CartItem } from "../../services/types";
@@ -55,6 +54,21 @@ const basketSlice = createSlice({
         }
       }
     },
+    // NEW: Remove entire item (all quantities)
+    removeLine: (
+      state,
+      action: PayloadAction<{ id: number; size?: string; color?: string }>
+    ) => {
+      const { id, size = "", color = "" } = action.payload;
+      state.items = state.items.filter(
+        (item) =>
+          !(
+            item.id === id &&
+            (item.size || "") === size &&
+            (item.color || "") === color
+          )
+      );
+    },
     clearCart: (state, action: PayloadAction<number>) => {
       state.items = state.items.filter((item) => item.store !== action.payload);
     },
@@ -64,7 +78,13 @@ const basketSlice = createSlice({
   },
 });
 
-export const { addItem, removeItem, clearCart, clearAllCart } = basketSlice.actions;
+export const {
+  addItem,
+  removeItem,
+  removeLine, // <--- export new reducer
+  clearCart,
+  clearAllCart,
+} = basketSlice.actions;
 export const selectCartItems = (state: RootState) => state.basket.items;
 
 export default basketSlice.reducer;

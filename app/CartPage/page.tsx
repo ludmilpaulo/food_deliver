@@ -1,16 +1,17 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useAppSelector, useAppDispatch } from "@/redux/store";
-import { removeItem, clearAllCart, addItem } from "@/redux/slices/basketSlice";
+import { removeItem, removeLine, clearAllCart, addItem } from "@/redux/slices/basketSlice";
 import { selectUser } from "@/redux/slices/authSlice";
 import Image from "next/image";
+import withAuth from "@/components/ProtectedPage";
 import { formatCurrency, getCurrencyForCountry } from "@/utils/currency";
 import { t, setLanguageFromBrowser, setLanguage, getLanguage } from "@/configs/i18n";
 import { SupportedLocale } from "@/configs/translations";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CartItem } from "@/services/types";
-import { FaTrash, FaShoppingCart, FaImage } from "react-icons/fa";
+import { FaShoppingCart, FaImage } from "react-icons/fa";
 import { MdRemoveShoppingCart } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
 
@@ -49,11 +50,7 @@ const CartPage: React.FC = () => {
   // Totals
   const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
-  // Cart logic
-  const handleRemove = (item: CartItem) => {
-    dispatch(removeItem({ id: item.id, size: item.size || "", color: item.color || "" }));
-  };
-
+  // Remove only one unit
   const handleQuantityChange = (item: CartItem, diff: 1 | -1) => {
     if (diff === 1) {
       dispatch(
@@ -71,6 +68,11 @@ const CartPage: React.FC = () => {
     } else {
       dispatch(removeItem({ id: item.id, size: item.size || "", color: item.color || "" }));
     }
+  };
+
+  // Remove the entire item (all quantities)
+  const handleRemoveLine = (item: CartItem) => {
+    dispatch(removeLine({ id: item.id, size: item.size || "", color: item.color || "" }));
   };
 
   // Confirm clear cart
@@ -156,7 +158,7 @@ const CartPage: React.FC = () => {
                     <span className="text-lg font-bold truncate">{item.name}</span>
                     <button
                       className="ml-2 p-1 hover:bg-red-100 rounded"
-                      onClick={() => handleRemove(item)}
+                      onClick={() => handleRemoveLine(item)}
                       aria-label={t("Remove", "Remover")}
                     >
                       <IoMdClose className="text-red-500 text-lg" />
@@ -197,7 +199,7 @@ const CartPage: React.FC = () => {
                   </span>
                   <button
                     className="mt-3 text-xs text-red-500 font-semibold hover:underline"
-                    onClick={() => handleRemove(item)}
+                    onClick={() => handleRemoveLine(item)}
                   >
                     {t("Remove", "Remover")}
                   </button>
@@ -241,4 +243,4 @@ const CartPage: React.FC = () => {
   );
 };
 
-export default CartPage;
+export default withAuth(CartPage);

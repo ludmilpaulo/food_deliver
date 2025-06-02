@@ -1,7 +1,7 @@
 // redux/slices/authSlice.ts
 
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import { loginUserService } from "../../services/authService"; // adjust the path
+import { loginUserService } from "../../services/authService"; // adjust as needed
 
 export interface User {
   user_id: number;
@@ -38,17 +38,14 @@ export const loginUser = createAsyncThunk<
   try {
     const data = await loginUserService(username, password);
     if (!data.token) {
-      // In case backend sends OK but without token, treat as error
       return rejectWithValue(data.message || "Erro desconhecido.");
     }
     return data;
   } catch (error: any) {
-    // Error object from service is always Error
     return rejectWithValue(error.message || "Erro desconhecido.");
   }
 });
 
-// ---- Slice ----
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -84,7 +81,6 @@ const authSlice = createSlice({
           };
           state.message = action.payload.message || "Login com sucesso";
         } else {
-          // Defensive, but should never happen if thunk is correct
           state.error = "Login failed";
         }
       })
@@ -97,7 +93,10 @@ const authSlice = createSlice({
 
 export const { logoutUser, clearAuthMessage } = authSlice.actions;
 
-export const selectUser = (state: { auth: AuthState }) => state.auth;
+// User only
+export const selectUser = (state: { auth: AuthState }) => state.auth.user;
 
+// Whole auth slice (status, errors, etc.)
 export const selectAuth = (state: { auth: AuthState }) => state.auth;
+
 export default authSlice.reducer;

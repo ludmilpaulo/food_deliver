@@ -54,11 +54,16 @@ export interface ProductImage {
   id: number;
   image: string;
 }
+export interface ProductCategory {
+  id: number;
+  name: string;
+  icon: string;
+}
 export interface Product {
   id: number;
   store_id: number;
   name: string;
-  category?: string;
+  category: ProductCategory;
   description?: string;
   price: number;
   stock: number;
@@ -66,10 +71,12 @@ export interface Product {
   bulk_sale: boolean;
   discount_percentage: number;
   season?: string;
-  images?: ProductImage[];
+  images: ProductImage[];
+  image_urls: string[];
   gender?: string;
   colors?: string[];
   sizes?: string[];
+  store: number;
 
 }
   
@@ -181,6 +188,21 @@ export interface JobApplication {
   resume: File | null;
 }
 
+export interface StoreCategory {
+  id: number;
+  name: string;
+  image: string | null;
+  slug: string;
+}
+
+export interface StoreOpeningHour {
+  id: number;
+  day: string; // e.g., "monday"
+  from_hour: string; // "09:00 AM"
+  to_hour: string;   // "05:00 PM"
+  is_closed: boolean;
+}
+
 
 export interface Store {
   id: number;
@@ -197,10 +219,13 @@ export interface Store {
   location?: string;
   license?: string | null;
   banner?: boolean;
+  barnner: boolean;
   is_approved?: boolean;
-  category?: number | null;
   store_type?: number | null;
-  distance?: number | null; // Calculated client-side
+  distance?: number | null;
+  category: StoreCategory | null;
+  opening_hours: StoreOpeningHour[]; 
+   // Calculated client-side
 }
 
 

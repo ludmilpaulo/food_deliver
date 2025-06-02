@@ -6,14 +6,18 @@ import { aboutApi } from "./slices/aboutApi";
 import storesReducer from "./slices/storesSlice";
 import productsReducer from "./slices/productsSlice";
 import authReducer from "./slices/authSlice";
+import allStoresReducer from "./slices/allStoresSlice";
+import allProductsReducer from "./slices/allProductsSlice";
 
 export const store = configureStore({
   reducer: {
     storeTypes: storeTypeReducer,
     basket: basketReducer,
     stores: storesReducer,
+    allStores: allStoresReducer,
     products: productsReducer,
     auth: authReducer,
+    allProducts: allProductsReducer,
     [aboutApi.reducerPath]: aboutApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>

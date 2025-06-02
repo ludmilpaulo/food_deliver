@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { IoMdMenu, IoMdClose, IoMdCart, IoMdPerson } from "react-icons/io";
-import { MdStore } from "react-icons/md";
+import { MdStore, MdCategory, MdDashboard } from "react-icons/md";
+import { FiPackage } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import logo from "@/assets/azul.png";
@@ -18,17 +19,14 @@ const LANGUAGES: { value: SupportedLocale; label: string }[] = [
 
 const Navbar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [searchText, setSearchText] = useState("");
   const [lang, setLang] = useState<SupportedLocale>(getLanguage());
   const router = useRouter();
 
-  // System language detection on mount (only client-side)
   useEffect(() => {
     setLanguageFromBrowser();
     setLang(getLanguage());
   }, []);
 
-  // Update language state when changed
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setLanguage(e.target.value as SupportedLocale);
     setLang(getLanguage());
@@ -40,59 +38,56 @@ const Navbar: React.FC = () => {
 
   const toggleMenu = () => setMenuOpen((prev) => !prev);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchText.trim()) {
-      router.push(`/search?query=${encodeURIComponent(searchText)}`);
-      setSearchText("");
-      setMenuOpen(false); // Close menu on mobile
-    }
-  };
-
-  // NavLinks for DRY code (mobile & desktop)
   const navLinks = (
     <>
-      <form onSubmit={handleSearch} className="relative flex-1 max-w-xs">
-        <input
-          type="text"
-          placeholder={t("search")}
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          className="w-full px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
-          aria-label={t("search")}
-        />
-      </form>
-      <Link href="/HomeScreen" className="flex items-center text-gray-800 hover:text-blue-600 font-semibold transition px-2 py-1">
-        <MdStore size={20} className="mr-1" /> {t("Stores")}
+      <Link
+        href="/AllProducts"
+        className="flex items-center gap-1 text-gray-800 hover:bg-blue-50/60 active:bg-yellow-100 rounded-xl px-3 py-2 font-semibold transition shadow-sm hover:shadow"
+      >
+        <FiPackage size={20} className="mr-1 text-blue-700" />
+        {t("allProducts") || "All Products"}
+      </Link>
+      <Link
+        href="/StoreTypes"
+        className="flex items-center gap-1 text-gray-800 hover:bg-blue-50/60 active:bg-yellow-100 rounded-xl px-3 py-2 font-semibold transition shadow-sm hover:shadow"
+      >
+        <MdStore size={20} className="mr-1 text-yellow-500" />
+        {t("Stores")}
       </Link>
       <Link
         href="/CartPage"
-        className="relative flex items-center text-gray-800 hover:text-blue-600 font-semibold transition px-2 py-1"
+        className="relative flex items-center gap-1 text-gray-800 hover:bg-blue-50/60 active:bg-yellow-100 rounded-xl px-3 py-2 font-semibold transition shadow-sm hover:shadow"
       >
-        <span className="relative">
-          <IoMdCart size={22} />
-          {cartQuantity > 0 && (
-            <span className="absolute -top-2 -right-3 bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center shadow">
-              {cartQuantity}
-            </span>
-          )}
-        </span>
-        <span className="ml-1">{t("Cart")}</span>
+        <IoMdCart size={22} className="mr-1 text-green-700" />
+        <span>{t("Cart")}</span>
+        {cartQuantity > 0 && (
+          <span className="absolute -top-2 -right-3 bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center shadow font-bold">
+            {cartQuantity}
+          </span>
+        )}
       </Link>
       {user ? (
-        <Link href="/UserDashboard" className="flex items-center text-gray-800 hover:text-blue-600 font-semibold transition px-2 py-1">
-          <IoMdPerson size={20} className="mr-1" /> {t("Profile")}
+        <Link
+          href="/UserDashboard"
+          className="flex items-center gap-1 text-gray-800 hover:bg-blue-50/60 active:bg-yellow-100 rounded-xl px-3 py-2 font-semibold transition shadow-sm hover:shadow"
+        >
+          <IoMdPerson size={20} className="mr-1 text-indigo-700" />
+          {t("Profile")}
         </Link>
       ) : (
-        <Link href="/LoginScreenUser" className="flex items-center text-gray-800 hover:text-blue-600 font-semibold transition px-2 py-1">
-          <IoMdPerson size={20} className="mr-1" /> {t("login")}
+        <Link
+          href="/LoginScreenUser"
+          className="flex items-center gap-1 text-gray-800 hover:bg-blue-50/60 active:bg-yellow-100 rounded-xl px-3 py-2 font-semibold transition shadow-sm hover:shadow"
+        >
+          <IoMdPerson size={20} className="mr-1 text-indigo-700" />
+          {t("login")}
         </Link>
       )}
     </>
   );
 
   return (
-    <nav className="bg-gradient-to-r from-yellow-400 via-yellow-200 to-blue-700 shadow-md sticky top-0 z-50 transition">
+    <nav className="backdrop-blur-xl bg-white/60 shadow-xl sticky top-0 z-50 border-b border-slate-100">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-3">
           <Link href="/" className="flex items-center gap-2">
@@ -102,15 +97,13 @@ const Navbar: React.FC = () => {
               width={48}
               height={48}
               priority
-              className="rounded-xl shadow-md"
+              className="rounded-xl shadow-md border border-blue-200"
             />
-            <span className="text-xl font-bold text-blue-900 drop-shadow-sm hidden sm:block">Kudya</span>
+            <span className="text-2xl font-extrabold text-blue-900 drop-shadow-sm hidden sm:block">Kudya</span>
           </Link>
-
-          {/* Language selector */}
           <div className="flex items-center gap-2">
             <select
-              className="p-1 rounded bg-white/80 border border-gray-300 text-gray-800 font-semibold text-sm shadow"
+              className="p-2 rounded-xl bg-white/70 border border-gray-200 text-gray-800 font-semibold text-sm shadow focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={lang}
               onChange={handleLanguageChange}
               aria-label={t("changeLanguage")}
@@ -121,15 +114,13 @@ const Navbar: React.FC = () => {
                 </option>
               ))}
             </select>
-
             {/* Desktop nav */}
-            <div className="hidden md:flex items-center gap-4 ml-4">{navLinks}</div>
-
+            <div className="hidden md:flex items-center gap-2 ml-4">{navLinks}</div>
             {/* Hamburger for mobile */}
             <button
               onClick={toggleMenu}
               aria-label={menuOpen ? "Close menu" : "Open menu"}
-              className="md:hidden p-2 rounded-full hover:bg-blue-100 focus:outline-none transition"
+              className="md:hidden p-2 rounded-full hover:bg-blue-100 focus:outline-none shadow transition"
             >
               {menuOpen ? (
                 <IoMdClose size={28} className="text-gray-700" />
@@ -139,10 +130,9 @@ const Navbar: React.FC = () => {
             </button>
           </div>
         </div>
-
         {/* Mobile nav */}
         {menuOpen && (
-          <div className="md:hidden flex flex-col space-y-3 pb-4 animate-in fade-in-0 zoom-in-95">
+          <div className="md:hidden flex flex-col space-y-3 pb-4 animate-in fade-in-0 zoom-in-95 bg-white/95 rounded-xl shadow-lg mt-2 px-2 pt-2">
             {navLinks}
           </div>
         )}

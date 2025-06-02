@@ -50,8 +50,8 @@ const CartPage: React.FC = () => {
   const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   // Cart logic
-  const handleRemove = (itemId: number, size?: string) => {
-    dispatch(removeItem({ id: itemId, size: size || "" }));
+  const handleRemove = (item: CartItem) => {
+    dispatch(removeItem({ id: item.id, size: item.size || "", color: item.color || "" }));
   };
 
   const handleQuantityChange = (item: CartItem, diff: 1 | -1) => {
@@ -62,19 +62,27 @@ const CartPage: React.FC = () => {
           name: item.name,
           price: item.price,
           image: item.image,
-          size: item.size,
+          size: item.size || "",
+          color: item.color || "",
           store: item.store,
           quantity: 1,
         })
       );
     } else {
-      dispatch(removeItem({ id: item.id, size: item.size || "" }));
+      dispatch(removeItem({ id: item.id, size: item.size || "", color: item.color || "" }));
     }
   };
 
   // Confirm clear cart
   const confirmClearCart = () => {
-    if (window.confirm(t("Are you sure you want to remove all items from your cart?", "Tem certeza que deseja remover todos os itens do carrinho?"))) {
+    if (
+      window.confirm(
+        t(
+          "Are you sure you want to remove all items from your cart?",
+          "Tem certeza que deseja remover todos os itens do carrinho?"
+        )
+      )
+    ) {
       dispatch(clearAllCart());
     }
   };
@@ -93,7 +101,9 @@ const CartPage: React.FC = () => {
       <header className="sticky top-0 z-30 bg-white/80 border-b border-blue-200 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between px-4 py-3">
         <div className="flex items-center gap-2">
           <FaShoppingCart className="text-blue-700 text-2xl" />
-          <h1 className="text-xl font-extrabold text-blue-900 drop-shadow"> {t("Your Cart", "Seu carrinho")}</h1>
+          <h1 className="text-xl font-extrabold text-blue-900 drop-shadow">
+            {t("Your Cart", "Seu carrinho")}
+          </h1>
         </div>
         <select
           className="p-1 rounded bg-white/80 border border-gray-300 text-gray-800 font-semibold text-sm shadow ml-auto mt-2 md:mt-0"
@@ -113,7 +123,9 @@ const CartPage: React.FC = () => {
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center mt-20 mb-24">
             <MdRemoveShoppingCart className="text-6xl text-gray-300 mb-2" />
-            <div className="text-lg text-gray-400 font-semibold mb-4">{t("Your cart is empty", "Seu carrinho está vazio")}</div>
+            <div className="text-lg text-gray-400 font-semibold mb-4">
+              {t("Your cart is empty", "Seu carrinho está vazio")}
+            </div>
             <Link href="/HomeScreen">
               <button className="bg-blue-600 hover:bg-blue-700 px-8 py-3 rounded-full text-white font-semibold shadow transition">
                 {t("Go Shopping", "Comprar agora")}
@@ -124,7 +136,7 @@ const CartPage: React.FC = () => {
           <div className="flex flex-col gap-4 mb-36">
             {items.map((item, idx) => (
               <div
-                key={`${item.id}-${item.size || ""}-${item.store}-${idx}`}
+                key={`${item.id}-${item.size || ""}-${item.color || ""}-${item.store}-${idx}`}
                 className="bg-white rounded-2xl flex flex-col sm:flex-row items-center p-4 shadow-md gap-4 relative"
               >
                 <div className="w-20 h-20 relative bg-gray-100 flex-shrink-0 rounded-xl overflow-hidden flex items-center justify-center">
@@ -144,14 +156,21 @@ const CartPage: React.FC = () => {
                     <span className="text-lg font-bold truncate">{item.name}</span>
                     <button
                       className="ml-2 p-1 hover:bg-red-100 rounded"
-                      onClick={() => handleRemove(item.id, item.size)}
+                      onClick={() => handleRemove(item)}
                       aria-label={t("Remove", "Remover")}
                     >
                       <IoMdClose className="text-red-500 text-lg" />
                     </button>
                   </div>
                   {!!item.size && (
-                    <div className="text-xs text-gray-500 mt-1">{t("Size", "Tamanho")}: {item.size}</div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {t("Size", "Tamanho")}: {item.size}
+                    </div>
+                  )}
+                  {!!item.color && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      {t("Color", "Cor")}: {item.color}
+                    </div>
                   )}
                   <div className="flex items-center gap-2 mt-2">
                     <button
@@ -159,13 +178,17 @@ const CartPage: React.FC = () => {
                       onClick={() => handleQuantityChange(item, -1)}
                       aria-label={t("Decrease quantity", "Diminuir quantidade")}
                       disabled={item.quantity <= 1}
-                    >-</button>
+                    >
+                      -
+                    </button>
                     <span className="mx-2 text-lg font-semibold">{item.quantity}</span>
                     <button
                       className="bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center text-xl font-bold hover:bg-blue-100 transition"
                       onClick={() => handleQuantityChange(item, 1)}
                       aria-label={t("Increase quantity", "Aumentar quantidade")}
-                    >+</button>
+                    >
+                      +
+                    </button>
                   </div>
                 </div>
                 <div className="flex flex-col items-end min-w-[5rem]">
@@ -174,7 +197,7 @@ const CartPage: React.FC = () => {
                   </span>
                   <button
                     className="mt-3 text-xs text-red-500 font-semibold hover:underline"
-                    onClick={() => handleRemove(item.id, item.size)}
+                    onClick={() => handleRemove(item)}
                   >
                     {t("Remove", "Remover")}
                   </button>
@@ -190,8 +213,12 @@ const CartPage: React.FC = () => {
         <footer className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-2xl z-50">
           <div className="max-w-3xl mx-auto px-4 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div className="flex items-center gap-2">
-              <span className="text-lg font-extrabold text-gray-800">{t("Total:", "Total:")}</span>
-              <span className="text-xl font-extrabold text-blue-700">{formatCurrency(total, currencyCode, language)}</span>
+              <span className="text-lg font-extrabold text-gray-800">
+                {t("Total:", "Total:")}
+              </span>
+              <span className="text-xl font-extrabold text-blue-700">
+                {formatCurrency(total, currencyCode, language)}
+              </span>
             </div>
             <div className="flex gap-3">
               <button

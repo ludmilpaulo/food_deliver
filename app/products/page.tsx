@@ -11,8 +11,8 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { getCurrencyForCountry, formatCurrency } from "@/utils/currency";
 import { Product } from "@/services/types";
 
-// --- Types for per-product selection ---
 type ProductSelections = Record<number, { size: string | null; color: string | null }>;
+type SelectionPrompt = { [productId: number]: string | null };
 
 export default function ProductsPage() {
   const dispatch = useAppDispatch();
@@ -30,12 +30,12 @@ export default function ProductsPage() {
 
   // Per-product selection (size/color per product)
   const [productSelections, setProductSelections] = useState<ProductSelections>({});
+  const [selectionPrompt, setSelectionPrompt] = useState<SelectionPrompt>({});
 
   // UI search/filter
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  // --- Load products on storeId change ---
   useEffect(() => {
     if (typeof storeId === "number" && !Number.isNaN(storeId)) {
       dispatch(fetchProductsByStore(storeId));
@@ -64,7 +64,7 @@ export default function ProductsPage() {
     return filtered;
   }, [products, search, selectedCategory]);
 
-  // --- On-sale promo banners ---
+  // --- Promo banners ---
   const onSaleProducts = useMemo(
     () => products.filter((p) => p.on_sale && p.discount_percentage > 0),
     [products]
@@ -86,41 +86,48 @@ export default function ProductsPage() {
     typeof window !== "undefined" ? navigator.language.split("-")[1] || "ZA" : "ZA";
   const currencyCode = getCurrencyForCountry(regionCode);
 
-  // --- Per-product selection helpers ---
+  // --- Helpers ---
   const getSelection = (productId: number) =>
     productSelections[productId] || { size: null, color: null };
 
-  const handleSelectSize = (productId: number, size: string) => {
-    setProductSelections((prev) => ({
-      ...prev,
-      [productId]: { ...getSelection(productId), size, color: null }
-    }));
-  };
-
-  const handleSelectColor = (productId: number, color: string) => {
-    setProductSelections((prev) => ({
-      ...prev,
-      [productId]: { ...getSelection(productId), color }
-    }));
-  };
-
-  const handleAddToCart = (productId: number) => {
-    setProductSelections((prev) => ({
-      ...prev,
-      [productId]: { size: null, color: null }
-    }));
-  };
-
-  // --- Cart item lookup (id+size+color uniqueness) ---
-  const getCartItem = (productId: number, size: string | null, color: string | null) =>
+  const getCartItem = (
+    productId: number,
+    size: string | null,
+    color: string | null
+  ) =>
     cartItems.find(
-      (item: any) =>
+      (item) =>
         item.id === productId &&
         (item.size || "") === (size || "") &&
         (item.color || "") === (color || "")
     );
 
-  // --- Add/Remove quantity logic ---
+  // Selection Handlers
+  const startAddToCart = (productId: number) => {
+    setProductSelections((prev) => ({
+      ...prev,
+      [productId]: { size: null, color: null },
+    }));
+    setSelectionPrompt((prev) => ({ ...prev, [productId]: null }));
+  };
+
+  const handleSelectSize = (productId: number, size: string) => {
+    setProductSelections((prev) => ({
+      ...prev,
+      [productId]: { ...getSelection(productId), size },
+    }));
+    setSelectionPrompt((prev) => ({ ...prev, [productId]: null }));
+  };
+
+  const handleSelectColor = (productId: number, color: string) => {
+    setProductSelections((prev) => ({
+      ...prev,
+      [productId]: { ...getSelection(productId), color },
+    }));
+    setSelectionPrompt((prev) => ({ ...prev, [productId]: null }));
+  };
+
+  // Add/Remove Quantity
   const handleChangeQuantity = (
     change: 1 | -1,
     product: Product,
@@ -151,25 +158,57 @@ export default function ProductsPage() {
         })
       );
     } else if (cartItem) {
-      dispatch(removeItem({ id: product.id, size: size || "", color: color || "" }));
-      if (cartItem.quantity === 1) {
-        setProductSelections((prev) => {
-          const updated = { ...prev };
-          delete updated[product.id];
-          return updated;
-        });
-      }
+      dispatch(
+        removeItem({ id: product.id, size: size || "", color: color || "" })
+      );
     }
   };
 
-  // --- Is product in cart? (any variant) ---
-  const isProductInCart = (product: Product) =>
-    cartItems.some((item: any) => item.id === product.id);
+  // Confirm Add To Cart
+  const handleConfirmAddToCart = (
+    product: Product,
+    selectedSize: string | null,
+    selectedColor: string | null
+  ) => {
+    // Validation: size, then color if needed
+    if (product.sizes?.length && !selectedSize) {
+      setSelectionPrompt((prev) => ({
+        ...prev,
+        [product.id]: t("selectSize") || "Please select size",
+      }));
+      return;
+    }
+    if (product.colors?.length && !selectedColor) {
+      setSelectionPrompt((prev) => ({
+        ...prev,
+        [product.id]: t("selectColor") || "Please select color",
+      }));
+      return;
+    }
+    // Add to cart
+    dispatch(
+      addItem({
+        id: product.id,
+        name: product.name,
+        price:
+          product.on_sale && product.discount_percentage > 0
+            ? product.price - (product.price * product.discount_percentage) / 100
+            : product.price,
+        image: product.images?.[0]?.image,
+        size: selectedSize || "",
+        color: selectedColor || "",
+        store: storeId,
+        quantity: 1,
+      })
+    );
+    // Clear prompt and (optional) selection
+    setSelectionPrompt((prev) => ({ ...prev, [product.id]: null }));
+  };
 
-  // --- UI ---
+  // Render
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-yellow-300 via-yellow-200 to-blue-400">
-      {/* Carousel: Sales Banners */}
+      {/* Carousel */}
       {promoBanners.length > 0 && (
         <div className="mb-6 px-4">
           <Carousel
@@ -283,11 +322,14 @@ export default function ProductsPage() {
 
             const { size: selectedSize, color: selectedColor } = getSelection(product.id);
             const cartItem = getCartItem(product.id, selectedSize, selectedColor);
-            const alreadyInCart = isProductInCart(product);
 
-            // --- Control per-product add/select/qty ---
+            // Selection requirements
             const needsSize = product.sizes && product.sizes.length > 0 && !selectedSize;
-            const needsColor = product.colors && product.colors.length > 0 && ((product.sizes?.length > 0 && selectedSize && !selectedColor) || (product.sizes?.length === 0 && !selectedColor));
+            const needsColor =
+              product.colors &&
+              product.colors.length > 0 &&
+              ((product.sizes?.length > 0 && selectedSize && !selectedColor) ||
+                (product.sizes?.length === 0 && !selectedColor));
             const canChangeQty =
               (product.sizes?.length > 0 ? !!selectedSize : true) &&
               (product.colors?.length > 0 ? !!selectedColor : true);
@@ -346,95 +388,154 @@ export default function ProductsPage() {
                   </span>
                 </div>
 
-                {/* Add to Cart Flow */}
-                {!alreadyInCart && !disableAddToCart && (
+                {/* --- ADD TO CART LOGIC --- */}
+                {!disableAddToCart && (
                   <>
-                    {/* 1. Start Add to Cart */}
-                    {!productSelections[product.id] && (
+                    {/* Step 1: Add to cart button */}
+                    {!productSelections[product.id] && !cartItem && (
                       <button
                         className="bg-green-600 w-full py-2 rounded-lg text-white font-bold mt-1"
-                        onClick={() => handleAddToCart(product.id)}
+                        onClick={() => startAddToCart(product.id)}
                         disabled={disableAddToCart}
                       >
                         {t("addToCart")}
                       </button>
                     )}
 
-                    {/* 2. Select Size */}
+                    {/* Step 2: Size selection */}
                     {productSelections[product.id] && needsSize && (
-                      <div className="flex flex-wrap mt-2 gap-2">
-                        {product.sizes.map((size: string) => (
+                      <>
+                        <div className="mb-2 text-sm font-medium text-yellow-600">
+                          {selectionPrompt[product.id] ?? t("selectSize")}
+                        </div>
+                        <div className="flex flex-wrap mt-2 gap-2">
+                          {product.sizes.map((size: string) => (
+                            <button
+                              key={size}
+                              className={`px-4 py-2 rounded-full border m-1 font-bold ${
+                                selectedSize === size
+                                  ? "bg-black border-black text-white"
+                                  : "bg-white border-gray-300 text-gray-800"
+                              }`}
+                              onClick={() => handleSelectSize(product.id, size)}
+                            >
+                              {size}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+
+                    {/* Step 3: Color selection */}
+                    {productSelections[product.id] && !needsSize && needsColor && (
+                      <>
+                        <div className="mb-2 text-sm font-medium text-yellow-600">
+                          {selectionPrompt[product.id] ?? t("selectColor")}
+                        </div>
+                        <div className="flex flex-wrap mt-2 gap-2">
+                          {product.colors.map((color: string) => (
+                            <button
+                              key={color}
+                              className={`px-4 py-2 rounded-full border m-1 font-bold ${
+                                selectedColor === color
+                                  ? "bg-pink-600 border-pink-600 text-white"
+                                  : "bg-white border-gray-300 text-gray-800"
+                              }`}
+                              onClick={() => handleSelectColor(product.id, color)}
+                            >
+                              {color}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+
+                    {/* Step 4: Quantity controls and Confirm Add to Cart */}
+                    {productSelections[product.id] && canChangeQty && !cartItem && (
+                      <div className="flex flex-col gap-2 mt-3">
+                        <div className="flex items-center justify-center">
                           <button
-                            key={size}
-                            className={`px-4 py-2 rounded-full border m-1 font-bold ${
-                              selectedSize === size
-                                ? "bg-black border-black text-white"
-                                : "bg-white border-gray-300 text-gray-800"
-                            }`}
-                            onClick={() => handleSelectSize(product.id, size)}
+                            className="bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center"
+                            onClick={() =>
+                              handleChangeQuantity(
+                                -1,
+                                product,
+                                selectedSize,
+                                selectedColor
+                              )
+                            }
+                            disabled={true} // can't go below 1 when adding new
                           >
-                            {size}
+                            <span className="text-xl font-bold">-</span>
                           </button>
-                        ))}
+                          <span className="mx-6 text-lg font-bold">1</span>
+                          <button
+                            className="bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center"
+                            onClick={() =>
+                              handleChangeQuantity(
+                                1,
+                                product,
+                                selectedSize,
+                                selectedColor
+                              )
+                            }
+                            disabled={false}
+                          >
+                            <span className="text-xl font-bold">+</span>
+                          </button>
+                        </div>
+                        <button
+                          className="bg-green-600 w-full py-2 rounded-lg text-white font-bold"
+                          onClick={() =>
+                            handleConfirmAddToCart(product, selectedSize, selectedColor)
+                          }
+                        >
+                          {t("addToCart")}
+                        </button>
+                        {selectionPrompt[product.id] && (
+                          <div className="text-xs text-red-600 text-center">
+                            {selectionPrompt[product.id]}
+                          </div>
+                        )}
                       </div>
                     )}
 
-                    {/* 3. Select Color */}
-                    {productSelections[product.id] && needsColor && (
-                      <div className="flex flex-wrap mt-2 gap-2">
-                        {product.colors.map((color: string) => (
-                          <button
-                            key={color}
-                            className={`px-4 py-2 rounded-full border m-1 font-bold ${
-                              selectedColor === color
-                                ? "bg-pink-600 border-pink-600 text-white"
-                                : "bg-white border-gray-300 text-gray-800"
-                            }`}
-                            onClick={() => handleSelectColor(product.id, color)}
-                          >
-                            {color}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* 4. Plus/Minus */}
-                    {productSelections[product.id] && canChangeQty && (
+                    {/* Step 5: Variant is already in cart: show quantity and go to cart */}
+                    {cartItem && canChangeQty && (
                       <div className="flex items-center justify-center mt-2">
                         <button
                           className="bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center"
                           onClick={() =>
                             handleChangeQuantity(-1, product, selectedSize, selectedColor)
                           }
-                          disabled={!cartItem || cartItem.quantity <= 0}
+                          disabled={cartItem.quantity <= 1}
                         >
                           <span className="text-xl font-bold">-</span>
                         </button>
-                        <span className="mx-6 text-lg font-bold">
-                          {cartItem?.quantity || 1}
-                        </span>
+                        <span className="mx-6 text-lg font-bold">{cartItem.quantity}</span>
                         <button
                           className="bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center"
                           onClick={() =>
                             handleChangeQuantity(1, product, selectedSize, selectedColor)
                           }
-                          disabled={!!cartItem && cartItem.quantity >= product.stock}
+                          disabled={cartItem.quantity >= product.stock}
                         >
                           <span className="text-xl font-bold">+</span>
+                        </button>
+                        <button
+                          className="ml-4 bg-blue-600 px-4 py-2 rounded-lg text-white font-bold"
+                          onClick={() => router.push("/CartPage")}
+                        >
+                          {t("goToCart")}
                         </button>
                       </div>
                     )}
                   </>
                 )}
-
-                {/* Show "Go to Cart" if in cart */}
-                {alreadyInCart && (
-                  <button
-                    className="bg-blue-600 w-full py-2 rounded-lg text-white font-bold mt-1"
-                    onClick={() => router.push("/cart")}
-                  >
-                    {t("goToCart")}
-                  </button>
+                {disableAddToCart && (
+                  <div className="text-center text-gray-400 font-semibold mt-2">
+                    {t("outOfStock")}
+                  </div>
                 )}
               </div>
             );

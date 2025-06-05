@@ -11,13 +11,13 @@ const CustomersList = dynamic(() => import("./CustomersList"));
 const Report = dynamic(() => import("./Report"));
 const DriverList = dynamic(() => import("./DriverList"));
 const Orders = dynamic(() => import("./Orders"));
-const store = dynamic(() => import("./store"));
-const MealList = dynamic(() => import("./store/MealList"));
+const Store = dynamic(() => import("./Store"));
+const ProductList = dynamic(() => import("./store/ProductList"));
 const DatabaseActions = dynamic(() => import("./DatabaseActions"));
 
 const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, onToggle }) => {
   const [showProducts, setShowProducts] = useState(false);
-  const [showMeals, setShowMeals] = useState(false);
+  const [showproducts, setShowproducts] = useState(false);
   const [showOrders, setShowOrders] = useState(false);
   const [showstore, setShowstore] = useState(false);
   const [showReport, setShowReport] = useState(false);
@@ -79,7 +79,7 @@ const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, 
                     setShowReport(false);
                     setListOfCustomer(false);
                     setListOfDriver(false);
-                    setShowMeals(false);
+                    setShowproducts(false);
                     setShowDatabaseActions(false);
                     onToggle();
                   }}
@@ -100,7 +100,7 @@ const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, 
                     setShowReport(false);
                     setListOfCustomer(false);
                     setListOfDriver(false);
-                    setShowMeals(true);
+                    setShowproducts(true);
                     setShowDatabaseActions(false);
                     onToggle();
                   }}
@@ -121,7 +121,7 @@ const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, 
                     setShowReport(false);
                     setListOfCustomer(false);
                     setListOfDriver(false);
-                    setShowMeals(false);
+                    setShowproducts(false);
                     setShowDatabaseActions(false);
                     onToggle();
                   }}
@@ -142,7 +142,7 @@ const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, 
                     setShowReport(true);
                     setListOfCustomer(false);
                     setListOfDriver(false);
-                    setShowMeals(false);
+                    setShowproducts(false);
                     setShowDatabaseActions(false);
                     onToggle();
                   }}
@@ -163,7 +163,7 @@ const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, 
                     setShowReport(false);
                     setListOfCustomer(true);
                     setListOfDriver(false);
-                    setShowMeals(false);
+                    setShowproducts(false);
                     setShowDatabaseActions(false);
                     onToggle();
                   }}
@@ -184,7 +184,7 @@ const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, 
                     setShowReport(false);
                     setListOfCustomer(false);
                     setListOfDriver(true);
-                    setShowMeals(false);
+                    setShowproducts(false);
                     setShowDatabaseActions(false);
                     onToggle();
                   }}
@@ -205,7 +205,7 @@ const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, 
                     setShowReport(false);
                     setListOfCustomer(false);
                     setListOfDriver(false);
-                    setShowMeals(false);
+                    setShowproducts(false);
                     setShowDatabaseActions(false);
                     onToggle();
                   }}
@@ -226,7 +226,7 @@ const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, 
                     setShowReport(false);
                     setListOfCustomer(false);
                     setListOfDriver(false);
-                    setShowMeals(false);
+                    setShowproducts(false);
                     setShowDatabaseActions(true);
                     onToggle();
                   }}
@@ -263,9 +263,9 @@ const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, 
           </nav>
         </div>
         <div className="flex-1 overflow-y-auto bg-gray-100">
-          {showMeals && <MealList />}
+          {showproducts && <ProductList />}
           {showOrders && <Orders />}
-          {showstore && <store />}
+          {showstore && <Store />}
           {showReport && <Report />}
           {listOfCustomer && <CustomersList />}
           {listOfDriver && <DriverList />}

@@ -8,7 +8,7 @@ import { Transition } from '@headlessui/react';
 import { addItem, removeItem } from '@/redux/slices/basketSlice';
 import { baseAPI } from '@/services/types';
 
-type Meal = {
+type product = {
   id: number;
   image_url: string;
   name: string;
@@ -24,7 +24,7 @@ type Category = string;
 const storeMenu: React.FC = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [meals, setMeals] = useState<Meal[]>([]);
+  const [products, setproducts] = useState<product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -34,37 +34,37 @@ const storeMenu: React.FC = () => {
 
   useEffect(() => {
     if (store_id) {
-      fetch(`${baseAPI}/customer/customer/meals/${store_id}/`)
+      fetch(`${baseAPI}/customer/customer/products/${store_id}/`)
         .then((response) => response.json())
         .then((data) => {
-          setMeals(data.meals);
-          const uniqueCategories = Array.from(new Set<string>(data.meals.map((meal: Meal) => meal.category)));
+          setproducts(data.products);
+          const uniqueCategories = Array.from(new Set<string>(data.products.map((product: product) => product.category)));
           setCategories(uniqueCategories);
           setLoading(false);
         })
         .catch((error) => {
-          console.error('Error fetching meals:', error);
+          console.error('Error fetching products:', error);
           setLoading(false);
         });
     }
   }, [store_id]);
 
-  const filteredMeals = selectedCategory
-    ? meals.filter((meal) => meal.category === selectedCategory)
-    : meals;
+  const filteredproducts = selectedCategory
+    ? products.filter((product) => product.category === selectedCategory)
+    : products;
 
-  const handleAddToCart = (meal: Meal) => {
-    dispatch(addItem(meal));
+  const handleAddToCart = (product: product) => {
+    dispatch(addItem(product));
   };
 
-  const handleRemoveFromCart = (mealId: number) => {
-    dispatch(removeItem(mealId));
+  const handleRemoveFromCart = (productId: number) => {
+    dispatch(removeItem(productId));
   };
 
-  const isInCart = (mealId: number) => cartItems.some((item) => item.id === mealId);
+  const isInCart = (productId: number) => cartItems.some((item) => item.id === productId);
 
-  const handleViewDetails = (meal: Meal) => {
-    sessionStorage.setItem('selectedMeal', JSON.stringify(meal));
+  const handleViewDetails = (product: product) => {
+    sessionStorage.setItem('selectedproduct', JSON.stringify(product));
     router.push(`/FoodDetailsPage`);
   };
 
@@ -112,32 +112,32 @@ const storeMenu: React.FC = () => {
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredMeals.map((meal) => (
-              <div key={meal.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                <Image src={meal.image_url} alt={meal.name} width={400} height={300} className="w-full h-48 object-cover" />
+            {filteredproducts.map((product) => (
+              <div key={product.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                <Image src={product.image_url} alt={product.name} width={400} height={300} className="w-full h-48 object-cover" />
                 <div className="p-4">
-                  <h2 className="text-2xl font-semibold text-gray-800">{meal.name}</h2>
-                  <p className="text-gray-600">{meal.short_description.length > 100 ? `${meal.short_description.substring(0, 100)}...` : meal.short_description}</p>
-                  <p className="text-gray-800 font-bold">Preço: {meal.price} Kz</p>
+                  <h2 className="text-2xl font-semibold text-gray-800">{product.name}</h2>
+                  <p className="text-gray-600">{product.short_description.length > 100 ? `${product.short_description.substring(0, 100)}...` : product.short_description}</p>
+                  <p className="text-gray-800 font-bold">Preço: {product.price} Kz</p>
                   <div className="flex items-center mt-4">
                     <button
                       className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700"
-                      onClick={() => handleAddToCart(meal)}
+                      onClick={() => handleAddToCart(product)}
                     >
                       +
                     </button>
                     <span className="mx-4 text-gray-800 font-semibold">
-                      {cartItems.find((item) => item.id === meal.id)?.quantity || 0}
+                      {cartItems.find((item) => item.id === product.id)?.quantity || 0}
                     </span>
                     <button
                       className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700"
-                      onClick={() => handleRemoveFromCart(meal.id)}
+                      onClick={() => handleRemoveFromCart(product.id)}
                     >
                       -
                     </button>
                   </div>
                   <div className="mt-4">
-                    {isInCart(meal.id) ? (
+                    {isInCart(product.id) ? (
                       <button
                         className="px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700"
                         onClick={() => router.push('/CartPage')}
@@ -147,7 +147,7 @@ const storeMenu: React.FC = () => {
                     ) : (
                       <button
                         className="px-4 py-2 bg-gray-600 text-white rounded-full hover:bg-gray-700"
-                        onClick={() => handleViewDetails(meal)}
+                        onClick={() => handleViewDetails(product)}
                       >
                         Ver a refeição
                       </button>

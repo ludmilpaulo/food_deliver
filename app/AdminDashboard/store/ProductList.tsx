@@ -2,22 +2,22 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Transition } from '@headlessui/react';
-import { baseAPI, Meal } from '@/services/types';
-import { getMeals } from '@/services/managerService';
+import { baseAPI, Product } from '@/services/types';
+import { getproducts } from '@/services/managerService';
 
-const MealList: React.FC = () => {
-  const [meals, setMeals] = useState<Meal[]>([]);
+const ProductList: React.FC = () => {
+  const [products, setproducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedstore, setSelectedstore] = useState<string>('');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000]); // Updated range to ensure wide coverage
 
   useEffect(() => {
-    const fetchMeals = async () => {
+    const fetchproducts = async () => {
       try {
-        const mealData = await getMeals();
-        console.log('Fetched Meals:', mealData); // Debugging log
-        setMeals(mealData);
+        const productData = await getproducts();
+        console.log('Fetched products:', productData); // Debugging log
+        setproducts(productData);
       } catch (error) {
         console.error('Erro ao buscar refeições:', error);
       } finally {
@@ -25,20 +25,20 @@ const MealList: React.FC = () => {
       }
     };
 
-    fetchMeals();
+    fetchproducts();
   }, []);
 
-  const filteredMeals = meals.filter(meal => {
-    const matchesSearch = meal.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesstore = selectedstore === '' || meal.store_name === selectedstore;
-    const matchesPrice = meal.price_with_markup >= priceRange[0] && meal.price_with_markup <= priceRange[1];
+  const filteredproducts = products.filter(product => {
+    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesstore = selectedstore === '' || product.store_name === selectedstore;
+    const matchesPrice = product.price_with_markup >= priceRange[0] && product.price_with_markup <= priceRange[1];
 
     return matchesSearch && matchesstore && matchesPrice;
   });
 
-  const uniquestores = Array.from(new Set(meals.map(meal => meal.store_name)));
+  const uniquestores = Array.from(new Set(products.map(product => product.store_name)));
 
-  console.log('Filtered Meals:', filteredMeals); // Debugging log
+  console.log('Filtered products:', filteredproducts); // Debugging log
 
   return (
     <>
@@ -98,8 +98,8 @@ const MealList: React.FC = () => {
           </div>
 
           <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filteredMeals.length > 0 ? (
-              filteredMeals.map((meal, index) => (
+            {filteredproducts.length > 0 ? (
+              filteredproducts.map((product, index) => (
                 <motion.li
                   key={index}
                   whileHover={{ scale: 1.05 }}
@@ -107,13 +107,13 @@ const MealList: React.FC = () => {
                   className="p-4 rounded shadow-lg hover:bg-blue-100 cursor-pointer bg-white"
                 >
                   <div className="flex flex-col items-center">
-                    <Image src={`${baseAPI}${meal.image}`} alt={meal.name} width={100} height={100} className="rounded mb-2" />
+                    <Image src={`${baseAPI}${product.image}`} alt={product.name} width={100} height={100} className="rounded mb-2" />
                     <div className="text-center">
-                      <h3 className="text-lg font-semibold">{meal.name}</h3>
-                      <p className="text-gray-500">{meal.short_description}</p>
-                      <p className="text-gray-700">storee: {meal.store_name}</p>
-                      <p className="text-gray-700">Preço Original: {meal.original_price.toFixed(2)} Kz</p>
-                      <p className="text-gray-900 font-bold">Preço com Acréscimo: {meal.price_with_markup.toFixed(2)} Kz</p>
+                      <h3 className="text-lg font-semibold">{product.name}</h3>
+                      <p className="text-gray-500">{product.short_description}</p>
+                      <p className="text-gray-700">storee: {product.store_name}</p>
+                      <p className="text-gray-700">Preço Original: {product.original_price.toFixed(2)} Kz</p>
+                      <p className="text-gray-900 font-bold">Preço com Acréscimo: {product.price_with_markup.toFixed(2)} Kz</p>
                     </div>
                   </div>
                 </motion.li>
@@ -130,4 +130,4 @@ const MealList: React.FC = () => {
   );
 };
 
-export default MealList;
+export default ProductList;

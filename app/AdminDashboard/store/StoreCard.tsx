@@ -1,16 +1,16 @@
 import React from "react";
 import Image from "next/image";
-import { storeType } from "@/services/types";
+import { Store } from "@/services/types";
 
-interface storeCardProps {
-  store: storeType;
+interface StoreCardProps {
+  store: Store;
   onActivate: (id: number) => void;
   onDeactivate: (id: number) => void;
-  onEdit: (store: storeType) => void;
+  onEdit: (store: Store) => void;
   onDelete: (id: number) => void;
 }
 
-const storeCard: React.FC<storeCardProps> = ({ store, onActivate, onDeactivate, onEdit, onDelete }) => {
+const StoreCard: React.FC<StoreCardProps> = ({ store, onActivate, onDeactivate, onEdit, onDelete }) => {
   return (
     <div className="mb-4 p-4 border rounded-lg">
       <div className="flex items-center">
@@ -52,4 +52,4 @@ const storeCard: React.FC<storeCardProps> = ({ store, onActivate, onDeactivate, 
   );
 };
 
-export default storeCard;
+export default StoreCard;

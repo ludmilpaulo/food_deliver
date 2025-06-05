@@ -99,7 +99,7 @@ const Order: React.FC = () => {
                         <td className="px-4 py-2 border">
                           {order.order_details.map((od, index) => (
                             <span key={od.id}>
-                              {od.meal.name} {od.meal.price} x {od.quantity} = {od.sub_total}kz
+                              {od.product.name} {od.product.price} x {od.quantity} = {od.sub_total}kz
                               {index < order.order_details.length - 1 && <br />}
                             </span>
                           ))}

@@ -6,6 +6,10 @@ import { loginUserService } from "../../services/authService"; // adjust as need
 export interface User {
   user_id: number;
   username: string;
+  name?: string; // Optional, as it might not be returned in all cases
+  phone?: string; // Optional, as it might not be returned in all cases
+  email?: string; // Optional, as it might not be returned in all cases
+  token: string; // Optional, as it might not be returned in all cases
   is_customer: boolean;
   is_driver: boolean;
 }
@@ -13,6 +17,8 @@ export interface User {
 export interface AuthState {
   user: User | null;
   token: string | null;
+  user_id: number | null;
+  username: string | null;
   loading: boolean;
   error: string | null;
   message: string | null;
@@ -21,6 +27,8 @@ export interface AuthState {
 const initialState: AuthState = {
   user: null,
   token: null,
+  user_id: null,
+  username: null,
   loading: false,
   error: null,
   message: null,
@@ -53,6 +61,8 @@ const authSlice = createSlice({
     logoutUser(state) {
       state.user = null;
       state.token = null;
+      state.user_id = null;
+      state.username = null;
       state.loading = false;
       state.error = null;
       state.message = null;
@@ -76,9 +86,12 @@ const authSlice = createSlice({
           state.user = {
             user_id: action.payload.user_id,
             username: action.payload.username,
+            token: action.payload.token,
             is_customer: action.payload.is_customer,
             is_driver: action.payload.is_driver,
           };
+          state.user_id = action.payload.user_id;
+          state.username = action.payload.username;
           state.message = action.payload.message || "Login com sucesso";
         } else {
           state.error = "Login failed";

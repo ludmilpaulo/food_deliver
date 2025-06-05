@@ -33,7 +33,7 @@ export type UserDetails = {
     id: number;
     order_details: {
       id: number;
-      meal: {
+      product: {
         name: string;
         price: number;
       };
@@ -63,7 +63,7 @@ export interface Product {
   id: number;
   store_id: number;
   name: string;
-  category: ProductCategory;
+  category: string | ProductCategory;
   description?: string;
   price: number;
   stock: number;
@@ -72,7 +72,7 @@ export interface Product {
   discount_percentage: number;
   season?: string;
   images: ProductImage[];
-  image_urls: string[];
+  image_url: string[];
   gender?: string;
   colors?: string[];
   sizes?: string[];

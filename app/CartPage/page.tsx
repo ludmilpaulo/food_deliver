@@ -80,8 +80,8 @@ const CartPage: React.FC = () => {
     if (
       window.confirm(
         t(
-          "Are you sure you want to remove all items from your cart?",
-          "Tem certeza que deseja remover todos os itens do carrinho?"
+          "Are you sure you want to remove all items from your cart?"
+          
         )
       )
     ) {
@@ -104,14 +104,14 @@ const CartPage: React.FC = () => {
         <div className="flex items-center gap-2">
           <FaShoppingCart className="text-blue-700 text-2xl" />
           <h1 className="text-xl font-extrabold text-blue-900 drop-shadow">
-            {t("Your Cart", "Seu carrinho")}
+            {t("YourCart")}
           </h1>
         </div>
         <select
           className="p-1 rounded bg-white/80 border border-gray-300 text-gray-800 font-semibold text-sm shadow ml-auto mt-2 md:mt-0"
           value={lang}
           onChange={handleLanguageChange}
-          aria-label={t("changeLanguage", "Change language")}
+          aria-label={t("changeLanguage")}
         >
           {LANGUAGES.map((langOpt) => (
             <option key={langOpt.value} value={langOpt.value}>
@@ -126,11 +126,11 @@ const CartPage: React.FC = () => {
           <div className="flex flex-col items-center justify-center mt-20 mb-24">
             <MdRemoveShoppingCart className="text-6xl text-gray-300 mb-2" />
             <div className="text-lg text-gray-400 font-semibold mb-4">
-              {t("Your cart is empty", "Seu carrinho está vazio")}
+              {t("Your cart is empty")}
             </div>
             <Link href="/HomeScreen">
               <button className="bg-blue-600 hover:bg-blue-700 px-8 py-3 rounded-full text-white font-semibold shadow transition">
-                {t("Go Shopping", "Comprar agora")}
+                {t("Go Shopping")}
               </button>
             </Link>
           </div>
@@ -159,26 +159,26 @@ const CartPage: React.FC = () => {
                     <button
                       className="ml-2 p-1 hover:bg-red-100 rounded"
                       onClick={() => handleRemoveLine(item)}
-                      aria-label={t("Remove", "Remover")}
+                      aria-label={t("Remove")}
                     >
                       <IoMdClose className="text-red-500 text-lg" />
                     </button>
                   </div>
                   {!!item.size && (
                     <div className="text-xs text-gray-500 mt-1">
-                      {t("Size", "Tamanho")}: {item.size}
+                      {t("size")}: {item.size}
                     </div>
                   )}
                   {!!item.color && (
                     <div className="text-xs text-gray-500 mt-1">
-                      {t("Color", "Cor")}: {item.color}
+                      {t("color")}: {item.color}
                     </div>
                   )}
                   <div className="flex items-center gap-2 mt-2">
                     <button
                       className="bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center text-xl font-bold hover:bg-blue-100 transition"
                       onClick={() => handleQuantityChange(item, -1)}
-                      aria-label={t("Decrease quantity", "Diminuir quantidade")}
+                      aria-label={t("Decrease quantity")}
                       disabled={item.quantity <= 1}
                     >
                       -
@@ -187,7 +187,7 @@ const CartPage: React.FC = () => {
                     <button
                       className="bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center text-xl font-bold hover:bg-blue-100 transition"
                       onClick={() => handleQuantityChange(item, 1)}
-                      aria-label={t("Increase quantity", "Aumentar quantidade")}
+                      aria-label={t("Increase quantity")}
                     >
                       +
                     </button>
@@ -201,7 +201,7 @@ const CartPage: React.FC = () => {
                     className="mt-3 text-xs text-red-500 font-semibold hover:underline"
                     onClick={() => handleRemoveLine(item)}
                   >
-                    {t("Remove", "Remover")}
+                    {t("Remove")}
                   </button>
                 </div>
               </div>
@@ -216,7 +216,7 @@ const CartPage: React.FC = () => {
           <div className="max-w-3xl mx-auto px-4 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div className="flex items-center gap-2">
               <span className="text-lg font-extrabold text-gray-800">
-                {t("Total:", "Total:")}
+             Total:
               </span>
               <span className="text-xl font-extrabold text-blue-700">
                 {formatCurrency(total, currencyCode, language)}
@@ -227,13 +227,13 @@ const CartPage: React.FC = () => {
                 className="bg-blue-600 hover:bg-blue-700 py-3 px-8 rounded-xl text-white font-bold shadow transition"
                 onClick={handleCheckout}
               >
-                {t("Proceed to Checkout", "Finalizar Compra")}
+                {t("Proceed to Checkout")}
               </button>
               <button
                 className="bg-red-100 text-red-500 hover:bg-red-200 py-3 px-5 rounded-xl font-semibold transition"
                 onClick={confirmClearCart}
               >
-                {t("Clear Cart", "Esvaziar carrinho")}
+                {t("Clear Cart")}
               </button>
             </div>
           </div>

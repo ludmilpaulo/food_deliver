@@ -38,7 +38,7 @@ export const fetchFornecedorData = async (userId: number): Promise<FornecedorTyp
 
 
 export const fetchCategorias = async (): Promise<Categoria[]> => {
-  const response = await fetch(`${baseAPI}/store/meal-categories/`);
+  const response = await fetch(`${baseAPI}/store/product-categories/`);
   if (!response.ok) {
     throw new Error("Failed to fetch categories");
   }

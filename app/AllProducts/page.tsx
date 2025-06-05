@@ -15,7 +15,6 @@ import {
   FaMars,
   FaVenus,
   FaGenderless,
-  FaCheckCircle,
 } from "react-icons/fa";
 import { getUserRegion } from "@/utils/region";
 
@@ -38,7 +37,11 @@ const BrowseProductsPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [userRegion, setUserRegion] = useState<string>("ZA");
 
-  // Unique filters
+  // Currency/Locale
+  const language = typeof window !== "undefined" ? navigator.language.split("-")[0] : "en";
+  const regionCode = userRegion || "ZA";
+
+  // Unique filter options
   const categories = useMemo(
     () =>
       Array.from(
@@ -68,7 +71,7 @@ const BrowseProductsPage: React.FC = () => {
   // Filtering logic
   const filteredProducts = useMemo(() => {
     let res = allProducts.filter((p) => {
-      // Search by name or description (case-insensitive)
+      // Search by name or description
       const q = search.trim().toLowerCase();
       let matchesSearch =
         p.name?.toLowerCase().includes(q) ||
@@ -99,7 +102,7 @@ const BrowseProductsPage: React.FC = () => {
         !size ||
         (Array.isArray(p.sizes) && p.sizes.includes(size));
 
-      // Color (assume string for colors, adapt as needed)
+      // Color
       let matchesColor =
         !color ||
         (Array.isArray(p.colors) && p.colors.includes(color));
@@ -179,7 +182,7 @@ const BrowseProductsPage: React.FC = () => {
         </h1>
 
         {/* Filter UI */}
-        <div className="flex flex-wrap items-center gap-4 bg-white/40 rounded-2xl shadow px-4 py-4 mb-8 glassmorphism">
+        <div className="flex flex-wrap items-center gap-4 bg-white/60 rounded-2xl shadow px-4 py-4 mb-8 glassmorphism border backdrop-blur-md border-blue-100">
           {/* Search box */}
           <div className="flex items-center gap-2 flex-1 min-w-[220px]">
             <FiSearch size={18} />
@@ -339,12 +342,12 @@ const BrowseProductsPage: React.FC = () => {
             <div className="col-span-full text-center text-xl text-gray-400 py-16">{t("noProductsFound")}</div>
           ) : (
             pagedProducts.map((product) => (
-             <ProductCard
-    key={product.id}
-    product={product}
-    regionCode={regionCode}
-    language={language}
-  />
+              <ProductCard
+                key={product.id}
+                product={product}
+                regionCode={regionCode}
+                language={language}
+              />
             ))
           )}
         </div>

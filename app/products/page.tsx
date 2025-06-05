@@ -9,10 +9,17 @@ import Image from "next/image";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { getCurrencyForCountry, formatCurrency } from "@/utils/currency";
-import { Product } from "@/services/types";
+import { baseAPI, Product } from "@/services/types";
 
 type ProductSelections = Record<number, { size: string | null; color: string | null }>;
 type SelectionPrompt = { [productId: number]: string | null };
+
+// --- Helper to normalize category as string ---
+const getCategoryName = (cat: string | { id: number; name: string }): string => {
+  if (!cat) return "";
+  if (typeof cat === "string") return cat;
+  return cat.name ?? "";
+};
 
 export default function ProductsPage() {
   const dispatch = useAppDispatch();
@@ -42,9 +49,15 @@ export default function ProductsPage() {
     }
   }, [storeId, dispatch]);
 
-  // --- Categories ---
+  // --- Categories (all as string) ---
   const categories = useMemo(() => {
-    const cats = Array.from(new Set(products.map((p) => p.category).filter(Boolean)));
+    const cats = Array.from(
+      new Set(
+        products
+          .map((p) => getCategoryName(p.category))
+          .filter((name) => name && name !== "")
+      )
+    );
     return ["all", ...cats];
   }, [products]);
 
@@ -52,7 +65,9 @@ export default function ProductsPage() {
   const filteredProducts = useMemo(() => {
     let filtered = products;
     if (selectedCategory !== "all") {
-      filtered = filtered.filter((p) => p.category === selectedCategory);
+      filtered = filtered.filter(
+        (p) => getCategoryName(p.category) === selectedCategory
+      );
     }
     if (search.trim()) {
       filtered = filtered.filter(
@@ -72,7 +87,8 @@ export default function ProductsPage() {
   const promoBanners = onSaleProducts.slice(0, 5).map((product) => ({
     id: product.id,
     name: product.name,
-    subtitle: product.discount_percentage > 0 ? `-${product.discount_percentage}%` : "SALE",
+    subtitle:
+      product.discount_percentage > 0 ? `-${product.discount_percentage}%` : "SALE",
     image:
       product.images?.[0]?.image?.startsWith("/media/")
         ? `${process.env.NEXT_PUBLIC_BASE_API}${product.images[0].image}`
@@ -138,7 +154,9 @@ export default function ProductsPage() {
     if (change === 1) {
       if (cartItem && cartItem.quantity >= product.stock) {
         alert(
-          `${t("stockLimitReached")}\n${t("only")} ${product.stock} ${t("itemsAvailable")}.`
+          `${t("stockLimitReached")}\n${t("only")} ${product.stock} ${t(
+            "itemsAvailable"
+          )}.`
         );
         return;
       }
@@ -148,7 +166,8 @@ export default function ProductsPage() {
           name: product.name,
           price:
             product.on_sale && product.discount_percentage > 0
-              ? product.price - (product.price * product.discount_percentage) / 100
+              ? product.price -
+                (product.price * product.discount_percentage) / 100
               : product.price,
           image: product.images?.[0]?.image,
           size: size || "",
@@ -201,7 +220,6 @@ export default function ProductsPage() {
         quantity: 1,
       })
     );
-    // Clear prompt and (optional) selection
     setSelectionPrompt((prev) => ({ ...prev, [product.id]: null }));
   };
 
@@ -226,7 +244,7 @@ export default function ProductsPage() {
                 onClick={() => router.push(`/product/${item.id}`)}
               >
                 <Image
-                  src={item.image}
+                  src={item.image || "/no-image.png"}
                   alt={item.name}
                   fill
                   className="object-cover rounded-xl"
@@ -323,16 +341,16 @@ export default function ProductsPage() {
             const { size: selectedSize, color: selectedColor } = getSelection(product.id);
             const cartItem = getCartItem(product.id, selectedSize, selectedColor);
 
-            // Selection requirements
-            const needsSize = product.sizes && product.sizes.length > 0 && !selectedSize;
+           // Selection requirements (fully safe!)
+            const needsSize = (product.sizes?.length ?? 0) > 0 && !selectedSize;
             const needsColor =
-              product.colors &&
-              product.colors.length > 0 &&
-              ((product.sizes?.length > 0 && selectedSize && !selectedColor) ||
-                (product.sizes?.length === 0 && !selectedColor));
+              (product.colors?.length ?? 0) > 0 &&
+              (((product.sizes?.length ?? 0) > 0 && selectedSize && !selectedColor) ||
+                ((product.sizes?.length ?? 0) === 0 && !selectedColor));
             const canChangeQty =
-              (product.sizes?.length > 0 ? !!selectedSize : true) &&
-              (product.colors?.length > 0 ? !!selectedColor : true);
+              ((product.sizes?.length ?? 0) > 0 ? !!selectedSize : true) &&
+              ((product.colors?.length ?? 0) > 0 ? !!selectedColor : true);
+
 
             return (
               <div
@@ -341,15 +359,15 @@ export default function ProductsPage() {
               >
                 <div
                   className="relative cursor-pointer"
-                  onClick={() => router.push(`/product/${product.id}`)}
+                  onClick={() => router.push(`/products/${product.id}`)}
                 >
                   <div className="w-full h-40 rounded-lg bg-gray-200 overflow-hidden mb-2 relative">
                     <Image
                       src={
-                        product.images?.[0]?.image
-                          ? product.images[0].image.startsWith("/media/")
-                            ? `${process.env.NEXT_PUBLIC_BASE_API}${product.images[0].image}`
-                            : product.images[0].image
+                        product.image_url?.[0]
+                          ? product.image_url[0].startsWith("/media/")
+                            ? `${baseAPI}${product.image_url[0]}`
+                            : product.image_url[0]
                           : "/no-image.png"
                       }
                       alt={product.name}
@@ -357,6 +375,7 @@ export default function ProductsPage() {
                       className="object-cover rounded-lg"
                       sizes="(max-width: 768px) 100vw, 33vw"
                     />
+
                     {hasSale && (
                       <div className="absolute top-2 right-2 bg-blue-500 rounded-lg px-2 py-1 flex items-center">
                         <span className="text-white text-xs font-bold">
@@ -409,7 +428,7 @@ export default function ProductsPage() {
                           {selectionPrompt[product.id] ?? t("selectSize")}
                         </div>
                         <div className="flex flex-wrap mt-2 gap-2">
-                          {product.sizes.map((size: string) => (
+                          {product.sizes!.map((size: string) => (
                             <button
                               key={size}
                               className={`px-4 py-2 rounded-full border m-1 font-bold ${
@@ -433,7 +452,7 @@ export default function ProductsPage() {
                           {selectionPrompt[product.id] ?? t("selectColor")}
                         </div>
                         <div className="flex flex-wrap mt-2 gap-2">
-                          {product.colors.map((color: string) => (
+                          {product.colors!.map((color: string) => (
                             <button
                               key={color}
                               className={`px-4 py-2 rounded-full border m-1 font-bold ${

@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { selectUser, logoutUser } from '@/redux/slices/authSlice';
 
 type OrderDetail = {
-  meal: {
+  product: {
     id: number;
     name: string;
     price: number;
@@ -109,7 +109,7 @@ const OrderHistory: React.FC = () => {
                 <ul className="list-disc list-inside">
                   {order.order_details.map((detail, index) => (
                     <li key={index}>
-                      {detail.meal.name} - {detail.quantity} x {detail.sub_total}Kz
+                      {detail.product.name} - {detail.quantity} x {detail.sub_total}Kz
                     </li>
                   ))}
                 </ul>

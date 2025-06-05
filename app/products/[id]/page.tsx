@@ -3,18 +3,25 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/store";
 import { RootState } from "@/redux/store";
-import { Product, Review } from "@/services/types";
+import { baseAPI, Product} from "@/services/types";
 import { addItem } from "@/redux/slices/basketSlice";
 import { t } from "@/configs/i18n";
 import Image from "next/image";
-import { formatCurrency } from "@/utils/currency";
+import { formatCurrency, getCurrencyForCountry } from "@/utils/currency";
 import { fetchRelatedProducts } from "@/redux/slices/relatedProductsSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart as faSolidHeart, faShareNodes, faStar as faSolidStar, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faRegularHeart, faStar as faRegularStar } from "@fortawesome/free-regular-svg-icons";
-import { useSelector } from "react-redux";
-import { selectUser } from "@/redux/slices/authSlice";
 import Link from "next/link";
+
+// Define the Review type
+type Review = {
+  id: number;
+  user: string;
+  comment: string;
+  rating: number;
+  created_at: string;
+};
 
 type Props = {};
 
@@ -23,49 +30,69 @@ const ProductDetailPage: React.FC<Props> = () => {
   const params = useParams();
   const dispatch = useAppDispatch();
 
-  // Get productId from route
-  const productId = Number(params?.id);
+  // Product ID from URL
+  const productId = useMemo(() => {
+    // Handle dynamic segment safely
+    const raw = params?.id;
+    return typeof raw === "string" ? Number(raw) : Array.isArray(raw) ? Number(raw[0]) : NaN;
+  }, [params]);
 
-  // Redux state
-  const reduxState = useAppSelector((state) => state);
-  const product: Product | undefined = useMemo(
-    () =>
-      reduxState.products.data.find((p) => p.id === productId) ||
-      reduxState.relatedProducts.data.find((p) => p.id === productId),
-    [reduxState, productId]
+  // Find product in any redux slice first (strict order: products > allProducts > relatedProducts)
+  const reduxProduct = useAppSelector((state: RootState) =>
+    state.products.data.find((p) => p.id === productId) ||
+    state.allProducts.data.find((p) => p.id === productId) ||
+    state.relatedProducts.data.find((p) => p.id === productId)
   );
 
-  // Local fallback fetch if not in Redux
-  const [fetchedProduct, setFetchedProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(!product);
-  useEffect(() => {
-    setFetchedProduct(null);
-    setLoading(!product);
+  // Fallback: fetch from API only if not in Redux
+  const [apiProduct, setApiProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState<boolean>(!reduxProduct && !!productId);
+  const [notFound, setNotFound] = useState(false);
 
-    if (!product && productId) {
-      fetch(`/api/product/${productId}`)
+  useEffect(() => {
+    let ignore = false;
+    setNotFound(false);
+    if (!reduxProduct && productId && !isNaN(productId)) {
+      setLoading(true);
+      fetch(`${baseAPI}/store/products/${productId}/`)
         .then((r) => r.json())
         .then((data) => {
-          if (!data || data.detail === "Not found.") {
-            setFetchedProduct(null);
-            setLoading(false);
-            return;
+          if (!ignore) {
+            if (!data || data.detail === "Not found.") {
+              setApiProduct(null);
+              setNotFound(true);
+            } else {
+              setApiProduct(data);
+            }
           }
-          setFetchedProduct(data);
         })
-        .catch(() => setFetchedProduct(null))
-        .finally(() => setLoading(false));
+        .catch(() => {
+          if (!ignore) {
+            setApiProduct(null);
+            setNotFound(true);
+          }
+        })
+        .finally(() => {
+          if (!ignore) setLoading(false);
+        });
+    } else {
+      setApiProduct(null);
+      setLoading(false);
+      setNotFound(false);
     }
-  }, [productId, product]);
+    return () => { ignore = true; };
+  }, [productId, reduxProduct]);
 
-  const productToShow: Product | undefined = product || fetchedProduct || undefined;
+  // Final product to show
+  const productToShow: Product | undefined = reduxProduct || apiProduct || undefined;
 
-  // UI state
+  // UI State
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [quantity, setQuantity] = useState<number>(1);
   const [isWishlisted, setIsWishlisted] = useState<boolean>(false);
-  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
   const [averageRating, setAverageRating] = useState<number>(0);
+  const [selectedColor, setSelectedColor] = useState<string>("");
 
   // Cart state
   const cartItems = useAppSelector((state) => state.basket.items);
@@ -80,7 +107,7 @@ const ProductDetailPage: React.FC<Props> = () => {
 
   // Related products (redux)
   useEffect(() => {
-    if (productId) dispatch(fetchRelatedProducts(productId));
+    if (productId && !isNaN(productId)) dispatch(fetchRelatedProducts(productId));
   }, [dispatch, productId]);
   const relatedProducts = useAppSelector(
     (state: RootState) =>
@@ -129,31 +156,42 @@ const ProductDetailPage: React.FC<Props> = () => {
       return;
     }
     const price = productToShow.on_sale
-      ? Number(productToShow.price) -
-        (Number(productToShow.price) * productToShow.discount_percentage) / 100
+      ? Number(productToShow.price) - (Number(productToShow.price) * productToShow.discount_percentage) / 100
       : Number(productToShow.price);
     dispatch(
-      addItem({
-        id: productToShow.id,
-        name: productToShow.name,
-        size: selectedSize || "",
-        price,
-        image: productToShow.images?.[0]?.image || "",
-        store: productToShow.store_id,
-        quantity,
-      })
-    );
+  addItem({
+    id: productToShow.id,
+    name: productToShow.name,
+    size: selectedSize || "",
+    color: selectedColor || "", // <-- Add this line!
+    price,
+    image: productToShow.images?.[0]?.image || "",
+    store: productToShow.store_id,
+    quantity,
+  })
+);
     alert(`${productToShow.name} ${t("addToCart")}!`);
   };
 
-  if (loading || !productToShow) {
+  // Loading and not found states
+  if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <span className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
+  if (!productToShow) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center text-lg text-red-500">
+        {notFound
+          ? t("productNotFound")
+          : t("loading")}
+      </div>
+    );
+  }
 
+  // ... your existing product UI rendering (unchanged) ...
   return (
     <div className="min-h-screen bg-white">
       {/* Top bar actions */}
@@ -186,7 +224,7 @@ const ProductDetailPage: React.FC<Props> = () => {
       <div className="w-full relative aspect-square bg-gray-100">
         {productToShow.images?.length ? (
           <Image
-            src={productToShow.images[0].image}
+            src={productToShow.image_url[0] || "/no-image.png"}
             alt={productToShow.name}
             fill
             className="object-cover rounded-xl"
@@ -207,13 +245,14 @@ const ProductDetailPage: React.FC<Props> = () => {
           {productToShow.on_sale ? (
             <>
               <span className="text-gray-400 line-through text-lg">
-                {formatCurrency(Number(productToShow.price), "ZA", "en")}
+                {formatCurrency(Number(productToShow.price), getCurrencyForCountry("ZA"), "en")
+}
               </span>
               <span className="text-xl font-bold text-green-700">
                 {formatCurrency(
                   Number(productToShow.price) -
                     (Number(productToShow.price) * productToShow.discount_percentage) / 100,
-                  "ZA",
+                  getCurrencyForCountry("ZA"),
                   "en"
                 )}
               </span>
@@ -223,7 +262,7 @@ const ProductDetailPage: React.FC<Props> = () => {
             </>
           ) : (
             <span className="text-xl text-green-700">
-              {formatCurrency(Number(productToShow.price), "ZA", "en")}
+              {formatCurrency(Number(productToShow.price))}
             </span>
           )}
         </div>
@@ -293,7 +332,7 @@ const ProductDetailPage: React.FC<Props> = () => {
             onClick={() => {
               if (productToShow.stock === 0) return;
               if (isInCart) {
-                router.push("/cart");
+                router.push("/CartPage");
               } else {
                 handleAddToCart();
               }
@@ -359,10 +398,10 @@ const ProductDetailPage: React.FC<Props> = () => {
             <span className="text-gray-400">{t("noReviews")}</span>
           ) : (
             relatedProducts.map((rel) => (
-              <Link key={rel.id} href={`/product/${rel.id}`} className="w-36 flex-shrink-0">
+              <Link key={rel.id} href={`/products/${rel.id}`} className="w-36 flex-shrink-0">
                 <div className="relative w-full h-32 rounded-lg bg-gray-200 overflow-hidden">
                   <Image
-                    src={rel.images?.[0]?.image || "/no-image.png"}
+                    src={rel.image_url?.[0] || "/no-image.png"}
                     alt={rel.name}
                     fill
                     className="object-cover"
@@ -374,7 +413,7 @@ const ProductDetailPage: React.FC<Props> = () => {
                     rel.on_sale
                       ? rel.price - (rel.price * rel.discount_percentage) / 100
                       : rel.price,
-                    "ZA",
+                    getCurrencyForCountry("ZA"),
                     "en"
                   )}
                 </span>

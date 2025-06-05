@@ -58,7 +58,7 @@ const LoginScreenUser: React.FC = () => {
         router.push("/HomeScreen");
       } else if (resultAction.is_customer === false) {
         alert(t("loginSuccess"));
-        router.push("/storeDashboad");
+        router.push("/StoreDashboad");
       }
     } catch (error: any) {
       if (typeof error === "string") {

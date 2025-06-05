@@ -8,6 +8,8 @@ import productsReducer from "./slices/productsSlice";
 import authReducer from "./slices/authSlice";
 import allStoresReducer from "./slices/allStoresSlice";
 import allProductsReducer from "./slices/allProductsSlice";
+import relatedProductsReducer from "./slices/relatedProductsSlice";
+
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +20,7 @@ export const store = configureStore({
     products: productsReducer,
     auth: authReducer,
     allProducts: allProductsReducer,
+    relatedProducts: relatedProductsReducer,
     [aboutApi.reducerPath]: aboutApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>

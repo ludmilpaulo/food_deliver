@@ -14,6 +14,7 @@ export const loginUserService = async (username: string, password: string) => {
   });
 
   const data = await response.json();
+  console.log("Login response:", data);
 
   if (!response.ok) {
     return data;
@@ -76,13 +77,9 @@ export const resetPassword = async (uid: string, token: string, newPassword: str
   }
 };
 
-export const getCurrentUser = async (token: string) => {
+export const getCurrentUser = async (user_id: number) => {
   try {
-    const response = await axios.get(`${API_URL}/profile/`, {
-      headers: {
-        Authorization: `Token ${token}`,
-      },
-    });
+    const response = await axios.get(`${API_URL}/customer/customer/profile/?user_id=${user_id}`);
     return response.data;
   } catch (error) {
     if (isAxiosError(error)) {
@@ -91,6 +88,7 @@ export const getCurrentUser = async (token: string) => {
     throw error;
   }
 };
+
 
 
 export const updateUserDetails = async (token: string, data: FormData) => {

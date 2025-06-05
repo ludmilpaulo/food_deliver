@@ -2,31 +2,31 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/redux/slices/authSlice";
 
-import { storeType } from "@/services/types";
-import storeCard from "./store/storeCard";
+import { StoreType, Store } from "@/services/types";
+import StoreCard from "./store/StoreCard";
 import { Transition } from '@headlessui/react';
-import useLoadScript from "./store//useLoadScript";
+import useLoadScript from "./store/useLoadScript";
 import { getstores, activatestore, updatestore, deactivatestore, deletestore } from "@/services/managerService";
 
 declare global {
   interface Window {
-    initMap: (store: storeType) => void;
+    initMap: (store: StoreType) => void;
   }
 }
 
-const store: React.FC = () => {
+const Store: React.FC = () => {
   const user = useSelector(selectUser);
-  const [stores, setstores] = useState<storeType[]>([]);
+  const [stores, setstores] = useState<Store[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<string>("storees");
-  const [editData, setEditData] = useState<Partial<storeType> | null>(null);
-  const [selectedstore, setSelectedstore] = useState<storeType | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("stores");
+  const [editData, setEditData] = useState<Partial<Store> | null>(null);
+  const [selectedstore, setSelectedstore] = useState<Store | null>(null);
   const [showMap, setShowMap] = useState<boolean>(false);
 
   useLoadScript(
     `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}&callback=initMap`,
     () => {
-      window.initMap = (store: storeType) => {
+      window.initMap = (store: Store) => {
         const [latitude, longitude] = store.location.split(',').map(Number);
         const mapElement = document.getElementById('map');
         if (mapElement) {
@@ -93,7 +93,7 @@ const store: React.FC = () => {
     }
   };
 
-  const handleEdit = (store: storeType) => {
+  const handleEdit = (store: Store) => {
     setEditData(store);
   };
 
@@ -128,7 +128,7 @@ const store: React.FC = () => {
     }
   };
 
-  const handleShowMap = (store: storeType) => {
+  const handleShowMap = (store: Store) => {
     setSelectedstore(store);
     setShowMap(true);
   };
@@ -177,7 +177,7 @@ const store: React.FC = () => {
       {activeTab === "storees" && (
         <div>
           {stores.map((store) => (
-            <storeCard
+            <StoreCard
               key={store.id}
               store={store}
               onActivate={handleActivate}
@@ -265,4 +265,4 @@ const store: React.FC = () => {
   );
 };
 
-export default store;
+export default Store;

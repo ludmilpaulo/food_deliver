@@ -1,6 +1,6 @@
 
 import axios from "axios";
-import { baseAPI, Categoria, FornecedorType, OpeningHourType, OrderTypes, Product, storeType } from "./types";
+import { baseAPI, Categoria, FornecedorType, OpeningHourType, OrderTypes, Product, Store as StoreType } from "./types";
 
 export const fetchFornecedorData = async (userId: number): Promise<FornecedorType | null> => {
     try {
@@ -129,7 +129,7 @@ export const fetchOrders = async (userId: number): Promise<OrderTypes[]> => {
 
 const API_URL = baseAPI;
 
-export const getstore = async (userId: number): Promise<storeType> => {
+export const getstore = async (userId: number): Promise<StoreType> => {
     const response = await axios.get(`${API_URL}/store/stores/${userId}/`);
     return response.data;
 };
@@ -139,7 +139,7 @@ export const fetchstoreCategorias = async () => {
   return response.data;
 };
 
-export const updatestore = async (userId: number, data: FormData): Promise<storeType> => {
+export const updatestore = async (userId: number, data: FormData): Promise<StoreType> => {
     const response = await axios.put(`${API_URL}/store/stores/${userId}/`, data, {
         headers: {
             'Content-Type': 'multipart/form-data'

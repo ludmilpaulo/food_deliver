@@ -336,7 +336,7 @@ const handlePlaceOrder = async (e: React.FormEvent) => {
             <span>{formatCurrency(DELIVERY_FEE, currencyCode, language)}</span>
           </div>
           <div className="flex justify-between text-lg font-bold border-t border-blue-200 pt-3 mt-3">
-            <span>Total"</span>
+            <span>Total</span>
             <span>{formatCurrency(total, currencyCode, language)}</span>
           </div>
         </div>

@@ -1,6 +1,15 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import API from "../../services/api";
-import { Review } from "../../services/types";
+// TODO: Ensure 'Review' is exported from '../../services/types' or import the correct type
+// import { Review } from "../../services/types";
+type Review = {
+  // Define the Review type here as a temporary fix
+  id: number;
+  productId: number;
+  rating: number;
+  comment: string;
+  // Add other fields as needed
+};
 
 interface ReviewsState {
   data: Review[];

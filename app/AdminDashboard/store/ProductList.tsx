@@ -107,10 +107,10 @@ const ProductList: React.FC = () => {
                   className="p-4 rounded shadow-lg hover:bg-blue-100 cursor-pointer bg-white"
                 >
                   <div className="flex flex-col items-center">
-                    <Image src={`${baseAPI}${product.image}`} alt={product.name} width={100} height={100} className="rounded mb-2" />
+                    <Image src={`${baseAPI}${product.images}`} alt={product.name} width={100} height={100} className="rounded mb-2" />
                     <div className="text-center">
                       <h3 className="text-lg font-semibold">{product.name}</h3>
-                      <p className="text-gray-500">{product.short_description}</p>
+                      <p className="text-gray-500">{product.description}</p>
                       <p className="text-gray-700">storee: {product.store_name}</p>
                       <p className="text-gray-700">Preço Original: {product.original_price.toFixed(2)} Kz</p>
                       <p className="text-gray-900 font-bold">Preço com Acréscimo: {product.price_with_markup.toFixed(2)} Kz</p>

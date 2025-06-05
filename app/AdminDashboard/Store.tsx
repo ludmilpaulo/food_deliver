@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/redux/slices/authSlice";
 
-import { StoreType, Store } from "@/services/types";
+import { Store as StoreType } from "@/services/types";
 import StoreCard from "./store/StoreCard";
 import { Transition } from '@headlessui/react';
 import useLoadScript from "./store/useLoadScript";
@@ -16,28 +16,38 @@ declare global {
 
 const Store: React.FC = () => {
   const user = useSelector(selectUser);
-  const [stores, setstores] = useState<Store[]>([]);
+  const [stores, setStores] = useState<StoreType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>("stores");
-  const [editData, setEditData] = useState<Partial<Store> | null>(null);
-  const [selectedstore, setSelectedstore] = useState<Store | null>(null);
+  const [editData, setEditData] = useState<Partial<StoreType> | null>(null);
+  const [selectedStore, setSelectedStore] = useState<StoreType | null>(null);
   const [showMap, setShowMap] = useState<boolean>(false);
 
-  useLoadScript(
+useLoadScript(
     `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}&callback=initMap`,
     () => {
-      window.initMap = (store: Store) => {
+      window.initMap = (store: StoreType) => {
+        if (!store.location) {
+          alert("No location set for this store.");
+          return;
+        }
         const [latitude, longitude] = store.location.split(',').map(Number);
+        if (isNaN(latitude) || isNaN(longitude)) {
+          alert("Invalid location format.");
+          return;
+        }
         const mapElement = document.getElementById('map');
         if (mapElement) {
+          // @ts-ignore
           const map = new google.maps.Map(mapElement, {
             center: { lat: latitude, lng: longitude },
-            zoom: 15
+            zoom: 15,
           });
+          // @ts-ignore
           new google.maps.Marker({
             position: { lat: latitude, lng: longitude },
             map: map,
-            title: store.name
+            title: store.name,
           });
         } else {
           console.error('Map element not found');
@@ -46,27 +56,27 @@ const Store: React.FC = () => {
     }
   );
 
-  useEffect(() => {
-    const fetchstores = async () => {
+   useEffect(() => {
+    const fetchStores = async () => {
       setLoading(true);
       try {
         const data = await getstores();
-        setstores(data);
+        setStores(data);
       } catch (error) {
         console.error("Error fetching stores data", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchstores();
+    fetchStores();
   }, [user]);
 
-  const handleActivate = async (id: number) => {
+const handleActivate = async (id: number) => {
     setLoading(true);
     try {
       await activatestore(id);
-      setstores((prev) =>
-        prev.map((store) =>
+      setStores(prev =>
+        prev.map(store =>
           store.id === id ? { ...store, is_approved: true } : store
         )
       );
@@ -81,8 +91,8 @@ const Store: React.FC = () => {
     setLoading(true);
     try {
       await deactivatestore(id);
-      setstores((prev) =>
-        prev.map((store) =>
+      setStores(prev =>
+        prev.map(store =>
           store.id === id ? { ...store, is_approved: false } : store
         )
       );
@@ -93,7 +103,7 @@ const Store: React.FC = () => {
     }
   };
 
-  const handleEdit = (store: Store) => {
+  const handleEdit = (store: StoreType) => {
     setEditData(store);
   };
 
@@ -101,10 +111,10 @@ const Store: React.FC = () => {
     if (editData && editData.id) {
       setLoading(true);
       try {
-        const updatedstore = await updatestore(editData.id, editData);
-        setstores((prev) =>
-          prev.map((store) =>
-            store.id === editData.id ? updatedstore : store
+        const updatedStore = await updatestore(editData.id, editData);
+        setStores(prev =>
+          prev.map(store =>
+            store.id === editData.id ? updatedStore : store
           )
         );
         setEditData(null);
@@ -120,7 +130,7 @@ const Store: React.FC = () => {
     setLoading(true);
     try {
       await deletestore(id);
-      setstores((prev) => prev.filter((store) => store.id !== id));
+      setStores(prev => prev.filter(store => store.id !== id));
     } catch (error) {
       console.error("Error deleting store", error);
     } finally {
@@ -128,16 +138,16 @@ const Store: React.FC = () => {
     }
   };
 
-  const handleShowMap = (store: Store) => {
-    setSelectedstore(store);
+  const handleShowMap = (store: StoreType) => {
+    setSelectedStore(store);
     setShowMap(true);
   };
 
   useEffect(() => {
-    if (showMap && selectedstore) {
-      window.initMap(selectedstore);
+    if (showMap && selectedStore) {
+      window.initMap(selectedStore);
     }
-  }, [showMap, selectedstore]);
+  }, [showMap, selectedStore]);
 
   return (
     <div className="relative p-6 bg-white rounded-lg shadow-md">
@@ -202,10 +212,10 @@ const Store: React.FC = () => {
               </button>
             </div>
           ))}
-          {showMap && selectedstore && (
+          {showMap && selectedStore && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
               <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl">
-                <h2 className="text-xl font-bold mb-4">Localização de {selectedstore.name}</h2>
+                <h2 className="text-xl font-bold mb-4">Localização de {selectedStore.name}</h2>
                 <div id="map" style={{ height: '400px' }}></div>
                 <button
                   className="py-2 px-4 bg-gray-500 text-white mt-4 rounded-lg"

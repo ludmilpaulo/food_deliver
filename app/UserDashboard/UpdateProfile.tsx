@@ -1,12 +1,13 @@
 import React, { useState, useEffect, FormEvent } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { selectUser, logoutUser } from '@/redux/slices/authSlice';
+import { useDispatch } from 'react-redux';
+import { selectUser, logoutUser, User } from '@/redux/slices/authSlice';
 import { updateUserDetails } from '@/services/authService';
 import { fetchUserDetails } from '@/services/checkoutService';
+import { useAppSelector } from '@/redux/store';
 
 
 const UpdateProfile: React.FC = () => {
-  const user = useSelector(selectUser);
+   const user = useAppSelector(selectUser);
   const dispatch = useDispatch();
   const [userDetails, setUserDetails] = useState<any>({});
   const [avatar, setAvatar] = useState<File | null>(null);
@@ -14,6 +15,8 @@ const UpdateProfile: React.FC = () => {
   const [address, setAddress] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  const token = user?.token || '';
 
   useEffect(() => {
     if (user && user.token) {
@@ -43,14 +46,14 @@ const UpdateProfile: React.FC = () => {
     setError(null);
     const formData = new FormData();
     formData.append('phone', phone);
-    formData.append('access_token', user?.token);
+    formData.append('access_token', token);
     formData.append('address', address);
     if (avatar) {
       formData.append('avatar', avatar);
     }
 
     try {
-      await updateUserDetails(user.token, formData);
+      await updateUserDetails(token, formData);
       alert('Perfil atualizado com sucesso!');
     } catch (error) {
       console.error('Error updating profile:', error);

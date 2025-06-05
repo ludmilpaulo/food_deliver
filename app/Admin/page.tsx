@@ -6,7 +6,7 @@ import { useState } from 'react';
 const Users = dynamic(() => import('./user/Users'));
 const SiteInfo = dynamic(() => import('./info/SiteInfo'));
 const Orders = dynamic(() => import('./order/Orders'));
-const stores = dynamic(() => import('./store/stores'));
+const Stores = dynamic(() => import('./store/Stores'));
 const Careers = dynamic(() => import('./carrer/Careers'));
 
 const Dashboard = () => {
@@ -21,7 +21,7 @@ const Dashboard = () => {
       case 'orders':
         return <Orders />;
       case 'stores':
-        return <stores />;
+        return <Stores />;
       case 'careers':
         return <Careers />;
       default:

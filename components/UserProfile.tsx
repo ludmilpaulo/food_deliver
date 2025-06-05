@@ -23,7 +23,7 @@ const UserProfile: React.FC = () => {
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
-  const userToken = user.token;
+  const userToken = user?.token || "";
   const router = useRouter();
 
   useEffect(() => {

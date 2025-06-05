@@ -10,12 +10,21 @@ interface StoreCardProps {
   onDelete: (id: number) => void;
 }
 
-const StoreCard: React.FC<StoreCardProps> = ({ store, onActivate, onDeactivate, onEdit, onDelete }) => {
+// You can use any placeholder image here (public folder recommended)
+const DEFAULT_STORE_IMAGE = "/store-placeholder.png"; // Place a placeholder image in /public
+
+const StoreCard: React.FC<StoreCardProps> = ({
+  store,
+  onActivate,
+  onDeactivate,
+  onEdit,
+  onDelete,
+}) => {
   return (
     <div className="mb-4 p-4 border rounded-lg">
       <div className="flex items-center">
         <Image
-          src={store.logo}
+          src={store.logo || DEFAULT_STORE_IMAGE}
           alt={store.name}
           width={64}
           height={64}
@@ -31,7 +40,11 @@ const StoreCard: React.FC<StoreCardProps> = ({ store, onActivate, onDeactivate, 
       <div className="flex mt-4">
         <button
           className={`py-2 px-4 mr-2 ${store.is_approved ? "bg-red-500 text-white" : "bg-green-500 text-white"}`}
-          onClick={() => (store.is_approved ? onDeactivate(store.id) : onActivate(store.id))}
+          onClick={() =>
+            store.is_approved
+              ? onDeactivate(store.id)
+              : onActivate(store.id)
+          }
         >
           {store.is_approved ? "Desativar" : "Ativar"}
         </button>

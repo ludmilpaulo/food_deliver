@@ -25,11 +25,12 @@ const Report: React.FC = () => {
   });
 
   const user = useSelector(selectUser);
+  const user_id = user?.user_id || 0;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${baseAPI}/report/store/${user.user_id}/`);
+        const response = await fetch(`${baseAPI}/report/store/${user_id}/`);
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }

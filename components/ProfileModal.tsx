@@ -31,7 +31,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, userDetail
   const [lastName, setLastName] = useState<string>(userDetails?.last_name || '');
   const [phone, setPhone] = useState<string>(userDetails?.phone || '');
   const [loading, setLoading] = useState<boolean>(false);
-  const userToken = user.token;
+  const userToken = user?.token || "";
   const router = useRouter();
 
   useEffect(() => {

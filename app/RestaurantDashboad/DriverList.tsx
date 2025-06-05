@@ -23,6 +23,7 @@ const DriverList: React.FC = () => {
   const [endDate, setEndDate] = useState<string>("");
 
   const user = useSelector(selectUser);
+  const user_id = user?.user_id || 0;
 
   useEffect(() => {
     fetchData();
@@ -31,7 +32,7 @@ const DriverList: React.FC = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        `${baseAPI}/report/store/drivers/${user.user_id}/`,
+        `${baseAPI}/report/store/drivers/${user_id}/`,
       );
       console.log("driver==>", response.data)
       setDrivers(response.data);

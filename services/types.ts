@@ -72,13 +72,16 @@ export interface Product {
   discount_percentage: number;
   season?: string;
   images: ProductImage[];
-  image_url: string[];
+  image_url: string[]; // matches Django @property
   gender?: string;
   colors?: string[];
   sizes?: string[];
   store: number;
-
+  price_with_markup: number;
+  original_price: number; // if you send this
+  store_name?: string;    // if you send this
 }
+
   
  // @/services/types.ts
 
@@ -117,7 +120,7 @@ export type OpeningHour = {
 
   export interface OpeningHourType {
     id?: number;
-    restaurant: number;
+    store: number;
     day: number;
     from_hour: string;
     to_hour: string;

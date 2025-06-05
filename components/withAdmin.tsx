@@ -12,11 +12,13 @@ const withAdmin = (WrappedComponent: React.ComponentType) => {
 
     const user = useSelector(selectUser);
 
+    const user_id = user?.user_id || 0;
+    const token = user?.token;
+
     useEffect(() => {
       const verifyAdmin = async () => {
         try {
-          const user_id = user?.user_id;
-          const token = user?.token;
+          
           if (user_id && token) {
             const adminStatus = await checkAdmin(user_id);
             setIsAdmin(adminStatus);

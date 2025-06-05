@@ -45,9 +45,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
           <div className="mb-4">
             <label className="block mb-2">Pequena Descrição</label>
             <input
-              {...register("short_description", { required: true })}
+              {...register("description", { required: true })}
               className="w-full p-2 border rounded"
-              defaultValue={editingProduct.short_description}
+              defaultValue={editingProduct.description}
             />
             {errors.short_description && <span className="text-red-500">Descrição curta é obrigatória</span>}
           </div>
@@ -55,7 +55,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
             <label className="block mb-2">Imagem</label>
             <input
               type="file"
-              {...register("image", { required: false })}
+              {...register("image_url", { required: false })}
               className="w-full p-2 border rounded"
             />
             {errors.image && <span className="text-red-500">Imagem é obrigatória</span>}

@@ -93,7 +93,7 @@ export const deleteContact = async (id: number) => {
 };
 
 
-export const checkAdmin = async (user_id: string) => {
+export const checkAdmin = async (user_id: number) => {
     const response = await api.get(`/users/${user_id}/`);
     return response.data.is_admin;
   };

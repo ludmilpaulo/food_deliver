@@ -4,6 +4,7 @@ import { baseAPI } from '@/services/types';
 import Image from 'next/image';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectUser, logoutUser } from '@/redux/slices/authSlice';
+import { useAppSelector } from '@/redux/store';
 
 type OrderDetail = {
   product: {
@@ -40,12 +41,13 @@ type Order = {
 const OrderHistory: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const user = useSelector(selectUser);
+  const user = useAppSelector(selectUser);
+   const token = user?.token || '';
 
   useEffect(() => {
     const fetchOrderHistory = async () => {
       try {
-        const token = user.token
+       
         if (!token) {
           console.error("Access token not found");
           return;
@@ -62,7 +64,7 @@ const OrderHistory: React.FC = () => {
     };
 
     fetchOrderHistory();
-  }, []);
+  }, [token]);
 
   return (
     <div className="p-4">

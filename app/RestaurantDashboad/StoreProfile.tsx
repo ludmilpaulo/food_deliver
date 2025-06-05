@@ -1,14 +1,14 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { MdEdit, MdSave, MdCancel } from "react-icons/md";
-import { storeType, CategoryType } from "@/services/types";
+import { Store as StoreType, CategoryType } from "@/services/types";
 import { updatestore, fetchstoreCategorias } from "@/services/apiService";
 
-type storeProfileProps = {
-  store: storeType;
-  setstore: (store: storeType) => void;
+type StoreProfileProps = {
+  store: StoreType;
+  setstore: (store: StoreType) => void;
 };
 
-const storeProfile: React.FC<storeProfileProps> = ({ store, setstore }) => {
+const StoreProfile: React.FC<StoreProfileProps> = ({ store, setstore }) => {
   const [editMode, setEditMode] = useState<boolean>(false);
   const [categories, setCategories] = useState<CategoryType[]>([]);
   const [formData, setFormData] = useState({
@@ -172,4 +172,4 @@ const storeProfile: React.FC<storeProfileProps> = ({ store, setstore }) => {
   );
 };
 
-export default storeProfile;
+export default StoreProfile;

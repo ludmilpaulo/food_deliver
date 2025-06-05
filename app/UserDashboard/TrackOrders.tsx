@@ -1,38 +1,34 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import { deleteMessages, addResponseMessage } from 'react-chat-widget';
-import 'react-chat-widget/lib/styles.css';
 import { baseAPI } from '@/services/types';
 import { selectUser } from '@/redux/slices/authSlice';
 import { useSelector } from 'react-redux';
-import useLoadScript from '@/hooks/useLoadScript';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComments } from '@fortawesome/free-solid-svg-icons';
-import 'tailwindcss/tailwind.css';
 
 interface LocationType {
   latitude: number;
   longitude: number;
 }
 
-const toRadians = (degrees: number) => {
-  return degrees * (Math.PI / 180);
-};
+const toRadians = (degrees: number) => degrees * (Math.PI / 180);
 
 const haversineDistance = (coords1: LocationType, coords2: LocationType) => {
-  const R = 6371; // Radius of the Earth in km
+  const R = 6371;
   const dLat = toRadians(coords2.latitude - coords1.latitude);
   const dLng = toRadians(coords2.longitude - coords1.longitude);
-
-  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(toRadians(coords1.latitude)) * Math.cos(toRadians(coords2.latitude)) *
-            Math.sin(dLng / 2) * Math.sin(dLng / 2);
-
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRadians(coords1.latitude)) *
+      Math.cos(toRadians(coords2.latitude)) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-  const distance = R * c; // Distance in km
-  const duration = (distance / 50) * 60; // Estimate duration assuming average speed of 50 km/h
-
+  const distance = R * c;
+  const duration = (distance / 50) * 60;
   return { distance, duration };
 };
 
@@ -43,13 +39,9 @@ const parseLocation = (location: string): LocationType => {
   return { latitude, longitude };
 };
 
-const getGeocodedAddress = async (location: LocationType): Promise<string> => {
-  const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.latitude},${location.longitude}&key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}`);
-  if (response.data.results && response.data.results.length > 0) {
-    return response.data.results[0].formatted_address;
-  }
-  return 'Endereço não disponível';
-};
+const toLatLng = (loc: LocationType) => [loc.latitude, loc.longitude] as [number, number];
+
+const DEFAULT_CENTER: LocationType = { latitude: -8.8399876, longitude: 13.2894368 }; // Fallback: Luanda
 
 const TrackOrders: React.FC = () => {
   const [orders, setOrders] = useState<any[]>([]);
@@ -58,150 +50,51 @@ const TrackOrders: React.FC = () => {
   const [userLocation, setUserLocation] = useState<LocationType | null>(null);
   const [chatMessages, setChatMessages] = useState<any[]>([]);
   const [distances, setDistances] = useState<{ [key: number]: any }>({});
-  const [addresses, setAddresses] = useState<{ [key: number]: string }>({});
   const [lastMessageId, setLastMessageId] = useState<number | null>(null);
   const [newMessageCount, setNewMessageCount] = useState<number>(0);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
+  const [chatInput, setChatInput] = useState<string>('');
 
   const user = useSelector(selectUser);
 
-  // Load the Google Maps script
-  useLoadScript(`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}&callback=initMap`, () => {
-    (window as any).initMap = (location: LocationType) => {
-      const mapElement = document.getElementById('map');
-      if (mapElement) {
-        const map = new google.maps.Map(mapElement, {
-          center: { lat: location?.latitude, lng: location?.longitude },
-          zoom: 15
-        });
-        new google.maps.Marker({
-          position: { lat: location.latitude, lng: location.longitude },
-          map: map,
-          title: 'Driver Location',
-          icon: 'path/to/your/delivery_person_with_logo_final.png' // Update this path as needed
-        });
-      } else {
-        console.error('Map element not found');
-      }
-    };
-  });
-
+  // Fix leaflet marker icon for Next.js
   useEffect(() => {
-    // Fetch all non-delivered orders
-    axios.post(`${baseAPI}/customer/customer/order/latest/`, { access_token: user.token })
-      .then(response => {
-        console.log('Orders response:', response.data);
-        setOrders(response.data.orders);
-      })
-      .catch(error => {
-        console.error('Error fetching the orders:', error);
-      });
+    delete (L.Icon.Default as any).prototype._getIconUrl;
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: '/leaflet/marker-icon-2x.png',
+      iconUrl: '/leaflet/marker-icon.png',
+      shadowUrl: '/leaflet/marker-shadow.png',
+    });
+  }, []);
 
-    // Fetch driver locations for all non-delivered orders
-    axios.post(`${baseAPI}/customer/customer/driver/location/`, { access_token: user.token })
-      .then(async (response) => {
-        console.log('Driver locations response:', response.data);
+  // Fetch orders & driver locations
+  useEffect(() => {
+    if (!user?.token) return;
+    axios
+      .post(`${baseAPI}/customer/customer/order/latest/`, { access_token: user.token })
+      .then((response) => setOrders(response.data.orders || []))
+      .catch((error) => console.error('Error fetching the orders:', error));
+    axios
+      .post(`${baseAPI}/customer/customer/driver/location/`, { access_token: user.token })
+      .then((response) => {
         const locations = response.data.order_locations.reduce((acc: any, loc: any) => {
           acc[loc.order_id] = loc;
           return acc;
         }, {});
         setOrderLocations(locations);
-
-        // Get addresses for driver locations
-        const newAddresses: { [key: number]: string } = { ...addresses };
-        for (const orderId in locations) {
-          if (locations[orderId].driver_location) {
-            const parsedLocation = parseLocation(locations[orderId].driver_location);
-            newAddresses[parseInt(orderId)] = await getGeocodedAddress(parsedLocation);
-          }
-        }
-        setAddresses(newAddresses);
       })
-      .catch(error => {
-        console.error('Error fetching driver locations:', error);
-      });
-
-    // Get user's current location
+      .catch((error) => console.error('Error fetching driver locations:', error));
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(position => {
+      navigator.geolocation.getCurrentPosition((position) => {
         setUserLocation({
           latitude: position.coords.latitude,
-          longitude: position.coords.longitude
+          longitude: position.coords.longitude,
         });
       });
     }
-  }, [user?.token, addresses]);
+  }, [user?.token]);
 
-  const fetchChatMessages = useCallback((order: any) => {
-    console.log('Fetching chat messages for order:', order.id);
-    // Fetch chat messages for the selected order
-    axios.get(`${baseAPI}/info/get_order_chat/${order.id}/`)
-      .then(response => {
-        console.log('Chat messages response:', response.data);
-        const newMessages = response.data;
-        if (newMessages.length > 0) {
-          const latestMessage = newMessages[newMessages.length - 1];
-          if (lastMessageId === null || latestMessage.id > lastMessageId) {
-            setLastMessageId(latestMessage.id);
-            setNewMessageCount(prevCount => prevCount + 1);
-            // Send notification if new message
-            if (Notification.permission === "granted") {
-              new Notification("New message", {
-                body: latestMessage.message,
-              });
-            }
-          }
-        }
-        setChatMessages(newMessages);
-        deleteMessages(newMessages.length);
-        newMessages.forEach((msg: any) => {
-          addResponseMessage(msg.message);
-        });
-      })
-      .catch(error => {
-        console.error('Error fetching chat messages:', error);
-      });
-  }, [lastMessageId]);
-
-  useEffect(() => {
-    if (currentOrder) {
-      const interval = setInterval(() => fetchChatMessages(currentOrder), 3000); // Poll every 3 seconds
-      return () => clearInterval(interval); // Cleanup on unmount
-    }
-  }, [currentOrder, fetchChatMessages]);
-
-  const handleOrderSelection = (order: any) => {
-    console.log('Order selected:', order.id);
-    setCurrentOrder(order);
-    fetchChatMessages(order);
-    setIsChatOpen(true);
-    setNewMessageCount(0);
-  };
-
-  const handleNewUserMessage = (newMessage: string) => {
-    if (currentOrder) {
-      console.log('Sending new message:', newMessage);
-      // Send chat message
-      axios.post(`${baseAPI}/info/send_chat_message/`, {
-        user_id: user.user_id,
-        order_id: currentOrder.id,
-        message: newMessage
-      })
-        .then(response => {
-          console.log('Send message response:', response.data);
-          fetchChatMessages(currentOrder); // Refetch chat messages to include the new message
-        })
-        .catch(error => {
-          console.error('Error sending chat message:', error);
-        });
-    }
-  };
-
-  const openGoogleMaps = (location: LocationType) => {
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${location.latitude},${location.longitude}`;
-    window.open(url, '_blank');
-  };
-
+  // Calculate distances
   const calculateDistanceAndTime = useCallback(() => {
     if (userLocation) {
       const newDistances = { ...distances };
@@ -212,7 +105,7 @@ const TrackOrders: React.FC = () => {
           const result = haversineDistance(userLocation, parsedLocation);
           newDistances[order.id] = {
             distance: `${result.distance.toFixed(2)} km`,
-            duration: `${Math.ceil(result.duration)} mins`
+            duration: `${Math.ceil(result.duration)} mins`,
           };
         }
       });
@@ -223,6 +116,63 @@ const TrackOrders: React.FC = () => {
   useEffect(() => {
     calculateDistanceAndTime();
   }, [userLocation, orders, orderLocations, calculateDistanceAndTime]);
+
+  // Fetch chat messages for an order
+  const fetchChatMessages = useCallback((order: any) => {
+    axios
+      .get(`${baseAPI}/info/get_order_chat/${order.id}/`)
+      .then((response) => {
+        const newMessages = response.data;
+        if (newMessages.length > 0) {
+          const latestMessage = newMessages[newMessages.length - 1];
+          if (lastMessageId === null || latestMessage.id > lastMessageId) {
+            setLastMessageId(latestMessage.id);
+            setNewMessageCount((prevCount) => prevCount + 1);
+            if (Notification.permission === 'granted') {
+              new Notification('New message', { body: latestMessage.message });
+            }
+          }
+        }
+        setChatMessages(newMessages);
+      })
+      .catch((error) => console.error('Error fetching chat messages:', error));
+  }, [lastMessageId]);
+
+  useEffect(() => {
+    if (currentOrder) {
+      fetchChatMessages(currentOrder);
+      const interval = setInterval(() => fetchChatMessages(currentOrder), 3000);
+      return () => clearInterval(interval);
+    }
+  }, [currentOrder, fetchChatMessages]);
+
+  const handleOrderSelection = (order: any) => {
+    setCurrentOrder(order);
+    fetchChatMessages(order);
+    setIsChatOpen(true);
+    setNewMessageCount(0);
+  };
+
+  const handleNewUserMessage = () => {
+    if (currentOrder && chatInput.trim()) {
+      axios
+        .post(`${baseAPI}/info/send_chat_message/`, {
+          user_id: user?.user_id,
+          order_id: currentOrder.id,
+          message: chatInput.trim(),
+        })
+        .then(() => {
+          setChatInput('');
+          fetchChatMessages(currentOrder);
+        })
+        .catch((error) => console.error('Error sending chat message:', error));
+    }
+  };
+
+  const openGoogleMaps = (location: LocationType) => {
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${location.latitude},${location.longitude}`;
+    window.open(url, '_blank');
+  };
 
   return (
     <div className="p-4 bg-gray-100 min-h-screen">
@@ -235,7 +185,7 @@ const TrackOrders: React.FC = () => {
               <p className="text-gray-700 mb-1"><strong>Status:</strong> {order.status}</p>
               {orderLocations[order.id]?.driver_location ? (
                 <>
-                  <p className="text-gray-700 mb-1"><strong>Endereço do Motorista:</strong> {addresses[order.id] || 'Carregando endereço...'}</p>
+                  <p className="text-gray-700 mb-1"><strong>Coordenadas do Motorista:</strong> {orderLocations[order.id].driver_location}</p>
                   {distances[order.id] ? (
                     <>
                       <p className="text-gray-700 mb-1"><strong>Distância:</strong> {distances[order.id].distance}</p>
@@ -250,13 +200,33 @@ const TrackOrders: React.FC = () => {
                   >
                     Ver no Google Maps
                   </button>
-                  <div id="map" className="h-64 w-full mt-4"></div>
-                  <button
-                    onClick={() => (window as any).initMap(parseLocation(orderLocations[order.id].driver_location))}
-                    className="mt-2 w-full p-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition duration-300"
-                  >
-                    Ver Mapa
-                  </button>
+                  <div className="h-64 w-full mt-4">
+                    <MapContainer
+                      center={
+                        orderLocations[order.id]?.driver_location
+                          ? toLatLng(parseLocation(orderLocations[order.id].driver_location))
+                          : toLatLng(DEFAULT_CENTER)
+                      }
+                      zoom={15}
+                      scrollWheelZoom={false}
+                      style={{ height: '100%', width: '100%', borderRadius: '0.5rem' }}
+                    >
+                      <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution="&copy; OpenStreetMap contributors"
+                      />
+                      <Marker
+                        position={toLatLng(parseLocation(orderLocations[order.id].driver_location))}
+                      >
+                        <Popup>Motorista está aqui</Popup>
+                      </Marker>
+                      {userLocation && (
+                        <Marker position={toLatLng(userLocation)}>
+                          <Popup>Você está aqui</Popup>
+                        </Marker>
+                      )}
+                    </MapContainer>
+                  </div>
                 </>
               ) : (
                 <p className="text-gray-700 mb-1"><strong>O pedido está sendo preparado por:</strong> {orderLocations[order.id]?.store}</p>
@@ -274,6 +244,7 @@ const TrackOrders: React.FC = () => {
       ) : (
         <p className="text-center text-gray-700">Carregando informações dos pedidos...</p>
       )}
+      {/* Floating chat button */}
       <div className="fixed bottom-4 right-4">
         <button
           onClick={() => setIsChatOpen(true)}
@@ -287,6 +258,7 @@ const TrackOrders: React.FC = () => {
           )}
         </button>
       </div>
+      {/* Chat modal */}
       {isChatOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded-lg shadow-md p-6 w-full max-w-md mx-auto relative">
@@ -307,17 +279,26 @@ const TrackOrders: React.FC = () => {
                 </div>
               ))}
             </div>
-            <input
-              type="text"
-              className="w-full p-2 rounded-lg border border-gray-300"
-              placeholder="Digite sua mensagem..."
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && e.currentTarget.value.trim() !== '') {
-                  handleNewUserMessage(e.currentTarget.value);
-                  e.currentTarget.value = '';
-                }
-              }}
-            />
+            <div className="flex">
+              <input
+                type="text"
+                className="flex-1 p-2 rounded-l-lg border border-gray-300"
+                placeholder="Digite sua mensagem..."
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && chatInput.trim() !== '') {
+                    handleNewUserMessage();
+                  }
+                }}
+              />
+              <button
+                onClick={handleNewUserMessage}
+                className="p-2 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600 transition duration-300"
+              >
+                Enviar
+              </button>
+            </div>
             <button
               onClick={() => setIsChatOpen(false)}
               className="mt-4 w-full p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300"

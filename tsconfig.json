@@ -33,7 +33,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "app/RestaurantDashboad/StoreProfile.tsx"  ],
   "exclude": [
     "node_modules"
   ]

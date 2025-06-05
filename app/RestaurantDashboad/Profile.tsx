@@ -2,15 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/redux/slices/authSlice";
 import { getstore, getOpeningHours } from "@/services/apiService";
-import { storeType, OpeningHourType } from "@/services/types";
+import { Store as StoreType, OpeningHourType } from "@/services/types";
 
 import OpeningHour from "./OpeningHour";
 import OpeningHoursCalendar from "./OpeningHoursCalendar";
-import storeProfile from "./storeProfile";
+import StoreProfile from "./StoreProfile";
 
 const Profile: React.FC = () => {
   const user = useSelector(selectUser);
-  const [store, setstore] = useState<storeType | null>(null);
+  const [store, setstore] = useState<StoreType | null>(null);
   const [openingHours, setOpeningHours] = useState<OpeningHourType[]>([]);
   const [activeTab, setActiveTab] = useState<string>("perfil");
 
@@ -55,7 +55,7 @@ const Profile: React.FC = () => {
       {store ? (
         <div>
           {activeTab === "perfil" && (
-            <storeProfile store={store} setstore={setstore} />
+            <StoreProfile store={store} setstore={setstore} />
           )}
           {activeTab === "horario" && (
             <OpeningHour storeId={store.id} openingHours={openingHours} setOpeningHours={setOpeningHours} />

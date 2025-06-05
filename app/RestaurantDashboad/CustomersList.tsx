@@ -24,6 +24,8 @@ const CustomersList: React.FC = () => {
 
   const user = useSelector(selectUser);
 
+  const user_id = user?.user_id || 0;
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -31,7 +33,7 @@ const CustomersList: React.FC = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        `${baseAPI}/report/store/customers/${user.user_id}/`,
+        `${baseAPI}/report/store/customers/${user_id}/`,
       );
       setCustomers(response.data);
     } catch (error) {

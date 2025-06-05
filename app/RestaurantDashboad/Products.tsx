@@ -12,6 +12,8 @@ import EditProductModal from "./EditProductModal";
 
 const Products: React.FC = () => {
   const user = useSelector(selectUser);
+  const user_id = user?.user_id || 0;
+  const user_token = user?.token || "";
   const [products, setProducts] = useState<Product[] | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -63,14 +65,14 @@ const Products: React.FC = () => {
   const onSubmit = async (data: Product) => {
     const formData = new FormData();
     formData.append("name", data.name);
-    formData.append("short_description", data.short_description);
-    if (data.image && data.image[0]) {
-      formData.append("image", data.image[0]);
+    formData.append("description", data.description ?? "");
+    if (data.image_url && data.image_url[0]) {
+      formData.append("image", data.image_url[0]);
     }
     formData.append("price", String(data.price));
     formData.append("category", selectedCategory);
-    formData.append("user_id", String(user.user_id));
-    formData.append("access_token", user.token);
+    formData.append("user_id", String(user_id));
+    formData.append("access_token", user_token);
   
     setLoading(true);
     try {
@@ -96,14 +98,14 @@ const Products: React.FC = () => {
   
     const formData = new FormData();
     formData.append("name", data.name);
-    formData.append("short_description", data.short_description);
-    if (data.image && data.image[0]) {
-      formData.append("image", data.image[0]);
+    formData.append("description",  data.description ?? "");
+    if (data.image_url && data.image_url[0]) {
+      formData.append("image", data.image_url[0]);
     }
     formData.append("price", String(data.price));
     formData.append("category", selectedCategory);
-    formData.append("user_id", String(user.user_id));
-    formData.append("access_token", user.token);
+    formData.append("user_id", String(user_id));
+    formData.append("access_token", user_token);
   
     setLoading(true);
     try {
@@ -192,12 +194,12 @@ const Products: React.FC = () => {
               {products?.map((product, index) => (
                 <tr key={index} className="hover:bg-gray-100">
                   <td className="px-6 py-4 border-b border-gray-300">{product.name}</td>
-                  <td className="px-6 py-4 border-b border-gray-300">{product.short_description}</td>
+                  <td className="px-6 py-4 border-b border-gray-300">{product.description}</td>
                   <td className="px-6 py-4 border-b border-gray-300">{product.price} Kz</td>
                   <td className="px-6 py-4 border-b border-gray-300">
                     <div className="relative w-16 h-16">
                       <Image
-                        src={product.image || "https://www.kudya.shop/media/logo/azul.png"}
+                        src={product.image_url[0] || "https://www.kudya.shop/media/logo/azul.png"}
                         alt={product.name}
                         layout="fill"
                         className="object-cover rounded"

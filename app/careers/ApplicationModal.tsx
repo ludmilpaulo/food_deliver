@@ -2,6 +2,8 @@
 import React, { useState, Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { baseAPI } from '@/services/api';
+import { t } from "@/configs/i18n";
+import { X } from "lucide-react"; // or use any icon lib you prefer
 
 interface ApplicationModalProps {
   isOpen: boolean;
@@ -22,7 +24,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
   const [resume, setResume] = useState<File | null>(null);
 
   const handleApply = async () => {
-    if (!resume) return alert('Por favor, anexe um currículo.');
+    if (!resume) return alert(t("pleaseAttachResume") || 'Por favor, anexe um currículo.');
     setLoading(true);
     const formData = new FormData();
     formData.append('career', String(careerId));
@@ -35,13 +37,15 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
       body: formData,
     });
 
+    setLoading(false);
     if (response.ok) {
-      setLoading(false);
-      alert('Inscrição enviada com sucesso!');
+      alert(t("applicationSuccess") || 'Inscrição enviada com sucesso!');
       closeModal();
+      setFullName('');
+      setEmail('');
+      setResume(null);
     } else {
-      setLoading(false);
-      alert('Falha ao enviar inscrição.');
+      alert(t("applicationFailed") || 'Falha ao enviar inscrição.');
     }
   };
 
@@ -61,10 +65,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
             <div className="fixed inset-0 bg-black bg-opacity-50" />
           </Transition.Child>
 
-          {/* Este elemento é para enganar o navegador e centralizar o conteúdo do modal. */}
-          <span className="inline-block h-screen align-middle" aria-hidden="true">
-            &#8203;
-          </span>
+          <span className="inline-block h-screen align-middle" aria-hidden="true">&#8203;</span>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -74,40 +75,50 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg">
-              <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
-                Candidate-se para {careerTitle}
+            <div className="relative inline-block w-full max-w-md p-7 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-2xl">
+              
+              {/* Close Button */}
+              <button
+                onClick={closeModal}
+                className="absolute top-4 right-4 text-gray-400 hover:text-red-600 transition-colors rounded-full focus:outline-none focus:ring-2 focus:ring-red-300"
+                aria-label={t("close") || "Fechar"}
+              >
+                <X className="w-6 h-6" />
+              </button>
+              
+              <Dialog.Title as="h3" className="text-2xl font-bold leading-6 text-blue-800 mb-3">
+                {t("applyFor") || "Candidate-se para"} {careerTitle}
               </Dialog.Title>
               <div className="mt-2">
                 <input
                   type="text"
-                  placeholder="Digite seu Nome Completo"
+                  placeholder={t("fullName") || "Nome Completo"}
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="input input-bordered w-full mb-4 p-2 border border-gray-300 rounded-md"
+                  className="w-full mb-3 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
                 />
                 <input
                   type="email"
-                  placeholder="Digite seu Email"
+                  placeholder={t("email") || "Email"}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="input input-bordered w-full mb-4 p-2 border border-gray-300 rounded-md"
+                  className="w-full mb-3 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
                 />
                 <input
                   type="file"
                   onChange={(e) => setResume(e.target.files ? e.target.files[0] : null)}
-                  className="file-input w-full mb-4 p-2 border border-gray-300 rounded-md"
+                  className="w-full mb-3 p-3 border border-gray-300 rounded-lg"
+                  accept=".pdf,.doc,.docx"
                 />
               </div>
-
               <div className="mt-4">
                 <button
                   type="button"
-                  className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-green-500 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green-500 w-full"
+                  className="w-full inline-flex justify-center px-4 py-3 text-base font-semibold text-white bg-gradient-to-r from-blue-600 to-yellow-400 rounded-xl hover:from-yellow-500 hover:to-blue-700 focus:outline-none transition"
                   onClick={handleApply}
                   disabled={loading}
                 >
-                  {loading ? 'Enviando...' : 'Enviar Inscrição'}
+                  {loading ? (t("sending") || "Enviando...") : (t("submitApplication") || "Enviar Inscrição")}
                 </button>
               </div>
             </div>

@@ -4,19 +4,11 @@ import { useAppDispatch, useAppSelector } from "@/redux/store";
 import { fetchAllProducts } from "@/redux/slices/allProductsSlice";
 import ProductCard from "@/components/ProductCard";
 import { t } from "@/configs/i18n";
-import {
-  FiSearch,
-  FiTrendingUp,
-  FiArrowDown,
-  FiArrowUp,
-} from "react-icons/fi";
-import {
-  FaTags,
-  FaMars,
-  FaVenus,
-  FaGenderless,
-} from "react-icons/fa";
+import { FiSearch, FiTrendingUp, FiArrowDown, FiArrowUp } from "react-icons/fi";
+import { FaTags, FaMars, FaVenus, FaGenderless } from "react-icons/fa";
 import { getUserRegion } from "@/utils/region";
+import { supportedRegionList, getCurrencyForCountry } from "@/utils/currency";
+import type { RegionCode } from "@/utils/currency";
 
 const PAGE_SIZE = 12;
 
@@ -35,11 +27,12 @@ const BrowseProductsPage: React.FC = () => {
   const [size, setSize] = useState("");
   const [color, setColor] = useState("");
   const [page, setPage] = useState(1);
-  const [userRegion, setUserRegion] = useState<string>("ZA");
 
-  // Currency/Locale
+  // Currency/Region
+  const [userRegion, setUserRegion] = useState<RegionCode>("ZA");
+  const [regionOverride, setRegionOverride] = useState<RegionCode | "">("");
   const language = typeof window !== "undefined" ? navigator.language.split("-")[0] : "en";
-  const regionCode = userRegion || "ZA";
+  const regionCode = (regionOverride as RegionCode) || userRegion || "ZA";
 
   // Unique filter options
   const categories = useMemo(
@@ -71,7 +64,6 @@ const BrowseProductsPage: React.FC = () => {
   // Filtering logic
   const filteredProducts = useMemo(() => {
     let res = allProducts.filter((p) => {
-      // Search by name or description
       const q = search.trim().toLowerCase();
       let matchesSearch =
         p.name?.toLowerCase().includes(q) ||
@@ -79,33 +71,20 @@ const BrowseProductsPage: React.FC = () => {
           ? p.description.toLowerCase().includes(q)
           : false);
 
-      // Category
       let matchesCat = !selectedCategory || p.category === selectedCategory;
-
-      // Sale filter
       let matchesSale = !onSaleOnly || p.on_sale;
-
-      // Gender
       let matchesGender =
         !gender ||
         !p.gender ||
         p.gender.toLowerCase() === gender.toLowerCase();
 
-      // Price
       let priceNum = Number(p.price);
       let matchesPrice =
         (!minPrice || priceNum >= minPrice) &&
         (!maxPrice || priceNum <= maxPrice);
 
-      // Size
-      let matchesSize =
-        !size ||
-        (Array.isArray(p.sizes) && p.sizes.includes(size));
-
-      // Color
-      let matchesColor =
-        !color ||
-        (Array.isArray(p.colors) && p.colors.includes(color));
+      let matchesSize = !size || (Array.isArray(p.sizes) && p.sizes.includes(size));
+      let matchesColor = !color || (Array.isArray(p.colors) && p.colors.includes(color));
 
       return (
         matchesSearch &&
@@ -118,7 +97,6 @@ const BrowseProductsPage: React.FC = () => {
       );
     });
 
-    // Sorting
     if (sortBy === "priceLowHigh") {
       res = [...res].sort((a, b) => Number(a.price) - Number(b.price));
     } else if (sortBy === "priceHighLow") {
@@ -148,11 +126,10 @@ const BrowseProductsPage: React.FC = () => {
   }, [filteredProducts, page]);
 
   useEffect(() => {
-    getUserRegion().then(setUserRegion);
+    getUserRegion().then((r) => setUserRegion(r as RegionCode));
     dispatch(fetchAllProducts());
   }, [dispatch]);
 
-  // Reset page if filters change
   useEffect(() => {
     setPage(1);
   }, [
@@ -174,12 +151,33 @@ const BrowseProductsPage: React.FC = () => {
     { value: "female", label: t("female"), icon: <FaVenus className="text-pink-400" /> }
   ];
 
+  // Region/currency select
+  const regionSelect = (
+    <select
+      className="p-1 rounded border border-blue-200 bg-white/90 text-blue-900"
+      value={regionOverride || userRegion}
+      onChange={(e) => setRegionOverride(e.target.value as RegionCode)}
+    >
+      {supportedRegionList.map((region) => (
+        <option key={region.code} value={region.code}>
+          {region.flag} {region.label}
+        </option>
+      ))}
+    </select>
+  );
+
   return (
     <div className="bg-gradient-to-br from-blue-50 to-yellow-50 min-h-screen pb-8">
       <div className="max-w-7xl mx-auto px-4 pt-6">
-        <h1 className="text-3xl font-bold flex items-center gap-2 mb-6 text-blue-900 drop-shadow">
-          {t("browseProducts")} <span role="img" aria-label="shop">🛒</span>
-        </h1>
+        <div className="flex justify-between items-center mb-2">
+          <h1 className="text-3xl font-bold flex items-center gap-2 mb-4 text-blue-900 drop-shadow">
+            {t("browseProducts")} <span role="img" aria-label="shop">🛒</span>
+          </h1>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-blue-700 font-semibold">{t("currency")}</span>
+            {regionSelect}
+          </div>
+        </div>
 
         {/* Filter UI */}
         <div className="flex flex-wrap items-center gap-4 bg-white/60 rounded-2xl shadow px-4 py-4 mb-8 glassmorphism border backdrop-blur-md border-blue-100">
@@ -306,7 +304,6 @@ const BrowseProductsPage: React.FC = () => {
             </button>
           </div>
         </div>
-
         {/* Category Bar */}
         <div className="flex gap-2 flex-wrap mb-8 px-1">
           <button
@@ -333,7 +330,6 @@ const BrowseProductsPage: React.FC = () => {
             </button>
           ))}
         </div>
-
         {/* Products grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-7 min-h-[480px]">
           {loading ? (
@@ -351,7 +347,6 @@ const BrowseProductsPage: React.FC = () => {
             ))
           )}
         </div>
-
         {/* Paginator */}
         {totalPages > 1 && (
           <div className="flex items-center justify-center gap-4 mt-10">

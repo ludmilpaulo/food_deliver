@@ -1,7 +1,7 @@
 
 //export const baseAPI: string = process.env.NEXT_PUBLIC_BASE_API || 'https://www.kudya.shop';
 
-export const baseAPI: string = process.env.NEXT_PUBLIC_BASE_API || "https://kudya.pythonanywhere.com";
+export const baseAPI: string = "http://127.0.0.1:8000";
 
 
 import { ReactNode } from "react";
@@ -71,7 +71,7 @@ export interface Product {
   bulk_sale: boolean;
   discount_percentage: number;
   season?: string;
-  images: ProductImage[];
+  images: string[];
   image_url: string[]; // matches Django @property
   gender?: string;
   colors?: string[];

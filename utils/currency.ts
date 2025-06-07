@@ -67,3 +67,23 @@ export function formatCurrency(
     return `${currencySymbols[code] || ""}${(amount ?? 0).toFixed(2)}`;
   }
 }
+
+export const supportedRegionList: { code: RegionCode; label: string; flag: string }[] = [
+  { code: "ZA", label: "South Africa", flag: "🇿🇦" },
+  { code: "AO", label: "Angola", flag: "🇦🇴" },
+  { code: "MZ", label: "Mozambique", flag: "🇲🇿" },
+  { code: "CV", label: "Cape Verde", flag: "🇨🇻" },
+  { code: "PT", label: "Portugal", flag: "🇵🇹" },
+  { code: "BR", label: "Brazil", flag: "🇧🇷" },
+  { code: "GW", label: "Guinea-Bissau", flag: "🇬🇼" },
+  { code: "ST", label: "São Tomé & Príncipe", flag: "🇸🇹" },
+  { code: "TL", label: "Timor-Leste", flag: "🇹🇱" },
+  { code: "GQ", label: "Equatorial Guinea", flag: "🇬🇶" },
+  { code: "SN", label: "Senegal", flag: "🇸🇳" },
+  { code: "ZW", label: "Zimbabwe", flag: "🇿🇼" },
+  { code: "BW", label: "Botswana", flag: "🇧🇼" },
+  { code: "NA", label: "Namibia", flag: "🇳🇦" },
+  { code: "ZM", label: "Zambia", flag: "🇿🇲" },
+  { code: "BF", label: "Burkina Faso", flag: "🇧🇫" },
+  { code: "NG", label: "Nigeria", flag: "🇳🇬" },
+];

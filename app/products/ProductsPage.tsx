@@ -90,10 +90,12 @@ export default function ProductsPage() {
     subtitle:
       product.discount_percentage > 0 ? `-${product.discount_percentage}%` : "SALE",
     image:
-      product.images?.[0]?.image?.startsWith("/media/")
-        ? `${process.env.NEXT_PUBLIC_BASE_API}${product.images[0].image}`
-        : product.images?.[0]?.image || "/no-image.png",
+      product.image_url?.[0]?.startsWith("/media/")
+        ? `${process.env.NEXT_PUBLIC_BASE_API}${product.image_url[0]}`
+        : product.image_url?.[0] || "/no-image.png",
   }));
+
+
 
   // --- Locale/currency ---
   const language =
@@ -169,7 +171,7 @@ export default function ProductsPage() {
               ? product.price -
                 (product.price * product.discount_percentage) / 100
               : product.price,
-          image: product.images?.[0]?.image,
+          image: product.image_url?.[0],
           size: size || "",
           color: color || "",
           store: storeId,
@@ -213,7 +215,7 @@ export default function ProductsPage() {
           product.on_sale && product.discount_percentage > 0
             ? product.price - (product.price * product.discount_percentage) / 100
             : product.price,
-        image: product.images?.[0]?.image,
+        image: product.images?.[0],
         size: selectedSize || "",
         color: selectedColor || "",
         store: storeId,
@@ -241,7 +243,7 @@ export default function ProductsPage() {
               <div
                 key={item.id}
                 className="relative rounded-xl overflow-hidden h-44 cursor-pointer"
-                onClick={() => router.push(`/product/${item.id}`)}
+                onClick={() => router.push(`/products/${item.id}`)}
               >
                 <Image
                   src={item.image || "/no-image.png"}

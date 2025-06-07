@@ -165,7 +165,7 @@ const ProductDetailPage: React.FC<Props> = () => {
     size: selectedSize || "",
     color: selectedColor || "", // <-- Add this line!
     price,
-    image: productToShow.images?.[0]?.image || "",
+    image: productToShow.images?.[0] || "",
     store: productToShow.store_id,
     quantity,
   })
@@ -401,11 +401,18 @@ const ProductDetailPage: React.FC<Props> = () => {
               <Link key={rel.id} href={`/products/${rel.id}`} className="w-36 flex-shrink-0">
                 <div className="relative w-full h-32 rounded-lg bg-gray-200 overflow-hidden">
                   <Image
-                    src={rel.image_url?.[0] || "/no-image.png"}
-                    alt={rel.name}
-                    fill
-                    className="object-cover"
-                  />
+                      src={
+                        rel.images?.[0]
+                          ? rel.images[0].startsWith("http")
+                            ? rel.images[0]
+                            : `${baseAPI}${rel.images[0]}`
+                          : "/no-image.png"
+                      }
+                      alt={rel.name}
+                      fill
+                      className="object-cover rounded-lg"
+                    />
+
                 </div>
                 <span className="mt-2 text-sm font-semibold text-gray-800 block truncate">{rel.name}</span>
                 <span className="text-xs font-bold text-blue-700 block">

@@ -184,6 +184,39 @@ export const translationKeys = [
   "Clear Cart",
   "Are you sure you want to remove all items from your cart?",
   "Total",
+  "careerOpportunities",
+  "careerSubtitle", 
+  "noOpenings",
+  "applyNow",
+  "applyFor",
+  "submitApplication",
+  "fullName",
+  "pleaseAttachResume",
+  "applicationSuccess",
+  "applicationFailed",
+  "sending",
+
+  "contactUs",
+  "contactSubtitle",
+  "subject",
+  "subjectPlaceholder",
+  "emailPlaceholder",
+  "phonePlaceholder",
+  "message",
+  "messagePlaceholder",
+  "contactSuccess",
+  "contactFailed",
+  "currency",
+
+  "adding",
+  "decreaseQuantity",
+  "increaseQuantity",
+
+  "downloadApp",
+  "aboutUs",
+  "seeCareers"
+
+        
 
  
 ] as const;
@@ -193,6 +226,42 @@ export type TranslationKey = typeof translationKeys[number];
 
 const translations: Record<SupportedLocale, Record<TranslationKey, string>> = {
   en: {
+    // ENGLISH
+    "downloadApp": "Download our App",
+    "aboutUs": "About Us",
+    "seeCareers": "See Careers",
+    "increaseQuantity": "Increase Quantity",
+    "decreaseQuantity": "Decrease Quantity",  
+    "adding": "Adding",
+
+"currency": "Currency",
+    // ENGLISH
+"contactUs": "Contact Us",
+"contactSubtitle": "Send your message, suggestion, or question. Our team will respond promptly!",
+"subject": "Subject",
+"subjectPlaceholder": "How can we help?",
+
+"emailPlaceholder": "your@email.com",
+
+"phonePlaceholder": "+244 912 345 678",
+"message": "Message",
+"messagePlaceholder": "Write your message...",
+
+"contactSuccess": "Message sent successfully! Check your email for confirmation.",
+"contactFailed": "Failed to send message. Please try again.",
+
+    /////////////////////
+    "careerOpportunities": "Career Opportunities",
+"careerSubtitle": "Build the future with us. See openings for your country.",
+"noOpenings": "No open positions for your country at the moment.",
+"applyNow": "Apply Now",
+"applyFor": "Apply for",
+"submitApplication": "Submit Application",
+"fullName": "Full Name",
+"pleaseAttachResume": "Please attach your resume.",
+"applicationSuccess": "Application sent successfully!",
+"applicationFailed": "Failed to submit application.",
+"sending": "Sending...",
     YourCart: "Your Cart",
     "Your cart is empty": "Your cart is empty",
     "Go Shopping": "Go Shopping",
@@ -376,6 +445,14 @@ networkError: "Network error, please try again.",
     onSale: "On Sale",
   },
   pt: {
+// PORTUGUÊS
+"downloadApp": "Baixe nosso App",
+"aboutUs": "Sobre Nós", 
+"seeCareers": "Ver Carreiras",
+"decreaseQuantity": "Diminuir Quantidade",
+"increaseQuantity": "Aumentar Quantidade",
+"adding": "Adicionando",
+"currency": "Moeda",
     YourCart: "Seu Carrinho",
 "Your cart is empty": "Seu carrinho está vazio",
 "Go Shopping": "Continuar Comprando",
@@ -555,6 +632,33 @@ networkError: "Erro de rede, tente novamente.",
     onSale: "Em Promoção",
     storeClosed: "O restaurante está fechado de momento, tente mais tarde.",
 
+    // pt
+    "careerOpportunities": "Oportunidades de Carreira",
+    "careerSubtitle": "Construa o futuro com a gente. Veja as vagas disponíveis para o seu país.",
+    "noOpenings": "Nenhuma vaga disponível para o seu país no momento.",
+    "applyNow": "Candidatar-se",
+    "applyFor": "Candidate-se para",
+    "submitApplication": "Enviar Inscrição",
+    "fullName": "Nome Completo",
+    "pleaseAttachResume": "Por favor, anexe um currículo.",
+    "applicationSuccess": "Inscrição enviada com sucesso!",
+    "applicationFailed": "Falha ao enviar inscrição.",
+    "sending": "Enviando...",
+
+    // PORTUGUÊS
+"contactUs": "Contacte-nos",
+"contactSubtitle": "Envie sua mensagem, sugestão ou dúvida. Nossa equipa irá responder rapidamente!",
+"subject": "Assunto",
+"subjectPlaceholder": "Como podemos ajudar?",
+
+"emailPlaceholder": "seu@email.com",
+
+"phonePlaceholder": "+244 912 345 678",
+"message": "Mensagem",
+"messagePlaceholder": "Escreva sua mensagem...",
+
+"contactSuccess": "Mensagem enviada com sucesso! Verifique seu e-mail para confirmação.",
+"contactFailed": "Falha ao enviar a mensagem. Tente novamente.",
   },
 };
 

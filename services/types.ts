@@ -1,9 +1,9 @@
 
 //export const baseAPI: string = process.env.NEXT_PUBLIC_BASE_API || 'https://www.kudya.shop';
 
-export const baseAPI: string = "http://127.0.0.1:8000";
+//export const baseAPI: string = "http://127.0.0.1:8000";
 
-
+export const baseAPI: string = "https://kudya.pythonanywhere.com";
 import { ReactNode } from "react";
 
 export type UserDetails = {

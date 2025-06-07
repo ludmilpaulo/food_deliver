@@ -1,9 +1,10 @@
 "use client";
-import React, { useState, Fragment } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import { baseAPI } from '@/services/api';
+import React, { useState, Fragment } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { X } from "lucide-react";
+import axios from "axios";
+import { baseAPI } from "@/services/api";
 import { t } from "@/configs/i18n";
-import { X } from "lucide-react"; // or use any icon lib you prefer
 
 interface ApplicationModalProps {
   isOpen: boolean;
@@ -18,111 +19,160 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
   careerTitle,
   careerId,
 }) => {
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [coverLetter, setCoverLetter] = useState("");
   const [resume, setResume] = useState<File | null>(null);
+  const [language, setLanguage] = useState<"en" | "pt">("en");
+  const [loading, setLoading] = useState(false);
 
-  const handleApply = async () => {
-    if (!resume) return alert(t("pleaseAttachResume") || 'Por favor, anexe um currículo.');
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resume) {
+      alert(t("pleaseAttachResume") || "Please attach your resume.");
+      return;
+    }
     setLoading(true);
-    const formData = new FormData();
-    formData.append('career', String(careerId));
-    formData.append('full_name', fullName);
-    formData.append('email', email);
-    formData.append('resume', resume);
+    try {
+      const formData = new FormData();
+      formData.append("career_id", String(careerId));
+      formData.append("full_name", fullName);
+      formData.append("email", email);
+      formData.append("cover_letter", coverLetter);
+      formData.append("language", language);
+      formData.append("resume", resume);
 
-    const response = await fetch(`${baseAPI}/careers/apply-for-job/`, {
-      method: 'POST',
-      body: formData,
-    });
+      const response = await axios.post(`${baseAPI}/careers/job-applications/`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
-    setLoading(false);
-    if (response.ok) {
-      alert(t("applicationSuccess") || 'Inscrição enviada com sucesso!');
-      closeModal();
-      setFullName('');
-      setEmail('');
-      setResume(null);
-    } else {
-      alert(t("applicationFailed") || 'Falha ao enviar inscrição.');
+      setLoading(false);
+      if (response.status === 201 || response.status === 200) {
+        alert(t("applicationSuccess") || "Application submitted successfully!");
+        closeModal();
+        setFullName("");
+        setEmail("");
+        setCoverLetter("");
+        setResume(null);
+        setLanguage("en");
+      } else {
+        alert(t("applicationFailed") || "Failed to submit application.");
+      }
+    } catch (err) {
+      setLoading(false);
+      alert(t("applicationFailed") || "Failed to submit application.");
     }
   };
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
-      <Dialog as="div" className="fixed inset-0 z-10 overflow-y-auto" onClose={closeModal}>
-        <div className="min-h-screen px-4 text-center">
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-black bg-opacity-50" />
-          </Transition.Child>
+      <Dialog as="div" className="relative z-50" onClose={closeModal}>
+        <Transition.Child
+          as={Fragment}
+          enter="ease-out duration-200"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-150"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <div className="fixed inset-0 bg-black bg-opacity-40" />
+        </Transition.Child>
 
-          <span className="inline-block h-screen align-middle" aria-hidden="true">&#8203;</span>
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0 scale-95"
-            enterTo="opacity-100 scale-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100 scale-100"
-            leaveTo="opacity-0 scale-95"
-          >
-            <div className="relative inline-block w-full max-w-md p-7 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-2xl">
-              
-              {/* Close Button */}
-              <button
-                onClick={closeModal}
-                className="absolute top-4 right-4 text-gray-400 hover:text-red-600 transition-colors rounded-full focus:outline-none focus:ring-2 focus:ring-red-300"
-                aria-label={t("close") || "Fechar"}
-              >
-                <X className="w-6 h-6" />
-              </button>
-              
-              <Dialog.Title as="h3" className="text-2xl font-bold leading-6 text-blue-800 mb-3">
-                {t("applyFor") || "Candidate-se para"} {careerTitle}
-              </Dialog.Title>
-              <div className="mt-2">
-                <input
-                  type="text"
-                  placeholder={t("fullName") || "Nome Completo"}
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="w-full mb-3 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
-                />
-                <input
-                  type="email"
-                  placeholder={t("email") || "Email"}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full mb-3 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
-                />
-                <input
-                  type="file"
-                  onChange={(e) => setResume(e.target.files ? e.target.files[0] : null)}
-                  className="w-full mb-3 p-3 border border-gray-300 rounded-lg"
-                  accept=".pdf,.doc,.docx"
-                />
-              </div>
-              <div className="mt-4">
-                <button
-                  type="button"
-                  className="w-full inline-flex justify-center px-4 py-3 text-base font-semibold text-white bg-gradient-to-r from-blue-600 to-yellow-400 rounded-xl hover:from-yellow-500 hover:to-blue-700 focus:outline-none transition"
-                  onClick={handleApply}
-                  disabled={loading}
-                >
-                  {loading ? (t("sending") || "Enviando...") : (t("submitApplication") || "Enviar Inscrição")}
-                </button>
-              </div>
-            </div>
-          </Transition.Child>
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex min-h-full items-center justify-center p-4">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-200"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="ease-in duration-150"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+              <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-xl bg-white p-6 shadow-xl transition-all">
+                <div className="flex justify-between items-center mb-4">
+                  <Dialog.Title className="text-2xl font-bold">
+                    {careerTitle}
+                  </Dialog.Title>
+                  <button onClick={closeModal} className="text-gray-500 hover:text-gray-800 transition">
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {/* Language Selector */}
+                  <div>
+                    <label className="block text-sm font-medium">{t("language") || "Language"}</label>
+                    <select
+                      className="border p-2 rounded w-full"
+                      value={language}
+                      onChange={(e) => setLanguage(e.target.value as "en" | "pt")}
+                    >
+                      <option value="en">English</option>
+                      <option value="pt">Português</option>
+                    </select>
+                  </div>
+
+                  {/* Full Name */}
+                  <div>
+                    <label className="block text-sm font-medium">{t("fullName") || "Full Name"}</label>
+                    <input
+                      type="text"
+                      className="w-full border p-2 rounded"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  {/* Email */}
+                  <div>
+                    <label className="block text-sm font-medium">{t("email") || "Email"}</label>
+                    <input
+                      type="email"
+                      className="w-full border p-2 rounded"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  {/* Cover Letter */}
+                  <div>
+                    <label className="block text-sm font-medium">{t("coverLetter") || "Cover Letter"}</label>
+                    <textarea
+                      className="w-full border p-2 rounded"
+                      rows={5}
+                      value={coverLetter}
+                      onChange={(e) => setCoverLetter(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  {/* Resume */}
+                  <div>
+                    <label className="block text-sm font-medium">{t("resume") || "Resume"}</label>
+                    <input
+                      type="file"
+                      accept="application/pdf"
+                      className="w-full border p-2 rounded"
+                      onChange={(e) => setResume(e.target.files?.[0] || null)}
+                      required
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:opacity-60"
+                    disabled={loading}
+                  >
+                    {loading ? (t("loading") || "Loading...") : (t("submit") || "Submit")}
+                  </button>
+                </form>
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
         </div>
       </Dialog>
     </Transition>

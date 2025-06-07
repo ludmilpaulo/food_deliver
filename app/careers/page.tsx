@@ -28,12 +28,11 @@ const countryMap: Record<string, string> = {
 export default function CareersPage() {
   const { careers, loading, error } = useCareers();
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedCareer, setSelectedCareer] = useState({ id: 0, title: "" });
+  const [selectedCareer, setSelectedCareer] = useState<{ id: number; title: string }>({ id: 0, title: "" });
   const [headerData, setHeaderData] = useState<AboutUsData | null>(null);
 
   // Detect user's country on client
-  const userCountryCode =
-    typeof window !== "undefined" ? getUserCountryCode() : "ZA";
+  const userCountryCode = typeof window !== "undefined" ? getUserCountryCode() : "ZA";
   const countryName = countryMap[userCountryCode];
 
   useEffect(() => {
@@ -53,7 +52,7 @@ export default function CareersPage() {
   }, [careers, countryName]);
 
   const handleApplyClick = (career: CareerPosition) => {
-    setSelectedCareer(career);
+    setSelectedCareer({ id: career.id, title: career.title });
     setModalOpen(true);
   };
 

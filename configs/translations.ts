@@ -214,7 +214,11 @@ export const translationKeys = [
 
   "downloadApp",
   "aboutUs",
-  "seeCareers"
+  "seeCareers",
+  "language",
+  "coverLetter",
+  "resume",
+  "submit",
 
         
 
@@ -227,6 +231,11 @@ export type TranslationKey = typeof translationKeys[number];
 const translations: Record<SupportedLocale, Record<TranslationKey, string>> = {
   en: {
     // ENGLISH
+   "language": "Language",
+  "coverLetter": "Cover Letter",
+  "resume": "Resume",
+  "submit": "Submit",
+
     "downloadApp": "Download our App",
     "aboutUs": "About Us",
     "seeCareers": "See Careers",
@@ -446,6 +455,10 @@ networkError: "Network error, please try again.",
   },
   pt: {
 // PORTUGUÊS
+"language": "Idioma",
+  "coverLetter": "Carta de Apresentação",
+  "resume": "Currículo",
+  "submit": "Enviar",
 "downloadApp": "Baixe nosso App",
 "aboutUs": "Sobre Nós", 
 "seeCareers": "Ver Carreiras",

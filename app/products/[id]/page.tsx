@@ -9,6 +9,7 @@ import { t } from "@/configs/i18n";
 import Image from "next/image";
 import { formatCurrency, getCurrencyForCountry } from "@/utils/currency";
 import { fetchRelatedProducts } from "@/redux/slices/relatedProductsSlice";
+import { useUserRegion } from "@/hooks/useUserRegion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart as faSolidHeart, faShareNodes, faStar as faSolidStar, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faRegularHeart, faStar as faRegularStar } from "@fortawesome/free-regular-svg-icons";
@@ -29,6 +30,7 @@ const ProductDetailPage: React.FC<Props> = () => {
   const router = useRouter();
   const params = useParams();
   const dispatch = useAppDispatch();
+  const { region: regionCode } = useUserRegion();
 
   // Product ID from URL
   const productId = useMemo(() => {
@@ -245,14 +247,13 @@ const ProductDetailPage: React.FC<Props> = () => {
           {productToShow.on_sale ? (
             <>
               <span className="text-gray-400 line-through text-lg">
-                {formatCurrency(Number(productToShow.price), getCurrencyForCountry("ZA"), "en")
-}
+                {formatCurrency(Number(productToShow.price), getCurrencyForCountry(regionCode), "en")}
               </span>
               <span className="text-xl font-bold text-green-700">
                 {formatCurrency(
                   Number(productToShow.price) -
                     (Number(productToShow.price) * productToShow.discount_percentage) / 100,
-                  getCurrencyForCountry("ZA"),
+                  getCurrencyForCountry(regionCode),
                   "en"
                 )}
               </span>
@@ -420,7 +421,7 @@ const ProductDetailPage: React.FC<Props> = () => {
                     rel.on_sale
                       ? rel.price - (rel.price * rel.discount_percentage) / 100
                       : rel.price,
-                    getCurrencyForCountry("ZA"),
+                    getCurrencyForCountry(regionCode),
                     "en"
                   )}
                 </span>

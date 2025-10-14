@@ -26,6 +26,11 @@ const menuItems = [
     label: { en: "Track Orders", pt: "Rastrear Pedidos" },
   },
   {
+    key: "trackDelivery",
+    icon: <FaTruck size={18} />,
+    label: { en: "Track Delivery", pt: "Rastrear Entrega" },
+  },
+  {
     key: "updateProfile",
     icon: <FaUserEdit size={18} />,
     label: { en: "Update Profile", pt: "Atualizar Perfil" },
@@ -34,6 +39,11 @@ const menuItems = [
     key: "orderHistory",
     icon: <FaHistory size={18} />,
     label: { en: "Order History", pt: "Histórico de Pedidos" },
+  },
+  {
+    key: "serviceBookings",
+    icon: <FaHistory size={18} />,
+    label: { en: "Service Bookings", pt: "Agendamentos" },
   },
   {
     key: "downloadInvoice",

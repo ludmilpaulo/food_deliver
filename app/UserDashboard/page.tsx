@@ -6,8 +6,10 @@ import UpdateProfile from "./UpdateProfile";
 import dynamic from "next/dynamic";
 import Sidebar from "./Sidebar";
 import { getLanguage, t } from "@/configs/i18n";
+import Bookings from "./Bookings";
 
 const TrackOrders = dynamic(() => import("./TrackOrders"), { ssr: false });
+const TrackDelivery = dynamic(() => import("./TrackDelivery"), { ssr: false });
 
 const UserDashboard: React.FC = () => {
   const [selectedMenu, setSelectedMenu] = useState<string>("trackOrders");
@@ -30,6 +32,10 @@ const UserDashboard: React.FC = () => {
     switch (selectedMenu) {
       case "trackOrders":
         return <TrackOrders />;
+      case "trackDelivery":
+        return <TrackDelivery />;
+      case "serviceBookings":
+        return <Bookings />;
       case "updateProfile":
         return <UpdateProfile />;
       case "orderHistory":

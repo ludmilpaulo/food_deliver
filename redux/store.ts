@@ -9,6 +9,7 @@ import authReducer from "./slices/authSlice";
 import allStoresReducer from "./slices/allStoresSlice";
 import allProductsReducer from "./slices/allProductsSlice";
 import relatedProductsReducer from "./slices/relatedProductsSlice";
+import servicesReducer from "./slices/servicesSlice";
 
 
 export const store = configureStore({
@@ -21,6 +22,7 @@ export const store = configureStore({
     auth: authReducer,
     allProducts: allProductsReducer,
     relatedProducts: relatedProductsReducer,
+    services: servicesReducer,
     [aboutApi.reducerPath]: aboutApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>

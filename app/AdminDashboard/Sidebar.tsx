@@ -9,6 +9,8 @@ import dynamic from "next/dynamic";
 const CustomersList = dynamic(() => import("./CustomersList"));
 
 const Report = dynamic(() => import("./Report"));
+const KYC = dynamic(() => import("./KYC"));
+const Payouts = dynamic(() => import("./Payouts"));
 const DriverList = dynamic(() => import("./DriverList"));
 const Orders = dynamic(() => import("./Orders"));
 const Store = dynamic(() => import("./Store"));
@@ -24,6 +26,8 @@ const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, 
   const [listOfCustomer, setListOfCustomer] = useState(false);
   const [listOfDriver, setListOfDriver] = useState(false);
   const [showDatabaseActions, setShowDatabaseActions] = useState(false);
+  const [showKYC, setShowKYC] = useState(false);
+  const [showPayouts, setShowPayouts] = useState(false);
   const [loading, setLoading] = useState(false);
 
   return (
@@ -227,14 +231,39 @@ const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, 
                     setListOfCustomer(false);
                     setListOfDriver(false);
                     setShowproducts(false);
-                    setShowDatabaseActions(true);
+                    setShowKYC(true);
+                    setShowPayouts(false);
+                    setShowDatabaseActions(false);
                     onToggle();
                   }}
                 >
                   <div className="flex items-center space-x-3">
                     <MdBarChart className="text-lg" />
-                    <span>Administração</span>
+                  <span>KYC</span>
                   </div>
+                </motion.li>
+                <motion.li
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="p-2 rounded hover:bg-blue-600 cursor-pointer"
+                  onClick={() => {
+                    setShowProducts(false);
+                    setShowOrders(false);
+                    setShowstore(false);
+                    setShowReport(false);
+                    setListOfCustomer(false);
+                    setListOfDriver(false);
+                    setShowproducts(false);
+                    setShowKYC(false);
+                    setShowPayouts(true);
+                    setShowDatabaseActions(false);
+                    onToggle();
+                  }}
+                >
+                <div className="flex items-center space-x-3">
+                  <MdBarChart className="text-lg" />
+                  <span>Payouts</span>
+                </div>
                 </motion.li>
               </ul>
             </div>
@@ -269,6 +298,8 @@ const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, 
           {showReport && <Report />}
           {listOfCustomer && <CustomersList />}
           {listOfDriver && <DriverList />}
+          {showKYC && <KYC />}
+          {showPayouts && <Payouts />}
           {showDatabaseActions && <DatabaseActions />} {/* Render the DatabaseActions component */}
         </div>
       </div>

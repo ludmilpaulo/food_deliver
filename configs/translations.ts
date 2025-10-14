@@ -219,6 +219,7 @@ export const translationKeys = [
   "coverLetter",
   "resume",
   "submit",
+  "requestSent",
 
         
 
@@ -234,7 +235,8 @@ const translations: Record<SupportedLocale, Record<TranslationKey, string>> = {
    "language": "Language",
   "coverLetter": "Cover Letter",
   "resume": "Resume",
-  "submit": "Submit",
+    "submit": "Submit",
+    "requestSent": "Request sent",
 
     "downloadApp": "Download our App",
     "aboutUs": "About Us",
@@ -459,6 +461,7 @@ networkError: "Network error, please try again.",
   "coverLetter": "Carta de Apresentação",
   "resume": "Currículo",
   "submit": "Enviar",
+  "requestSent": "Pedido enviado",
 "downloadApp": "Baixe nosso App",
 "aboutUs": "Sobre Nós", 
 "seeCareers": "Ver Carreiras",

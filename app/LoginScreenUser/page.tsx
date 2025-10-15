@@ -13,6 +13,7 @@ import ForgotPasswordModal from "./ForgotPasswordModal";
 import { clearAllCart } from "@/redux/slices/basketSlice";
 import { t, setLanguageFromBrowser, setLanguage, getLanguage } from "@/configs/i18n";
 import { SupportedLocale } from "@/configs/translations";
+import { analytics } from "@/utils/mixpanel";
 
 const LANGUAGES: { value: SupportedLocale; label: string }[] = [
   { value: "en", label: "🇬🇧 English" },
@@ -34,6 +35,7 @@ const LoginScreenUser: React.FC = () => {
     setLanguageFromBrowser();
     setLang(getLanguage());
     dispatch(clearAllCart());
+    analytics.trackPageView('Login Page');
     // eslint-disable-next-line
   }, []);
 
@@ -54,13 +56,22 @@ const LoginScreenUser: React.FC = () => {
       ).unwrap();
       // Result: {token, user_id, is_customer, ...}
       if (resultAction.is_customer === true) {
+        analytics.trackLogin(resultAction.user_id.toString(), {
+          user_type: 'customer',
+          platform: 'web'
+        });
         alert(t("loginSuccess"));
         router.push("/HomeScreen");
       } else if (resultAction.is_customer === false) {
+        analytics.trackLogin(resultAction.user_id.toString(), {
+          user_type: 'store',
+          platform: 'web'
+        });
         alert(t("loginSuccess"));
         router.push("/StoreDashboad");
       }
     } catch (error: any) {
+      analytics.trackError('Login Failed', { username, error: error?.toString() });
       if (typeof error === "string") {
         alert(error);
       } else {

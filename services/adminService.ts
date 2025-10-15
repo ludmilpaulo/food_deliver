@@ -9,7 +9,7 @@ const API_URL = baseAPI;
 
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BASE_API,
+  baseURL: baseAPI,
 });
 
 export const fetchAboutUs = async () => {

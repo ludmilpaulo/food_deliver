@@ -12,6 +12,7 @@ import { SupportedLocale } from "@/configs/translations";
 import { baseAPI, CartItem } from "@/services/types";
 import { FaCheckCircle, FaArrowLeft, FaWhatsapp, FaInfoCircle } from "react-icons/fa";
 import withAuth from "@/components/ProtectedPage";
+import { analytics } from "@/utils/mixpanel";
 
 const LANGUAGES: { value: SupportedLocale; label: string }[] = [
   { value: "en", label: "🇬🇧 English" },
@@ -68,6 +69,9 @@ const CheckoutPage: React.FC = () => {
 
   // Redirect if not logged in
   useEffect(() => {
+    analytics.trackPageView('Checkout Page');
+    analytics.trackCheckoutStarted(total, items.length);
+    
     if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -130,6 +134,7 @@ const handlePlaceOrder = async (e: React.FormEvent) => {
     setLoading(false);
 
     if (data.status === "success" || data.status === "partial_success") {
+      analytics.trackOrderCompleted(data.order_pins?.join(',') || 'unknown', total, items);
       setOrderSuccess(true);
       dispatch(clearAllCart());
       setOrderPin(data.order_pins || []);
@@ -138,6 +143,7 @@ const handlePlaceOrder = async (e: React.FormEvent) => {
         setError(`Some orders had issues: ${JSON.stringify(data.errors)}`);
       }
     } else {
+      analytics.trackError('Order Failed', { error: data.error });
       setError(data.error || "An unexpected error occurred");
     }
   } catch (e) {

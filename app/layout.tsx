@@ -5,6 +5,7 @@ import './globals.css';
 import StoreProvider from '@/redux/StoreProvider';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import ClientRoot from './ClientRoot';
 
 
 
@@ -50,9 +51,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt">
       <body className={inter.className}>
         <StoreProvider>
-          <Navbar />
-          {children}
-          <Footer />
+          <ClientRoot>
+            <Navbar />
+            {children}
+            <Footer />
+          </ClientRoot>
         </StoreProvider>
       </body>
     </html>

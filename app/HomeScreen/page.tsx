@@ -9,6 +9,7 @@ import TodaysDealsCarousel from "./TodaysDealsCarousel";
 import Image from "next/image";
 import { t } from "@/configs/i18n";
 import { Store, Category, Product } from "@/services/types";
+import { analytics } from "@/utils/mixpanel";
 
 const PAGE_SIZE = 9; // Stores per page
 
@@ -28,6 +29,7 @@ const HomeScreen: React.FC = () => {
 
   // Fetch stores & products
   useEffect(() => {
+    analytics.trackPageView('Home Screen');
     dispatch(fetchAllStores());
     dispatch(fetchAllProducts());
     const interval = setInterval(() => dispatch(fetchAllStores()), 120_000);

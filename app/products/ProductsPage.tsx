@@ -10,6 +10,7 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { getCurrencyForCountry, formatCurrency } from "@/utils/currency";
 import { baseAPI, Product } from "@/services/types";
+import { useUserRegion } from "@/hooks/useUserRegion";
 
 type ProductSelections = Record<number, { size: string | null; color: string | null }>;
 type SelectionPrompt = { [productId: number]: string | null };
@@ -98,10 +99,9 @@ export default function ProductsPage() {
 
 
   // --- Locale/currency ---
+  const { region: regionCode } = useUserRegion();
   const language =
     typeof window !== "undefined" ? navigator.language.split("-")[0] : "en";
-  const regionCode =
-    typeof window !== "undefined" ? navigator.language.split("-")[1] || "ZA" : "ZA";
   const currencyCode = getCurrencyForCountry(regionCode);
 
   // --- Helpers ---

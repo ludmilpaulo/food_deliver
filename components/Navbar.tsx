@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { IoMdMenu, IoMdClose, IoMdCart, IoMdPerson } from "react-icons/io";
 import { MdStore } from "react-icons/md";
+import { MdMedicalServices } from "react-icons/md";
 import { FiPackage } from "react-icons/fi";
 import Image from "next/image";
 import logo from "@/assets/azul.png";
@@ -40,6 +41,7 @@ const Navbar: React.FC = () => {
     <>
       <NavLink href="/AllProducts" icon={<FiPackage size={20} className="text-blue-700" />} label={t("allProducts") || "All Products"} />
       <NavLink href="/StoreTypes" icon={<MdStore size={20} className="text-yellow-500" />} label={t("Stores")} />
+      <NavLink href="/services" icon={<MdMedicalServices size={20} className="text-pink-600" />} label={"Services"} />
       <NavLink href="/CartPage" icon={<IoMdCart size={22} className="text-green-700" />} label={t("Cart")}>
         {cartQuantity > 0 && (
           <span className="absolute -top-2 -right-3 bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center shadow font-bold animate-bounce">

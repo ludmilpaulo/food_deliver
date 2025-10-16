@@ -27,6 +27,11 @@ const nextConfig = {
         pathname: '/**',
       },
       {
+        protocol: 'https',
+        hostname: 'www.kudya.store',
+        pathname: '/**',
+      },
+      {
         protocol: 'http',
         hostname: '127.0.0.1',
         port: '8000',

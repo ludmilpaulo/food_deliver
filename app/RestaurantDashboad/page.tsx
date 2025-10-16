@@ -7,7 +7,9 @@ import { Transition } from "@headlessui/react";
 import { fetchFornecedorData, updateLocation } from "@/services/apiService";
 import { FornecedorType } from "@/services/types";
 import { MdMenu } from "react-icons/md";
+import { HelpCircle } from "lucide-react";
 import withAuth from "@/components/ProtectedPage";
+import HelpGuideModal from "@/components/HelpGuideModal";
 
 // Dynamically import Sidebar to reduce initial bundle size
 const Sidebar = dynamic(() => import("./Sidebar"), {
@@ -21,6 +23,59 @@ const StoreDashboard: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+
+  const helpSections = [
+    {
+      title: 'Como usar o Dashboard',
+      content: 'O dashboard do restaurante permite gerenciar pedidos, produtos e perfil.',
+      steps: [
+        'Navegue pelo menu lateral para acessar diferentes seções',
+        'Visualize pedidos pendentes na página inicial',
+        'Atualize o status dos pedidos conforme progridem',
+        'Gerencie seus produtos e horários de funcionamento',
+      ],
+    },
+    {
+      title: 'Gerenciamento de Pedidos',
+      content: 'Acompanhe e gerencie todos os seus pedidos em tempo real.',
+      steps: [
+        'Aceite ou rejeite novos pedidos',
+        'Atualize o status do pedido (preparando, pronto, entregue)',
+        'Veja detalhes completos do pedido e informações do cliente',
+        'Entre em contato com entregadores quando necessário',
+      ],
+    },
+    {
+      title: 'Adicionar Produtos',
+      content: 'Adicione e gerencie os produtos do seu restaurante.',
+      steps: [
+        'Clique em "Produtos" no menu',
+        'Adicione fotos, descrições e preços',
+        'Defina categorias para seus produtos',
+        'Ative ou desative produtos conforme disponibilidade',
+      ],
+    },
+    {
+      title: 'Configurar Horários',
+      content: 'Defina seus horários de funcionamento.',
+      steps: [
+        'Acesse "Perfil" no menu',
+        'Configure horários para cada dia da semana',
+        'Marque dias de fechamento ou feriados',
+      ],
+    },
+    {
+      title: 'Relatórios e Estatísticas',
+      content: 'Visualize relatórios detalhados sobre seu negócio.',
+      steps: [
+        'Acesse "Relatórios" no menu',
+        'Veja vendas por período',
+        'Analise produtos mais vendidos',
+        'Exporte relatórios para análise',
+      ],
+    },
+  ];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -99,6 +154,15 @@ const StoreDashboard: React.FC = () => {
       {error && <p className="text-red-500">{error}</p>}
       {!loading && !error && (
         <>
+          <div className="absolute top-4 right-4 z-40">
+            <button
+              onClick={() => setShowHelp(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-colors"
+              title="Ajuda"
+            >
+              <HelpCircle size={24} />
+            </button>
+          </div>
           <div className="absolute top-0 left-0 md:hidden">
             <button
               onClick={handleSidebarToggle}
@@ -110,6 +174,12 @@ const StoreDashboard: React.FC = () => {
           <Sidebar fornecedor={fornecedor} isOpen={isSidebarOpen} onToggle={handleSidebarToggle} />
         </>
       )}
+      <HelpGuideModal
+        isOpen={showHelp}
+        onClose={() => setShowHelp(false)}
+        sections={helpSections}
+        title="Guia do Dashboard"
+      />
     </div>
   );
 };

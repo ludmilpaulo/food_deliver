@@ -12,7 +12,8 @@ import logo from "@/assets/azul.png";
 import { signup } from "@/services/authService";
 import { t, setLanguageFromBrowser, setLanguage, getLanguage } from "@/configs/i18n";
 import { SupportedLocale } from "@/configs/translations";
-import { useAppDispatch } from "@/redux/store"; 
+import { useAppDispatch } from "@/redux/store";
+import { analytics } from "@/utils/mixpanel"; 
 // LANGUAGE SELECT SUPPORT
 const LANGUAGES: { value: SupportedLocale; label: string }[] = [
   { value: "en", label: "🇬🇧 English" },
@@ -46,6 +47,7 @@ const SignupScreen = () => {
   React.useEffect(() => {
     setLanguageFromBrowser();
     setLang(getLanguage());
+    analytics.trackPageView('Signup Page');
   }, []);
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -91,7 +93,14 @@ const SignupScreen = () => {
       if (status === 201 || data.status === "201" || data.status === "success") {
         // If your backend returns login token after signup:
         // You may need to adjust payload if backend is different.
-        await dispatch(loginUser({ username: signupData.username, password: signupData.password })).unwrap();
+        const loginResult = await dispatch(loginUser({ username: signupData.username, password: signupData.password })).unwrap();
+
+        analytics.trackSignup(loginResult.user_id?.toString() || signupData.username, {
+          name: signupData.name,
+          email: signupData.email,
+          user_type: role,
+          platform: 'web'
+        });
 
         alert(t("registerSuccess"));
         router.push(role === "store" ? "/StoreDashboad" : "/HomeScreen");
@@ -99,6 +108,7 @@ const SignupScreen = () => {
         handleErrorResponse(status, data);
       }
     } catch (err) {
+      analytics.trackError('Signup Failed', { role, error: err?.toString() });
       alert(t("registerFailed"));
     } finally {
       setLoading(false);

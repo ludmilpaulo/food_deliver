@@ -14,6 +14,7 @@ import { CartItem } from "@/services/types";
 import { FaShoppingCart, FaImage } from "react-icons/fa";
 import { MdRemoveShoppingCart } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
+import { analytics } from "@/utils/mixpanel";
 
 const LANGUAGES: { value: SupportedLocale; label: string }[] = [
   { value: "en", label: "🇬🇧 English" },
@@ -27,6 +28,7 @@ const CartPage: React.FC = () => {
   // System language detection on mount (client-only)
   const [lang, setLangState] = useState(getLanguage());
   useEffect(() => {
+    analytics.trackPageView('Cart Page', { items_count: items.length });
     setLanguageFromBrowser();
     setLangState(getLanguage());
   }, []);
@@ -72,6 +74,7 @@ const CartPage: React.FC = () => {
 
   // Remove the entire item (all quantities)
   const handleRemoveLine = (item: CartItem) => {
+    analytics.trackRemoveFromCart(item.id.toString(), item.name);
     dispatch(removeLine({ id: item.id, size: item.size || "", color: item.color || "" }));
   };
 

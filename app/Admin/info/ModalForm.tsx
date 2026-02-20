@@ -2,6 +2,8 @@ import React from 'react';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
+const CKEditorComponent = CKEditor as any;
+
 interface ModalFormProps {
   isOpen: boolean;
   onRequestClose: () => void;
@@ -45,7 +47,7 @@ const ModalForm: React.FC<ModalFormProps> = ({
             className="w-full p-2 border rounded"
           />
           {isAboutUs && handleEditorChange && (
-            <CKEditor
+            <CKEditorComponent
               editor={ClassicEditor}
               data={formData.about || ''}
               onChange={handleEditorChange}

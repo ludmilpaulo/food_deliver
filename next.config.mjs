@@ -2,6 +2,7 @@ import { GenerateSW } from 'workbox-webpack-plugin';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  turbopack: {},
   webpack: (config, { isServer }) => {
     if (!isServer && config.plugins) {
       config.plugins = config.plugins.filter((p) => !(p instanceof GenerateSW));

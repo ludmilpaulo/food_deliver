@@ -73,7 +73,10 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
           </div>
           <div className="mb-4">
             <label className="block mb-2">Categoria</label>
-            <Combobox value={selectedCategory} onChange={setSelectedCategory}>
+            <Combobox
+              value={selectedCategory}
+              onChange={(value) => setSelectedCategory(value ?? "")}
+            >
               <div className="relative">
                 <Combobox.Input
                   className="w-full p-2 border rounded"

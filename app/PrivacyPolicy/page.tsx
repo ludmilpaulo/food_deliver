@@ -10,7 +10,7 @@ type SupportedLang = "en" | "pt";
 type PolicySection = {
   id: string;
   title: string;
-  content: JSX.Element;
+  content: React.ReactNode;
 };
 type PolicyContent = {
   [lang in SupportedLang]: {

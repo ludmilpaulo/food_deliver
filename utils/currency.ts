@@ -151,7 +151,7 @@ export function getUserRegion(): RegionCode {
 
 // Currency conversion functionality
 const BASE_CURRENCY = "AOA"; // Angolan Kwanza
-const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_API || "https://www.kudya.shop";
+const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_API || "https://www.kudya.store";
 
 /**
  * Fetch latest exchange rates from backend

@@ -71,7 +71,7 @@ Edit `.env.local`:
 ```env
 # API Configuration
 NEXT_PUBLIC_BASE_API=http://127.0.0.1:8000
-# For production: https://kudya.pythonanywhere.com
+# For production: https://www.kudya.store
 
 # Google Maps API Key
 NEXT_PUBLIC_GOOGLE_API_KEY=your_google_maps_api_key
@@ -83,7 +83,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 4. **Update API configuration** (if needed):
 Edit `services/types.ts`:
 ```typescript
-export const baseAPI: string = "https://kudya.pythonanywhere.com";
+export const baseAPI: string = "https://www.kudya.store";
 ```
 
 ## Running the App
@@ -160,7 +160,7 @@ food_deliver/
 
 This app connects to the Kudya Django REST API:
 - **Backend Repository**: [www_kudya_shop](https://github.com/ludmilpaulo/www_kudya_shop)
-- **API Base URL**: `https://kudya.pythonanywhere.com`
+- **API Base URL**: `https://www.kudya.store`
 
 ### Key API Endpoints Used
 
@@ -179,7 +179,7 @@ Create a `.env.local` file (see `.env.example`):
 
 ```env
 # Required
-NEXT_PUBLIC_BASE_API=https://kudya.pythonanywhere.com
+NEXT_PUBLIC_BASE_API=https://www.kudya.store
 NEXT_PUBLIC_GOOGLE_API_KEY=your_api_key
 
 # Optional
@@ -306,6 +306,6 @@ For support, email: ludmilpaulo@gmail.com
 ## Links
 
 - **Website**: https://www.sdkudya.com
-- **Backend API**: https://kudya.pythonanywhere.com
+- **Backend API**: https://www.kudya.store
 - **Customer Mobile App**: [kudya-client](https://github.com/ludmilpaulo/kudya-client)
 - **Partner App**: [KudyaParceiro](https://github.com/ludmilpaulo/KudyaParceiro)

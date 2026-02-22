@@ -25,6 +25,11 @@ export default function ServiceDetailPage() {
   const [bookingLoading, setBookingLoading] = useState(false);
   const [bookingMessage, setBookingMessage] = useState<string | null>(null);
 
+  const formatPrice = (value: unknown): string => {
+    const numeric = typeof value === "number" ? value : Number(value);
+    return Number.isFinite(numeric) ? numeric.toFixed(2) : "0.00";
+  };
+
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -118,7 +123,7 @@ export default function ServiceDetailPage() {
         <h1 className="text-2xl font-bold mt-4">{service.title}</h1>
         <div className="text-gray-600">{service.parceiro_name}</div>
         <div className="mt-2 text-blue-700 font-bold">
-          {service.price.toFixed(2)} {service.currency}
+          {formatPrice(service.price)} {service.currency}
         </div>
         <p className="mt-3 text-gray-700 whitespace-pre-line">{service.description}</p>
 

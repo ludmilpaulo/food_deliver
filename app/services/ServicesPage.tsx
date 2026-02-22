@@ -13,10 +13,17 @@ export default function ServicesPage() {
   const { data, loading, error } = useAppSelector((s) => s.services);
 
   const [search, setSearch] = useState("");
+  const [requestedOnce, setRequestedOnce] = useState(false);
 
   useEffect(() => {
+    setRequestedOnce(true);
     dispatch(fetchServices(undefined));
   }, [dispatch]);
+
+  const formatPrice = (value: unknown): string => {
+    const numeric = typeof value === "number" ? value : Number(value);
+    return Number.isFinite(numeric) ? numeric.toFixed(2) : "0.00";
+  };
 
   const filtered = useMemo(() => {
     if (!search.trim()) return data;
@@ -51,7 +58,7 @@ export default function ServicesPage() {
             {error}
           </div>
         )}
-        {!loading && !error && filtered.length === 0 && (
+        {!loading && requestedOnce && !error && filtered.length === 0 && (
           <p className="text-center text-white/90 mt-16">{t("noStores")}</p>
         )}
 
@@ -75,7 +82,7 @@ export default function ServicesPage() {
               <div className="text-sm text-gray-500 truncate">{svc.parceiro_name}</div>
               <div className="mt-2 flex items-center justify-between">
                 <span className="text-blue-700 font-bold">
-                  {svc.price.toFixed(2)} {svc.currency}
+                  {formatPrice(svc.price)} {svc.currency}
                 </span>
                 <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full">
                   {svc.duration_minutes}m

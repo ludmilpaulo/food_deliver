@@ -1,58 +1,61 @@
-// Mixpanel Analytics Configuration
+// Mixpanel Analytics — singleton init (avoids mutex lock errors with Next.js HMR)
 import mixpanel from 'mixpanel-browser';
 
-// Initialize Mixpanel with your token
 const MIXPANEL_TOKEN = 'a8cf933c3054afed7f397f71249ba506';
-
-// Check if we're in the browser (not SSR)
 const isBrowser = typeof window !== 'undefined';
+const isDev = process.env.NODE_ENV === 'development';
 
-// Initialize Mixpanel
-if (isBrowser) {
+declare global {
+  interface Window {
+    __kudyaMixpanelInitialized?: boolean;
+  }
+}
+
+function initMixpanel(): void {
+  if (!isBrowser || window.__kudyaMixpanelInitialized) return;
+
+  window.__kudyaMixpanelInitialized = true;
+
   mixpanel.init(MIXPANEL_TOKEN, {
-    autocapture: true,
-    record_sessions_percent: 100,
-    debug: process.env.NODE_ENV === 'development',
+    // Cookie in dev avoids localStorage mutex timeouts; production uses localStorage.
+    persistence: isDev ? 'cookie' : 'localStorage',
+    autocapture: !isDev,
+    record_sessions_percent: isDev ? 0 : 10,
+    debug: false,
+    track_pageview: false,
+    batch_requests: true,
   });
 }
 
-// Analytics class for tracking events
+function ready(): boolean {
+  if (!isBrowser) return false;
+  initMixpanel();
+  return true;
+}
+
 class Analytics {
-  // Track page views
-  trackPageView(pageName: string, properties?: Record<string, any>) {
-    if (!isBrowser) return;
-    
-    mixpanel.track('Page View', {
-      page: pageName,
-      ...properties,
-    });
+  trackPageView(pageName: string, properties?: Record<string, unknown>) {
+    if (!ready()) return;
+    mixpanel.track('Page View', { page: pageName, ...properties });
   }
 
-  // Track user actions
-  track(eventName: string, properties?: Record<string, any>) {
-    if (!isBrowser) return;
-    
+  track(eventName: string, properties?: Record<string, unknown>) {
+    if (!ready()) return;
     mixpanel.track(eventName, properties);
   }
 
-  // Identify user
   identify(userId: string) {
-    if (!isBrowser) return;
-    
+    if (!ready()) return;
     mixpanel.identify(userId);
   }
 
-  // Set user properties
-  setUserProperties(properties: Record<string, any>) {
-    if (!isBrowser) return;
-    
+  setUserProperties(properties: Record<string, unknown>) {
+    if (!ready()) return;
     mixpanel.people.set(properties);
   }
 
-  // Track user signup
-  trackSignup(userId: string, properties?: Record<string, any>) {
-    if (!isBrowser) return;
-    
+  trackSignup(userId: string, properties?: Record<string, unknown>) {
+    if (!ready()) return;
     this.identify(userId);
     this.track('User Signup', properties);
     this.setUserProperties({
@@ -63,37 +66,26 @@ class Analytics {
     });
   }
 
-  // Track user login
-  trackLogin(userId: string, properties?: Record<string, any>) {
-    if (!isBrowser) return;
-    
+  trackLogin(userId: string, properties?: Record<string, unknown>) {
+    if (!ready()) return;
     this.identify(userId);
     this.track('User Login', properties);
   }
 
-  // Track user logout
   trackLogout() {
-    if (!isBrowser) return;
-    
+    if (!ready()) return;
     this.track('User Logout');
     mixpanel.reset();
+    if (isBrowser) window.__kudyaMixpanelInitialized = false;
   }
 
-  // Track product views
-  trackProductView(productId: string, productName: string, properties?: Record<string, any>) {
-    if (!isBrowser) return;
-    
-    this.track('Product Viewed', {
-      product_id: productId,
-      product_name: productName,
-      ...properties,
-    });
+  trackProductView(productId: string, productName: string, properties?: Record<string, unknown>) {
+    if (!ready()) return;
+    this.track('Product Viewed', { product_id: productId, product_name: productName, ...properties });
   }
 
-  // Track add to cart
   trackAddToCart(productId: string, productName: string, price: number, quantity: number) {
-    if (!isBrowser) return;
-    
+    if (!ready()) return;
     this.track('Product Added to Cart', {
       product_id: productId,
       product_name: productName,
@@ -103,92 +95,51 @@ class Analytics {
     });
   }
 
-  // Track remove from cart
   trackRemoveFromCart(productId: string, productName: string) {
-    if (!isBrowser) return;
-    
-    this.track('Product Removed from Cart', {
-      product_id: productId,
-      product_name: productName,
-    });
+    if (!ready()) return;
+    this.track('Product Removed from Cart', { product_id: productId, product_name: productName });
   }
 
-  // Track checkout started
   trackCheckoutStarted(cartValue: number, itemCount: number) {
-    if (!isBrowser) return;
-    
-    this.track('Checkout Started', {
-      cart_value: cartValue,
-      item_count: itemCount,
-    });
+    if (!ready()) return;
+    this.track('Checkout Started', { cart_value: cartValue, item_count: itemCount });
   }
 
-  // Track order completed
-  trackOrderCompleted(orderId: string, orderValue: number, items: any[]) {
-    if (!isBrowser) return;
-    
+  trackOrderCompleted(orderId: string, orderValue: number, items: unknown[]) {
+    if (!ready()) return;
     this.track('Order Completed', {
       order_id: orderId,
       order_value: orderValue,
       item_count: items.length,
-      items: items,
+      items,
     });
   }
 
-  // Track search
   trackSearch(query: string, results: number) {
-    if (!isBrowser) return;
-    
-    this.track('Search', {
-      query,
-      results_count: results,
-    });
+    if (!ready()) return;
+    this.track('Search', { query, results_count: results });
   }
 
-  // Track service booking
   trackServiceBooking(serviceId: string, serviceName: string, price: number) {
-    if (!isBrowser) return;
-    
-    this.track('Service Booked', {
-      service_id: serviceId,
-      service_name: serviceName,
-      price,
-    });
+    if (!ready()) return;
+    this.track('Service Booked', { service_id: serviceId, service_name: serviceName, price });
   }
 
-  // Track help guide opened
   trackHelpGuideOpened(section?: string) {
-    if (!isBrowser) return;
-    
-    this.track('Help Guide Opened', {
-      section,
-    });
+    if (!ready()) return;
+    this.track('Help Guide Opened', { section });
   }
 
-  // Track category selected
   trackCategorySelected(categoryId: string, categoryName: string) {
-    if (!isBrowser) return;
-    
-    this.track('Category Selected', {
-      category_id: categoryId,
-      category_name: categoryName,
-    });
+    if (!ready()) return;
+    this.track('Category Selected', { category_id: categoryId, category_name: categoryName });
   }
 
-  // Track error
-  trackError(error: string, errorDetails?: any) {
-    if (!isBrowser) return;
-    
-    this.track('Error Occurred', {
-      error_message: error,
-      error_details: errorDetails,
-    });
+  trackError(error: string, errorDetails?: unknown) {
+    if (!ready()) return;
+    this.track('Error Occurred', { error_message: error, error_details: errorDetails });
   }
 }
 
-// Export singleton instance
 export const analytics = new Analytics();
-
-// Export mixpanel instance for direct access if needed
 export { mixpanel };
-

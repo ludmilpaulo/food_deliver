@@ -16,6 +16,7 @@ const Orders = dynamic(() => import("./Orders"));
 const Store = dynamic(() => import("./Store"));
 const ProductList = dynamic(() => import("./store/ProductList"));
 const DatabaseActions = dynamic(() => import("./DatabaseActions"));
+const SuperAppAdmin = dynamic(() => import("@/components/SuperAppAdmin"));
 
 const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, onToggle }) => {
   const [showProducts, setShowProducts] = useState(false);
@@ -28,6 +29,7 @@ const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, 
   const [showDatabaseActions, setShowDatabaseActions] = useState(false);
   const [showKYC, setShowKYC] = useState(false);
   const [showPayouts, setShowPayouts] = useState(false);
+  const [showSuperApp, setShowSuperApp] = useState(true);
   const [loading, setLoading] = useState(false);
 
   return (
@@ -75,8 +77,33 @@ const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, 
                 <motion.li
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  className={`p-2 rounded hover:bg-blue-600 cursor-pointer ${showSuperApp ? "bg-blue-700" : ""}`}
+                  onClick={() => {
+                    setShowSuperApp(true);
+                    setShowProducts(false);
+                    setShowOrders(false);
+                    setShowstore(false);
+                    setShowReport(false);
+                    setListOfCustomer(false);
+                    setListOfDriver(false);
+                    setShowproducts(false);
+                    setShowKYC(false);
+                    setShowPayouts(false);
+                    setShowDatabaseActions(false);
+                    onToggle();
+                  }}
+                >
+                  <div className="flex items-center space-x-3">
+                    <MdBarChart className="text-lg" />
+                    <span>Super App</span>
+                  </div>
+                </motion.li>
+                <motion.li
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   className="p-2 rounded hover:bg-blue-600 cursor-pointer"
                   onClick={() => {
+                    setShowSuperApp(false);
                     setShowProducts(false);
                     setShowOrders(false);
                     setShowstore(true);
@@ -292,6 +319,7 @@ const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, 
           </nav>
         </div>
         <div className="flex-1 overflow-y-auto bg-gray-100">
+          {showSuperApp && <SuperAppAdmin />}
           {showproducts && <ProductList />}
           {showOrders && <Orders />}
           {showstore && <Store />}

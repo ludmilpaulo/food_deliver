@@ -10,6 +10,7 @@ import Image from "next/image";
 import { t } from "@/configs/i18n";
 import { Store, Category, Product } from "@/services/types";
 import { analytics } from "@/utils/mixpanel";
+import SuperAppModules from "@/components/SuperAppModules";
 
 const PAGE_SIZE = 9; // Stores per page
 
@@ -120,6 +121,9 @@ const HomeScreen: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-yellow-50 to-blue-200 dark:from-gray-800 dark:via-blue-900 dark:to-gray-900 transition-colors duration-700">
+      <div className="max-w-6xl mx-auto px-4 pt-8">
+        <SuperAppModules />
+      </div>
 
       {/* CATEGORIES */}
       <div className="flex justify-center mb-6 overflow-x-auto whitespace-nowrap px-2 pt-7 glassy border border-white/40 shadow-lg rounded-2xl mx-auto max-w-6xl">

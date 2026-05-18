@@ -4,7 +4,7 @@ import axios, { isAxiosError } from 'axios';
 const API_URL = baseAPI;
 
 export const loginUserService = async (username: string, password: string) => {
-  const response = await fetch(`${baseAPI}/conta/login/`, {
+  const response = await fetch(`${baseAPI}/api/auth/login/`, {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -14,7 +14,6 @@ export const loginUserService = async (username: string, password: string) => {
   });
 
   const data = await response.json();
-  console.log("Login response:", data);
 
   if (!response.ok) {
     return data;

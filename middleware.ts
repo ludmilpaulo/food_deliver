@@ -1,7 +1,7 @@
 // middleware.ts
 import { NextRequest, NextResponse } from 'next/server';
 
-const SUPPORTED_LOCALES = ['en', 'pt'];
+const SUPPORTED_LOCALES = ['en', 'pt', 'fr', 'es'];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -17,7 +17,7 @@ export function middleware(request: NextRequest) {
 
   // Else, auto-detect language from Accept-Language
   const acceptLang = request.headers.get('accept-language');
-  let detectedLang: string = 'en';
+  let detectedLang: string = 'pt';
   if (acceptLang) {
     const first = acceptLang.split(',')[0].trim().slice(0, 2);
     if (SUPPORTED_LOCALES.includes(first)) detectedLang = first;

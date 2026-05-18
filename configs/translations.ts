@@ -1,4 +1,4 @@
-export const supportedLocales = ['en', 'pt'] as const;
+export const supportedLocales = ['en', 'pt', 'fr', 'es'] as const;
 export type SupportedLocale = typeof supportedLocales[number];
 
 export const translationKeys = [
@@ -229,7 +229,7 @@ export const translationKeys = [
 export type TranslationKey = typeof translationKeys[number];
 
 
-const translations: Record<SupportedLocale, Record<TranslationKey, string>> = {
+const translations: Record<SupportedLocale, Partial<Record<TranslationKey, string>>> = {
   en: {
     // ENGLISH
    "language": "Language",
@@ -676,6 +676,8 @@ networkError: "Erro de rede, tente novamente.",
 "contactSuccess": "Mensagem enviada com sucesso! Verifique seu e-mail para confirmação.",
 "contactFailed": "Falha ao enviar a mensagem. Tente novamente.",
   },
+  fr: {},
+  es: {},
 };
 
 export default translations;

@@ -10,7 +10,7 @@ const Footer = dynamic(() => import('@/components/Footer'), { ssr: false });
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   return (
     <StoreProvider>
-      <Navbar />
+      <Navbar initialLocale="pt" />
       {children}
       <Footer />
     </StoreProvider>

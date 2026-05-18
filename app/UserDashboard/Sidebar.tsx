@@ -98,7 +98,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             aria-current={selectedMenu === item.key}
           >
             {item.icon}
-            <span>{item.label[lang]}</span>
+            <span>{item.label[lang as "en" | "pt"] ?? item.label.en}</span>
           </button>
         ))}
       </nav>

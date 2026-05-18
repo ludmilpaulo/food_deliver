@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { IoMdMenu, IoMdClose, IoMdCart, IoMdPerson } from "react-icons/io";
 import { MdStore } from "react-icons/md";
@@ -10,28 +10,33 @@ import Image from "next/image";
 import logo from "@/assets/azul.png";
 import { selectUser } from "@/redux/slices/authSlice";
 import { useAppSelector } from "@/redux/store";
-import { t, setLanguage, setLanguageFromBrowser, getLanguage } from "@/configs/i18n";
+import { initLanguage } from "@/configs/i18n";
 import { SupportedLocale } from "@/configs/translations";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const LANGUAGES: { value: SupportedLocale; label: string }[] = [
   { value: "en", label: "🇬🇧 English" },
   { value: "pt", label: "🇵🇹 Português" },
+  { value: "fr", label: "🇫🇷 Français" },
+  { value: "es", label: "🇪🇸 Español" },
 ];
 
-const Navbar: React.FC = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [lang, setLang] = useState<SupportedLocale>(getLanguage());
+interface NavbarProps {
+  initialLocale: SupportedLocale;
+}
 
-  useEffect(() => {
-    setLanguageFromBrowser();
-    setLang(getLanguage());
-  }, []);
+const Navbar: React.FC<NavbarProps> = ({ initialLocale }) => {
+  initLanguage(initialLocale);
+
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { t, languageCode, changeLanguage } = useTranslation(initialLocale);
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setLanguage(e.target.value as SupportedLocale);
-    setLang(getLanguage());
-    setMenuOpen(false); // Close mobile menu when changing language
+    const next = e.target.value as SupportedLocale;
+    initLanguage(next);
+    changeLanguage(next);
+    setMenuOpen(false);
   };
 
   const user = useAppSelector(selectUser);
@@ -42,8 +47,8 @@ const Navbar: React.FC = () => {
     <>
       <NavLink href="/AllProducts" icon={<FiPackage size={20} className="text-blue-700" />} label={t("allProducts") || "All Products"} />
       <NavLink href="/StoreTypes" icon={<MdStore size={20} className="text-yellow-500" />} label={t("Stores")} />
-      <NavLink href="/services" icon={<MdMedicalServices size={20} className="text-pink-600" />} label={"Services"} />
-      <NavLink href="/properties" icon={<MdHome size={20} className="text-teal-600" />} label={"Properties"} />
+      <NavLink href="/services" icon={<MdMedicalServices size={20} className="text-pink-600" />} label={t("Services", "Services")} />
+      <NavLink href="/properties" icon={<MdHome size={20} className="text-teal-600" />} label={t("Properties", "Properties")} />
       <NavLink href="/CartPage" icon={<IoMdCart size={22} className="text-green-700" />} label={t("Cart")}>
         {cartQuantity > 0 && (
           <span className="absolute -top-2 -right-3 bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center shadow font-bold animate-bounce">
@@ -81,9 +86,9 @@ const Navbar: React.FC = () => {
           {/* Language selector */}
           <div className="flex items-center gap-2">
             <motion.select
-              key={lang}
+              key={languageCode}
               className="p-2 rounded-xl bg-white/70 border border-gray-200 text-gray-800 font-semibold text-sm shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-              value={lang}
+              value={languageCode}
               onChange={handleLanguageChange}
               aria-label={t("changeLanguage")}
               initial={{ scale: 0.95, opacity: 0 }}
@@ -147,7 +152,7 @@ const NavLink: React.FC<NavLinkProps> = ({ href, icon, label, children }) => (
     className="relative flex items-center gap-1 text-gray-800 hover:bg-blue-50/60 active:bg-yellow-100 rounded-xl px-3 py-2 font-semibold transition-all shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400"
   >
     {icon}
-    <span>{label}</span>
+    <span suppressHydrationWarning>{label}</span>
     {children}
   </Link>
 );

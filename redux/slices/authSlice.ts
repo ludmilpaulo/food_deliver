@@ -17,6 +17,7 @@ export interface User {
 export interface AuthState {
   user: User | null;
   token: string | null;
+  refreshToken: string | null;
   user_id: number | null;
   username: string | null;
   loading: boolean;
@@ -27,6 +28,7 @@ export interface AuthState {
 const initialState: AuthState = {
   user: null,
   token: null,
+  refreshToken: null,
   user_id: null,
   username: null,
   loading: false,
@@ -37,7 +39,16 @@ const initialState: AuthState = {
 // ---- Thunk for Login ----
 export const loginUser = createAsyncThunk<
   // Return type:
-  { token: string; user_id: number; username: string; is_customer: boolean; is_driver: boolean; message: string },
+  {
+    access?: string;
+    refresh?: string;
+    token: string;
+    user_id: number;
+    username: string;
+    is_customer: boolean;
+    is_driver: boolean;
+    message: string;
+  },
   // Arg type:
   { username: string; password: string },
   // ThunkAPI:
@@ -61,6 +72,7 @@ const authSlice = createSlice({
     logoutUser(state) {
       state.user = null;
       state.token = null;
+      state.refreshToken = null;
       state.user_id = null;
       state.username = null;
       state.loading = false;
@@ -83,6 +95,7 @@ const authSlice = createSlice({
         state.loading = false;
         if (action.payload && action.payload.token) {
           state.token = action.payload.token;
+          state.refreshToken = action.payload.refresh ?? null;
           try { localStorage.setItem("auth_token", JSON.stringify(action.payload.token)); } catch {}
           state.user = {
             user_id: action.payload.user_id,

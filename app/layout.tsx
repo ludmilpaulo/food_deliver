@@ -1,15 +1,13 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { cookies } from 'next/headers';
 import './globals.css';
 
 import StoreProvider from '@/redux/StoreProvider';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ClientRoot from './ClientRoot';
-
-
-
-const inter = Inter({ subsets: ['latin'] });
+import { initLanguage } from '@/configs/i18n';
+import { supportedLocales, SupportedLocale } from '@/configs/translations';
 
 export const metadata: Metadata = {
   title: "Kudya - Entrega de Comida Rápida e Fácil | Melhores Restaurantes, Refeições Favoritas",
@@ -46,13 +44,24 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+function resolveLocale(cookieValue: string | undefined): SupportedLocale {
+  if (cookieValue && supportedLocales.includes(cookieValue as SupportedLocale)) {
+    return cookieValue as SupportedLocale;
+  }
+  return 'pt';
+}
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const cookieStore = await cookies();
+  const locale = resolveLocale(cookieStore.get('app_lang')?.value);
+  initLanguage(locale);
+
   return (
-    <html lang="pt">
-      <body className={inter.className}>
+    <html lang={locale} suppressHydrationWarning>
+      <body className="font-sans">
         <StoreProvider>
           <ClientRoot>
-            <Navbar />
+            <Navbar initialLocale={locale} />
             {children}
             <Footer />
           </ClientRoot>

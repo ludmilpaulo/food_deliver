@@ -1,4 +1,4 @@
-# Kudya - Food Delivery & E-Commerce Web App
+# Kudya - Food Delivery & E-Commerce 
 
 Next.js web application for customers to browse stores, shop for products, and order food delivery.
 

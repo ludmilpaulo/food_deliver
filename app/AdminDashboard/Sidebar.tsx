@@ -1,6 +1,6 @@
 // app/AdminDashboard/Sidebar.tsx
 import React, { useState } from "react";
-import { MdClose, MdContacts, MdBarChart, MdTableBar, MdLogout, MdLocationOn, MdLaptop } from "react-icons/md";
+import { MdClose, MdContacts, MdBarChart, MdTableBar, MdLogout, MdLocationOn, MdLaptop, MdSettingsBackupRestore } from "react-icons/md";
 import { motion } from "framer-motion";
 import { Transition } from "@headlessui/react";
 import Image from "next/image";
@@ -17,6 +17,7 @@ const Store = dynamic(() => import("./Store"));
 const ProductList = dynamic(() => import("./store/ProductList"));
 const DatabaseActions = dynamic(() => import("./DatabaseActions"));
 const SuperAppAdmin = dynamic(() => import("@/components/SuperAppAdmin"));
+const BackupExport = dynamic(() => import("@/components/BackupExport"));
 
 const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, onToggle }) => {
   const [showProducts, setShowProducts] = useState(false);
@@ -30,7 +31,23 @@ const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, 
   const [showKYC, setShowKYC] = useState(false);
   const [showPayouts, setShowPayouts] = useState(false);
   const [showSuperApp, setShowSuperApp] = useState(true);
+  const [showBackupExport, setShowBackupExport] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const resetPanels = () => {
+    setShowSuperApp(false);
+    setShowProducts(false);
+    setShowOrders(false);
+    setShowstore(false);
+    setShowReport(false);
+    setListOfCustomer(false);
+    setListOfDriver(false);
+    setShowproducts(false);
+    setShowKYC(false);
+    setShowPayouts(false);
+    setShowDatabaseActions(false);
+    setShowBackupExport(false);
+  };
 
   return (
     <>
@@ -79,17 +96,8 @@ const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, 
                   whileTap={{ scale: 0.95 }}
                   className={`p-2 rounded hover:bg-blue-600 cursor-pointer ${showSuperApp ? "bg-blue-700" : ""}`}
                   onClick={() => {
+                    resetPanels();
                     setShowSuperApp(true);
-                    setShowProducts(false);
-                    setShowOrders(false);
-                    setShowstore(false);
-                    setShowReport(false);
-                    setListOfCustomer(false);
-                    setListOfDriver(false);
-                    setShowproducts(false);
-                    setShowKYC(false);
-                    setShowPayouts(false);
-                    setShowDatabaseActions(false);
                     onToggle();
                   }}
                 >
@@ -103,15 +111,8 @@ const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, 
                   whileTap={{ scale: 0.95 }}
                   className="p-2 rounded hover:bg-blue-600 cursor-pointer"
                   onClick={() => {
-                    setShowSuperApp(false);
-                    setShowProducts(false);
-                    setShowOrders(false);
+                    resetPanels();
                     setShowstore(true);
-                    setShowReport(false);
-                    setListOfCustomer(false);
-                    setListOfDriver(false);
-                    setShowproducts(false);
-                    setShowDatabaseActions(false);
                     onToggle();
                   }}
                 >
@@ -292,6 +293,22 @@ const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, 
                   <span>Payouts</span>
                 </div>
                 </motion.li>
+                <li className="text-xs font-semibold tracking-wide uppercase mt-6">System Management</li>
+                <motion.li
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`p-2 rounded hover:bg-blue-600 cursor-pointer ${showBackupExport ? "bg-blue-700" : ""}`}
+                  onClick={() => {
+                    resetPanels();
+                    setShowBackupExport(true);
+                    onToggle();
+                  }}
+                >
+                  <div className="flex items-center space-x-3">
+                    <MdSettingsBackupRestore className="text-lg" />
+                    <span>Backup &amp; Export</span>
+                  </div>
+                </motion.li>
               </ul>
             </div>
             <div className="mt-6">
@@ -328,7 +345,8 @@ const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, 
           {listOfDriver && <DriverList />}
           {showKYC && <KYC />}
           {showPayouts && <Payouts />}
-          {showDatabaseActions && <DatabaseActions />} {/* Render the DatabaseActions component */}
+          {showDatabaseActions && <DatabaseActions />}
+          {showBackupExport && <BackupExport />}
         </div>
       </div>
     </>

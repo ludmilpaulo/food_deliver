@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const API_BASE = process.env.NEXT_PUBLIC_BASE_API || "https://www.kudya.store";
+const API_BASE = process.env.NEXT_PUBLIC_BASE_API || "https://kudya-api.onrender.com";
 
 interface DashboardStats {
   orders_today: number;

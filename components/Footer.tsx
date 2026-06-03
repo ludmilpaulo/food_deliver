@@ -164,14 +164,23 @@ const Footer: React.FC = () => {
             </ul>
           </div>
         </div>
-        <div className="text-center mt-10">
+        <div className="text-center mt-10 space-x-3 text-xs md:text-sm font-bold text-black">
+          <Link
+            href="/TermsOfService"
+            className="hover:underline hover:text-blue-900 transition"
+          >
+            {lang === "pt" ? "Termos de Serviço" : "Terms of Service"}
+          </Link>
+          <span aria-hidden="true">·</span>
           <Link
             href="/PrivacyPolicy"
-            aria-label={lang === "pt" ? "Ver Política de Privacidade" : "View Privacy Policy"}
-            className="inline-block text-xs md:text-sm font-bold text-black drop-shadow hover:underline hover:text-blue-900 transition cursor-pointer"
+            className="hover:underline hover:text-blue-900 transition"
           >
-            &copy; {currentYear} Kudya. {lang === "pt" ? "Todos os direitos reservados." : "All rights reserved."}
+            {lang === "pt" ? "Política de Privacidade" : "Privacy Policy"}
           </Link>
+          <div className="mt-2 text-xs md:text-sm font-bold text-black drop-shadow">
+            &copy; {currentYear} Kudya. {lang === "pt" ? "Todos os direitos reservados." : "All rights reserved."}
+          </div>
         </div>
 
       </div>

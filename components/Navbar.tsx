@@ -72,7 +72,7 @@ const Navbar: React.FC<NavbarProps> = ({ initialLocale }) => {
           <Link href="/" className="flex items-center gap-2 group">
             <Image
               src={logo}
-              alt="Logo"
+              alt="Kudya — food delivery and shopping"
               width={48}
               height={48}
               priority

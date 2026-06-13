@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { t } from "@/configs/i18n";
 import { baseAPI } from "@/services/types";
+import { useTranslation } from "@/hooks/useTranslation";
 
 type Booking = {
   id: number;
@@ -16,6 +16,7 @@ type Booking = {
 };
 
 export default function Bookings() {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<Booking[]>([]);
@@ -30,7 +31,7 @@ export default function Bookings() {
           credentials: "include",
         });
         if (!mounted) return;
-        if (!res.ok) throw new Error("Failed to load bookings");
+        if (!res.ok) throw new Error(t("failedToLoadBookings", "Failed to load bookings"));
         const json = await res.json();
         // Map into UI-friendly shape
         const mapped: Booking[] = (json || []).map((b: any) => ({
@@ -46,7 +47,7 @@ export default function Bookings() {
         }));
         setData(mapped);
       } catch (e: any) {
-        setError(e?.message || "Failed to load bookings");
+        setError(e?.message || t("failedToLoadBookings", "Failed to load bookings"));
       } finally {
         setLoading(false);
       }
@@ -57,7 +58,9 @@ export default function Bookings() {
   if (loading) return <div>{t("loading")}</div>;
   if (error) return <div className="text-red-600">{error}</div>;
 
-  if (data.length === 0) return <div className="text-gray-600">No bookings yet</div>;
+  if (data.length === 0) {
+    return <div className="text-gray-600">{t("noBookingsYet", "No bookings yet")}</div>;
+  }
 
   return (
     <div className="space-y-3">

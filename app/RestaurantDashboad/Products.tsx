@@ -9,8 +9,10 @@ import { fetchCategorias, fetchProducts, addProduct, updateProduct, deleteProduc
 import { Product, Category, Categoria } from "@/services/types";
 import AddProductModal from "./AddProductModal";
 import EditProductModal from "./EditProductModal";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const Products: React.FC = () => {
+  const { t } = useTranslation();
   const user = useSelector(selectUser);
   const user_id = user?.user_id || 0;
   const user_token = user?.token || "";
@@ -36,7 +38,7 @@ const Products: React.FC = () => {
         const data = await fetchCategorias();
         setCategorias(data);
       } catch (error) {
-        console.error("Falha ao buscar categorias:", error);
+      console.error(t("failedToFetchCategories", "Failed to fetch categories"), error);
       } finally {
         setLoading(false);
       }
@@ -52,7 +54,7 @@ const Products: React.FC = () => {
       console.log("products==>", data)
       setProducts(data);
     } catch (error) {
-      console.error("Falha ao buscar produtos:", error);
+      console.error(t("failedToFetchProducts", "Failed to fetch products"), error);
     } finally {
       setLoading(false);
     }
@@ -77,16 +79,16 @@ const Products: React.FC = () => {
     setLoading(true);
     try {
       await addProduct(formData);
-      alert("Produto adicionado com sucesso!");
+      alert(t("productAddedSuccess", "Product added successfully!"));
       setIsAddModalOpen(false);
       reset();
       loadProducts();
     } catch (error) {
-      console.error("Falha ao adicionar produto:", error);
+      console.error(t("failedToAddProduct", "Failed to add product"), error);
       if (error instanceof Error) {
         alert(`Erro: ${error.message}`);
       } else {
-        alert('Erro desconhecido');
+        alert(t("unknownError", "Unknown error"));
       }
     } finally {
       setLoading(false);
@@ -110,16 +112,16 @@ const Products: React.FC = () => {
     setLoading(true);
     try {
       await updateProduct(editingProduct.id!, formData);
-      alert("Produto atualizado com sucesso!");
+      alert(t("productUpdatedSuccess", "Product updated successfully!"));
       setIsEditModalOpen(false);
       setEditingProduct(null);
       loadProducts();
     } catch (error) {
-      console.error("Falha ao atualizar produto:", error);
+      console.error(t("failedToUpdateProduct", "Failed to update product"), error);
       if (error instanceof Error) {
         alert(`Erro: ${error.message}`);
       } else {
-        alert('Erro desconhecido');
+        alert(t("unknownError", "Unknown error"));
       }
     } finally {
       setLoading(false);
@@ -129,18 +131,18 @@ const Products: React.FC = () => {
 
   const handleDelete = async (productId: number) => {
     if (!user?.user_id) return;
-    if (!confirm("Tem certeza de que deseja excluir este produto?")) return;
+    if (!confirm(t("confirmDeleteProduct", "Are you sure you want to delete this product?"))) return;
     setLoading(true);
     try {
       await deleteProduct(productId, user.user_id);
-      alert("Produto excluído com sucesso!");
+      alert(t("productDeletedSuccess", "Product deleted successfully!"));
       loadProducts();
     } catch (error) {
-      console.error("Falha ao excluir produto:", error);
+      console.error(t("failedToDeleteProduct", "Failed to delete product"), error);
       if (error instanceof Error) {
         alert(`Erro: ${error.message}`);
       } else {
-        alert('Erro desconhecido');
+        alert(t("unknownError", "Unknown error"));
       }
     } finally {
       setLoading(false);
@@ -160,7 +162,7 @@ const Products: React.FC = () => {
           onClick={() => setIsAddModalOpen(true)}
           className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
         >
-          Adicionar Produto
+          {t("addProduct", "Add Product")}
         </button>
       </div>
 
@@ -183,11 +185,11 @@ const Products: React.FC = () => {
           <table className="min-w-full bg-white border">
             <thead>
               <tr>
-                <th className="px-6 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs leading-4 text-gray-600 uppercase tracking-wider">Nome</th>
-                <th className="px-6 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs leading-4 text-gray-600 uppercase tracking-wider">Descrição</th>
-                <th className="px-6 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs leading-4 text-gray-600 uppercase tracking-wider">Preço</th>
-                <th className="px-6 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs leading-4 text-gray-600 uppercase tracking-wider">Imagem</th>
-                <th className="px-6 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs leading-4 text-gray-600 uppercase tracking-wider">Ações</th>
+                <th className="px-6 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs leading-4 text-gray-600 uppercase tracking-wider">{t("name", "Name")}</th>
+                <th className="px-6 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs leading-4 text-gray-600 uppercase tracking-wider">{t("description", "Description")}</th>
+                <th className="px-6 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs leading-4 text-gray-600 uppercase tracking-wider">{t("price", "Price")}</th>
+                <th className="px-6 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs leading-4 text-gray-600 uppercase tracking-wider">{t("image", "Image")}</th>
+                <th className="px-6 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs leading-4 text-gray-600 uppercase tracking-wider">{t("actions", "Actions")}</th>
               </tr>
             </thead>
             <tbody>

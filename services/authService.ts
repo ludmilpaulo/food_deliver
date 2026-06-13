@@ -3,26 +3,85 @@ import { baseAPI } from "./types";
 import axios, { isAxiosError } from 'axios';
 const API_URL = baseAPI;
 
-export const loginUserService = async (username: string, password: string) => {
-  const response = await fetch(`${baseAPI}/api/auth/login/`, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ username, password }),
-  });
+type SignupRole = "client" | "store";
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    return data;
-  }
-
-  return data;
+type SignupData = {
+  username: string;
+  email: string;
+  password: string;
+  name?: string;
+  phone?: string;
+  address?: string;
+  logo?: File | null;
+  store_license?: File | null;
+  business_category?: string;
 };
 
-export const signup = async (role: "client" | "store", signupData: Record<string, any>) => {
+export const loginUserService = async (username: string, password: string) => {
+  let response: Response;
+  try {
+    response = await fetch(`${baseAPI}/api/auth/login/`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password }),
+    });
+  } catch {
+    throw new Error(
+      `Cannot reach API at ${baseAPI}. Start Kudya backend: cd www_kudya_shop && python manage.py runserver 8002`,
+    );
+  }
+
+  let data: Record<string, unknown> = {};
+  try {
+    data = await response.json();
+  } catch {
+    if (response.status === 404) {
+      throw new Error(
+        `Login endpoint not found on ${baseAPI}. Use the Kudya backend (www_kudya_shop), not another Django app on port 8001.`,
+      );
+    }
+    throw new Error("Server returned an invalid response.");
+  }
+
+  if (!response.ok) {
+    throw new Error(String(data.detail || data.message || "Login failed. Check username and password."));
+  }
+
+  const token = String(data.token || data.access || "");
+  if (!token) {
+    throw new Error("Login succeeded but no token was returned.");
+  }
+
+  return {
+    ...data,
+    token,
+    access: data.access || token,
+  } as {
+    token: string;
+    access?: string;
+    refresh?: string;
+    user_id: number;
+    username: string;
+    role?: string;
+    is_platform_admin?: boolean;
+    is_customer: boolean;
+    is_driver: boolean;
+    message: string;
+    business_profile?: {
+      id: number;
+      businessName: string;
+      category: string;
+      dashboardRoute: string;
+      isApproved: boolean;
+      isActive: boolean;
+    };
+  };
+};
+
+export const signup = async (role: SignupRole, signupData: SignupData) => {
   const url = role === "client" ? `${baseAPI}/customer/signup/` : `${baseAPI}/store/fornecedor/`;
 
   let body: FormData | string | null = null;
@@ -36,12 +95,15 @@ export const signup = async (role: "client" | "store", signupData: Record<string
     });
   } else if (role === "store") {
     const formData = new FormData();
-    Object.keys(signupData).forEach((key) => {
-      const value = signupData[key];
-      if (value !== null) {
-        formData.append(key, value);
-      }
-    });
+    formData.append("username", signupData.username);
+    formData.append("email", signupData.email);
+    formData.append("password", signupData.password);
+    if (signupData.name) formData.append("name", signupData.name);
+    if (signupData.phone) formData.append("phone", signupData.phone);
+    if (signupData.address) formData.append("address", signupData.address);
+    if (signupData.business_category) formData.append("business_category", signupData.business_category);
+    if (signupData.logo) formData.append("logo", signupData.logo);
+    if (signupData.store_license) formData.append("store_license", signupData.store_license);
 
     body = formData;
   }
@@ -60,7 +122,21 @@ export const signup = async (role: "client" | "store", signupData: Record<string
   });
 
   const data = await res.json();
-  return { status: res.status, data };
+  return {
+    status: res.status,
+    data: data as {
+      message?: string;
+      status?: string;
+      business_profile?: {
+        id: number;
+        businessName: string;
+        category: string;
+        dashboardRoute: string;
+        isApproved: boolean;
+        isActive: boolean;
+      };
+    },
+  };
 };
 
 

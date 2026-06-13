@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { MdLaptop } from 'react-icons/md';
 import UploadProofOfPayment from './order/UploadProofOfPayment';
 import { baseAPI } from '@/services/types';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface Order {
   id: number;
@@ -20,6 +21,7 @@ interface Order {
 }
 
 const Orders: React.FC = () => {
+  const { t } = useTranslation();
   const [orders, setOrders] = useState<Order[]>([]);
   const [filterBy, setFilterBy] = useState<string>('all');
   const [loading, setLoading] = useState<boolean>(true);
@@ -33,7 +35,7 @@ const Orders: React.FC = () => {
         setOrders(response.data.orders);
       } catch (err) {
         console.error('Erro ao buscar pedidos:', err);
-        setError('Failed to fetch orders');
+        setError(t("failedToFetchOrders", "Failed to fetch orders"));
       } finally {
         setLoading(false);
       }
@@ -61,19 +63,19 @@ const Orders: React.FC = () => {
       );
     } catch (err) {
       console.error('Erro ao marcar como pago:', err);
-      setError('Failed to mark as paid');
+      setError(t("failedToMarkAsPaid", "Failed to mark as paid"));
     }
   };
 
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-semibold">Pedidos</h1>
+        <h1 className="text-xl font-semibold">{t("orders", "Orders")}</h1>
         <select value={filterBy} onChange={handleFilterChange} className="p-2 border border-gray-300 rounded">
-          <option value="all">Todos</option>
-          <option value="day">Último Dia</option>
-          <option value="week">Última Semana</option>
-          <option value="month">Último Mês</option>
+          <option value="all">{t("all", "All")}</option>
+          <option value="day">{t("lastDay", "Last Day")}</option>
+          <option value="week">{t("lastWeek", "Last Week")}</option>
+          <option value="month">{t("lastMonth", "Last Month")}</option>
         </select>
       </div>
 
@@ -88,15 +90,15 @@ const Orders: React.FC = () => {
           <table className="min-w-full bg-white border border-gray-200">
             <thead className="bg-gray-100">
               <tr>
-                <th className="py-2 px-4">ID</th>
-                <th className="py-2 px-4">Cliente</th>
-                <th className="py-2 px-4">storee</th>
-                <th className="py-2 px-4">Status</th>
-                <th className="py-2 px-4">Total</th>
-                <th className="py-2 px-4">Data</th>
-                <th className="py-2 px-4">Fatura</th>
-                <th className="py-2 px-4">Pagamento storee</th>
-                <th className="py-2 px-4">Pagamento Motorista</th>
+                <th className="py-2 px-4">{t("id", "ID")}</th>
+                <th className="py-2 px-4">{t("customer", "Customer")}</th>
+                <th className="py-2 px-4">{t("store", "Store")}</th>
+                <th className="py-2 px-4">{t("status", "Status")}</th>
+                <th className="py-2 px-4">{t("Total", "Total")}</th>
+                <th className="py-2 px-4">{t("date", "Date")}</th>
+                <th className="py-2 px-4">{t("invoice", "Invoice")}</th>
+                <th className="py-2 px-4">{t("storePayment", "Store Payment")}</th>
+                <th className="py-2 px-4">{t("driverPayment", "Driver Payment")}</th>
               </tr>
             </thead>
             <tbody>
@@ -111,7 +113,7 @@ const Orders: React.FC = () => {
                   <td className="py-2 px-4">
                     {order.invoice_pdf ? (
                       <a href={order.invoice_pdf} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
-                        Baixar Fatura
+                        {t("downloadInvoice", "Download Invoice")}
                       </a>
                     ) : (
                       'N/A'
@@ -126,7 +128,7 @@ const Orders: React.FC = () => {
                         onClick={() => handleMarkAsPaid(order.id, 'store')}
                         className="mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                       >
-                        Marcar como Pago
+                        {t("markAsPaid", "Mark as Paid")}
                       </button>
                     )}
                   </td>
@@ -139,7 +141,7 @@ const Orders: React.FC = () => {
                         onClick={() => handleMarkAsPaid(order.id, 'driver')}
                         className="mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                       >
-                        Marcar como Pago
+                        {t("markAsPaid", "Mark as Paid")}
                       </button>
                     )}
                   </td>

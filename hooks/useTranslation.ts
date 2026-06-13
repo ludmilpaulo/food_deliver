@@ -2,13 +2,17 @@
 
 import { useEffect, useState } from "react";
 import {
+  detectBrowserLanguage,
   getLanguage,
   setLanguage,
   syncLanguageFromClientStorage,
   t as localT,
+  LANGUAGE_CHANGE_EVENT,
 } from "@/configs/i18n";
 import type { SupportedLocale, TranslationKey } from "@/configs/translations";
 import { fetchApiTranslations } from "@/services/platformApi";
+import { store } from "@/redux/store";
+import { languageApi } from "@/redux/slices/languageApi";
 
 const CACHE_KEY = "kudya_api_translations";
 
@@ -21,6 +25,44 @@ export function useTranslation(initialLocale?: SupportedLocale) {
   useEffect(() => {
     const synced = syncLanguageFromClientStorage();
     setLanguageCode(synced);
+
+    store
+      .dispatch(languageApi.endpoints.getLanguagePreference.initiate())
+      .unwrap()
+      .then((pref) => {
+        if (pref.preferredLanguage) {
+          setLanguage(pref.preferredLanguage);
+          setLanguageCode(pref.preferredLanguage);
+        }
+      })
+      .catch(() => {
+        // Local/cookie language remains active when unauthenticated or offline.
+      });
+  }, []);
+
+  useEffect(() => {
+    const handleLanguageChanged = (event: Event) => {
+      const customEvent = event as CustomEvent<{ locale?: SupportedLocale }>;
+      const nextLocale = customEvent.detail?.locale;
+      if (nextLocale) {
+        setLanguageCode(nextLocale);
+        return;
+      }
+      setLanguageCode(getLanguage());
+    };
+
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === "app_lang") {
+        setLanguageCode(syncLanguageFromClientStorage());
+      }
+    };
+
+    window.addEventListener(LANGUAGE_CHANGE_EVENT, handleLanguageChanged as EventListener);
+    window.addEventListener("storage", handleStorage);
+    return () => {
+      window.removeEventListener(LANGUAGE_CHANGE_EVENT, handleLanguageChanged as EventListener);
+      window.removeEventListener("storage", handleStorage);
+    };
   }, []);
 
   useEffect(() => {
@@ -58,6 +100,17 @@ export function useTranslation(initialLocale?: SupportedLocale) {
   const changeLanguage = (next: SupportedLocale) => {
     setLanguage(next);
     setLanguageCode(next);
+    void store
+      .dispatch(
+        languageApi.endpoints.updateLanguagePreference.initiate({
+          preferredLanguage: next,
+          systemLanguage: detectBrowserLanguage(),
+        }),
+      )
+      .unwrap()
+      .catch(() => {
+        // Local preference still applies.
+      });
   };
 
   const t = (key: string, fallback?: string) => {

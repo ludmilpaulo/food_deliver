@@ -1,0 +1,28 @@
+{
+  "at": "2026-06-08T16:42:53.532Z",
+  "passed": 3,
+  "total": 4,
+  "tests": [
+    {
+      "name": "Django API doctor login (8000)",
+      "ok": true,
+      "detail": "role=doctor"
+    },
+    {
+      "name": "KudyaParceiro doctor login (8091)",
+      "ok": true,
+      "detail": "Doctor Dashboard"
+    },
+    {
+      "name": "kudya-client Doctors tile (8081)",
+      "ok": false,
+      "detail": "Doctors tile not found on home"
+    },
+    {
+      "name": "food_deliver /Doctors page (3000)",
+      "ok": true,
+      "detail": "http://localhost:3000/Doctors"
+    }
+  ],
+  "screenshots": "H:\\GitHub\\Kudya\\food_deliver\\scripts\\kudya-browser-report"
+}

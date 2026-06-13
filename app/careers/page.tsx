@@ -6,8 +6,8 @@ import { ApplicationModal } from "./ApplicationModal";
 import { CareerCard } from "./CareerCard";
 import { CareerPosition } from "./types";
 import { useCareers } from "./useCareers";
-import { t } from "@/configs/i18n";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "@/hooks/useTranslation";
 
 // Helper to detect country
 function getUserCountryCode(): string {
@@ -26,6 +26,7 @@ const countryMap: Record<string, string> = {
 };
 
 export default function CareersPage() {
+  const { t } = useTranslation();
   const { careers, loading, error } = useCareers();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedCareer, setSelectedCareer] = useState<{ id: number; title: string }>({ id: 0, title: "" });

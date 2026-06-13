@@ -8,8 +8,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { MdStore, MdRestaurant, MdLocalGroceryStore, MdLocalPharmacy } from "react-icons/md";
 import { FiSearch, FiChevronRight } from "react-icons/fi";
-import { t, setLanguageFromBrowser, setLanguage, getLanguage } from "@/configs/i18n";
-import { SupportedLocale } from "@/configs/translations";
+import { SupportedLocale, supportedLocales } from "@/configs/translations";
+import { useTranslation } from "@/hooks/useTranslation";
+
+const LANGUAGE_LABELS: Record<SupportedLocale, string> = {
+  en: "English",
+  pt: "Portugues",
+  fr: "Francais",
+  es: "Espanol",
+};
 
 const getStoreTypeConfig = (name?: string) => {
   const key = (name ?? "").toLowerCase();
@@ -20,24 +27,21 @@ const getStoreTypeConfig = (name?: string) => {
 };
 
 export default function StoreTypesPage() {
+  const { t, languageCode, changeLanguage } = useTranslation();
   const dispatch = useAppDispatch();
   const storeTypes = useAppSelector((state) => state.storeTypes.data);
   const loading = useAppSelector((state) => state.storeTypes.loading);
   const error = useAppSelector((state) => state.storeTypes.error);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [lang, setLang] = useState(getLanguage());
   const router = useRouter();
 
   useEffect(() => {
     dispatch(fetchStoreTypes());
-    setLanguageFromBrowser();
-    setLang(getLanguage());
   }, [dispatch]);
 
   function handleLanguageChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    setLanguage(e.target.value as SupportedLocale);
-    setLang(getLanguage());
+    changeLanguage(e.target.value as SupportedLocale);
   }
 
   const filteredTypes = useMemo(
@@ -74,12 +78,15 @@ export default function StoreTypesPage() {
             >
               <select
                 className="px-4 py-2.5 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white font-medium focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none transition cursor-pointer"
-                value={lang}
+                value={languageCode}
                 onChange={handleLanguageChange}
-                aria-label="Change language"
+                aria-label={t("changeLanguage")}
               >
-                <option value="en" className="text-slate-900">🇬🇧 English</option>
-                <option value="pt" className="text-slate-900">🇵🇹 Português</option>
+                {supportedLocales.map((code) => (
+                  <option key={code} value={code} className="text-slate-900">
+                    {LANGUAGE_LABELS[code]}
+                  </option>
+                ))}
               </select>
             </motion.div>
           </div>
@@ -160,7 +167,7 @@ export default function StoreTypesPage() {
                     >
                       <motion.button
                         onClick={() => router.push(`/stores?storeTypeId=${type.id}`)}
-                        aria-label={type?.name ?? "Store"}
+                        aria-label={type?.name ?? t("store")}
                         whileHover={{ y: -4, transition: { duration: 0.2 } }}
                         whileTap={{ scale: 0.98 }}
                         className="w-full group flex items-center gap-5 p-6 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-xl hover:border-slate-300 transition-all duration-300 text-left"
@@ -182,7 +189,7 @@ export default function StoreTypesPage() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <span className={`block text-lg font-semibold ${config.text}`}>
-                            {type?.name ?? "Store"}
+                            {type?.name ?? t("store")}
                           </span>
                           {type?.description && (
                             <span className="block text-sm text-slate-500 mt-0.5 line-clamp-1">

@@ -27,8 +27,12 @@ const nextConfig = {
       {
         protocol: 'http',
         hostname: '127.0.0.1',
-        port: '8000',
-        pathname: '/**',
+        pathname: '/media/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        pathname: '/media/**',
       },
       {
         protocol: 'https',
@@ -40,10 +44,31 @@ const nextConfig = {
         hostname: 'developer.apple.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'kudya-api.onrender.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.kudya.shop',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'kudya.shop',
+        pathname: '/**',
+      },
     ],
   },
   env: {
     NEXT_PUBLIC_BASE_API: process.env.NEXT_PUBLIC_BASE_API,
+  },
+  async rewrites() {
+    return [
+      { source: '/Doctors', destination: '/doctors' },
+      { source: '/Doctors/:path*', destination: '/doctors/:path*' },
+    ];
   },
 };
 

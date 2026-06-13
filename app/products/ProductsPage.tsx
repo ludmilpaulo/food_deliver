@@ -4,13 +4,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/store";
 import { fetchProductsByStore } from "@/redux/slices/productsSlice";
 import { addItem, removeItem, selectCartItems } from "@/redux/slices/basketSlice";
-import { t } from "@/configs/i18n";
 import Image from "next/image";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { getCurrencyForCountry, formatCurrency } from "@/utils/currency";
 import { baseAPI, Product } from "@/services/types";
 import { useUserRegion } from "@/hooks/useUserRegion";
+import { useTranslation } from "@/hooks/useTranslation";
 
 type ProductSelections = Record<number, { size: string | null; color: string | null }>;
 type SelectionPrompt = { [productId: number]: string | null };
@@ -23,6 +23,7 @@ const getCategoryName = (cat: string | { id: number; name: string }): string => 
 };
 
 export default function ProductsPage() {
+  const { t, languageCode } = useTranslation();
   const dispatch = useAppDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -100,8 +101,7 @@ export default function ProductsPage() {
 
   // --- Locale/currency ---
   const { region: regionCode } = useUserRegion();
-  const language =
-    typeof window !== "undefined" ? navigator.language.split("-")[0] : "en";
+  const language = languageCode;
   const currencyCode = getCurrencyForCountry(regionCode);
 
   // --- Helpers ---

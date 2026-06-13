@@ -3,16 +3,17 @@ import React, { useMemo, useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/store";
 import { fetchAllProducts } from "@/redux/slices/allProductsSlice";
 import ProductCard from "@/components/ProductCard";
-import { t } from "@/configs/i18n";
 import { FiSearch, FiTrendingUp, FiArrowDown, FiArrowUp } from "react-icons/fi";
 import { FaTags, FaMars, FaVenus, FaGenderless } from "react-icons/fa";
 import { getUserRegion } from "@/utils/region";
 import { supportedRegionList, getCurrencyForCountry } from "@/utils/currency";
 import type { RegionCode } from "@/utils/currency";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const PAGE_SIZE = 12;
 
 const BrowseProductsPage: React.FC = () => {
+  const { t, languageCode } = useTranslation();
   const dispatch = useAppDispatch();
   const { data: allProducts, loading } = useAppSelector((s) => s.allProducts);
 
@@ -31,7 +32,7 @@ const BrowseProductsPage: React.FC = () => {
   // Currency/Region
   const [userRegion, setUserRegion] = useState<RegionCode>("ZA");
   const [regionOverride, setRegionOverride] = useState<RegionCode | "">("");
-  const language = typeof window !== "undefined" ? navigator.language.split("-")[0] : "en";
+  const language = languageCode;
   const regionCode = (regionOverride as RegionCode) || userRegion || "ZA";
 
   // Unique filter options

@@ -6,8 +6,10 @@ import { selectUser } from '@/redux/slices/authSlice';
 import { baseAPI, OrderTypes } from '@/services/types';
 import { fetchOrders, updateOrderStatus } from '@/services/apiService';
 import { Transition } from '@headlessui/react';
+import { useTranslation } from "@/hooks/useTranslation";
 
 const Order: React.FC = () => {
+  const { t } = useTranslation();
   const [orders, setOrders] = useState<OrderTypes[]>([]);
   const [loading, setLoading] = useState(false);
   const user = useSelector(selectUser);
@@ -30,19 +32,19 @@ const Order: React.FC = () => {
  const handleStatus = async (orderId: number) => {
     const user_id = user?.user_id;
     if (!user_id) {
-      alert("ID do usuário não fornecido.");
+      alert(t("userIdMissing", "User ID not provided."));
       return;
     }
 
-    if (window.confirm("Tem certeza de que deseja chamar o motorista?")) {
+    if (window.confirm(t("confirmCallDriver", "Are you sure you want to call the driver?"))) {
       try {
         console.log("sending")
         await updateOrderStatus(user_id, orderId);
-        alert("Motorista chamado com sucesso!");
+        alert(t("driverCalledSuccess", "Driver called successfully!"));
         fetchOrderData(); // Opcionalmente, você pode atualizar os pedidos
       } catch (error) {
         console.error("Erro ao atualizar o status do pedido:", error);
-        alert("Falha ao atualizar o status do pedido. Por favor, tente novamente.");
+        alert(t("orderStatusUpdateFailed", "Failed to update order status. Please try again."));
       }
     }
   };
@@ -83,13 +85,13 @@ const Order: React.FC = () => {
                 <table className="min-w-full bg-white border rounded-lg">
                   <thead>
                     <tr>
-                      <th className="px-4 py-2 border">No</th>
-                      <th className="px-4 py-2 border">Detalhes do Pedido</th>
-                      <th className="px-4 py-2 border">Cliente</th>
-                      <th className="px-4 py-2 border">Motorista</th>
-                      <th className="px-4 py-2 border">Total</th>
-                      <th className="px-4 py-2 border">Status</th>
-                      <th className="px-4 py-2 border">Ação</th>
+                      <th className="px-4 py-2 border">{t("number", "No")}</th>
+                      <th className="px-4 py-2 border">{t("orderDetails", "Order Details")}</th>
+                      <th className="px-4 py-2 border">{t("customer", "Customer")}</th>
+                      <th className="px-4 py-2 border">{t("driver", "Driver")}</th>
+                      <th className="px-4 py-2 border">{t("Total", "Total")}</th>
+                      <th className="px-4 py-2 border">{t("status", "Status")}</th>
+                      <th className="px-4 py-2 border">{t("action", "Action")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -109,12 +111,12 @@ const Order: React.FC = () => {
                         <td className="px-4 py-2 border">{order.total}</td>
                         <td className="px-4 py-2 border">{order.status}</td>
                         <td className="px-4 py-2 border">
-                          {order.status === 'Cozinhando' && (
+                          {order.status_code === 1 && (
                             <button
                               onClick={() => handleStatus(order.id)}
                               className="px-4 py-2 ml-4 text-white bg-blue-500 rounded hover:bg-blue-600"
                             >
-                              Chamar Motorista
+                              {t("callDriver", "Call Driver")}
                             </button>
                           )}
                         </td>

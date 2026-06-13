@@ -2,9 +2,10 @@
 import React, { useEffect, useState } from "react";
 import { useAppSelector } from "@/redux/store";
 import { fetchServiceCategories, fetchMyServices, createService, updateService, fetchAvailability, createAvailability, fetchBlackouts, createBlackout, getAvailableBalance, requestPayout } from "@/services/partnerApi";
-import { t } from "@/configs/i18n";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function PartnerDashboard() {
+  const { t } = useTranslation();
   const { user } = useAppSelector((s) => s.auth);
   const [categories, setCategories] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
@@ -89,12 +90,16 @@ export default function PartnerDashboard() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-yellow-300 via-yellow-400 to-blue-500 py-10">
       <div className="max-w-6xl mx-auto px-4">
-        <h1 className="text-3xl font-bold text-white mb-6">Partner Dashboard</h1>
+        <h1 className="text-3xl font-bold text-white mb-6">
+          {t("partnerDashboard", "Partner Dashboard")}
+        </h1>
 
         <section className="bg-white/90 rounded-2xl p-5 shadow mb-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold">My Services</h2>
-            <button onClick={handleCreateService} className="px-3 py-2 bg-blue-600 text-white rounded">Add</button>
+            <h2 className="text-xl font-semibold">{t("myServices", "My Services")}</h2>
+            <button onClick={handleCreateService} className="px-3 py-2 bg-blue-600 text-white rounded">
+              {t("add", "Add")}
+            </button>
           </div>
           <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
             {services.map((s) => (
@@ -110,8 +115,10 @@ export default function PartnerDashboard() {
         {selectedService && (
           <section className="bg-white/90 rounded-2xl p-5 shadow mb-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">Availability</h2>
-              <button onClick={handleAddAvailability} className="px-3 py-2 bg-blue-600 text-white rounded">Add</button>
+              <h2 className="text-xl font-semibold">{t("availability", "Availability")}</h2>
+              <button onClick={handleAddAvailability} className="px-3 py-2 bg-blue-600 text-white rounded">
+                {t("add", "Add")}
+              </button>
             </div>
             <ul className="mt-3 list-disc pl-5">
               {availability.map((a) => (
@@ -124,8 +131,10 @@ export default function PartnerDashboard() {
         {selectedService && (
           <section className="bg-white/90 rounded-2xl p-5 shadow mb-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">Blackout Days</h2>
-              <button onClick={handleAddBlackout} className="px-3 py-2 bg-blue-600 text-white rounded">Add</button>
+              <h2 className="text-xl font-semibold">{t("blackoutDays", "Blackout Days")}</h2>
+              <button onClick={handleAddBlackout} className="px-3 py-2 bg-blue-600 text-white rounded">
+                {t("add", "Add")}
+              </button>
             </div>
             <ul className="mt-3 list-disc pl-5">
               {blackouts.map((b) => (
@@ -136,10 +145,14 @@ export default function PartnerDashboard() {
         )}
 
         <section className="bg-white/90 rounded-2xl p-5 shadow mb-6">
-          <h2 className="text-xl font-semibold">Payouts</h2>
+          <h2 className="text-xl font-semibold">{t("payouts", "Payouts")}</h2>
           <div className="mt-3">
-            <div className="text-sm text-gray-700">Available: {balance?.available_balance ?? 0} {balance?.currency ?? 'AOA'}</div>
-            <button className="mt-2 px-3 py-2 bg-green-600 text-white rounded" onClick={handleRequestPayout}>Request Payout</button>
+            <div className="text-sm text-gray-700">
+              {t("available", "Available")}: {balance?.available_balance ?? 0} {balance?.currency ?? 'AOA'}
+            </div>
+            <button className="mt-2 px-3 py-2 bg-green-600 text-white rounded" onClick={handleRequestPayout}>
+              {t("requestPayout", "Request Payout")}
+            </button>
           </div>
         </section>
       </div>

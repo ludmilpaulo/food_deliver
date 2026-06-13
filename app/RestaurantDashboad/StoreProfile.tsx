@@ -2,6 +2,7 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import { MdEdit, MdSave, MdCancel } from "react-icons/md";
 import { Store as StoreType, CategoryType } from "@/services/types";
 import { updatestore, fetchstoreCategorias } from "@/services/apiService";
+import { useTranslation } from "@/hooks/useTranslation";
 
 type StoreProfileProps = {
   store: StoreType;
@@ -9,6 +10,7 @@ type StoreProfileProps = {
 };
 
 const StoreProfile: React.FC<StoreProfileProps> = ({ store, setstore }) => {
+  const { t } = useTranslation();
   const [editMode, setEditMode] = useState<boolean>(false);
   const [categories, setCategories] = useState<CategoryType[]>([]);
   const [formData, setFormData] = useState({
@@ -86,7 +88,7 @@ const StoreProfile: React.FC<StoreProfileProps> = ({ store, setstore }) => {
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Perfil do storee</h2>
+        <h2 className="text-2xl font-bold">{t("storeProfile", "Store Profile")}</h2>
         {editMode ? (
           <div className="flex space-x-2">
             <button onClick={handleSave} className="text-green-500"><MdSave size={24} /></button>
@@ -98,7 +100,7 @@ const StoreProfile: React.FC<StoreProfileProps> = ({ store, setstore }) => {
       </div>
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium">Nome do storee</label>
+          <label className="block text-sm font-medium">{t("storeName", "Store Name")}</label>
           <input
             type="text"
             name="name"
@@ -109,7 +111,7 @@ const StoreProfile: React.FC<StoreProfileProps> = ({ store, setstore }) => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium">Telefone do storee</label>
+          <label className="block text-sm font-medium">{t("storePhone", "Store Phone")}</label>
           <input
             type="text"
             name="phone"
@@ -120,7 +122,7 @@ const StoreProfile: React.FC<StoreProfileProps> = ({ store, setstore }) => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium">Endereço do storee</label>
+          <label className="block text-sm font-medium">{t("storeAddress", "Store Address")}</label>
           <input
             type="text"
             name="address"
@@ -131,7 +133,7 @@ const StoreProfile: React.FC<StoreProfileProps> = ({ store, setstore }) => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium">Logotipo do storee</label>
+          <label className="block text-sm font-medium">{t("storeLogo", "Store Logo")}</label>
           <input
             type="file"
             name="logo"
@@ -141,7 +143,7 @@ const StoreProfile: React.FC<StoreProfileProps> = ({ store, setstore }) => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium">Licença do storee</label>
+          <label className="block text-sm font-medium">{t("storeLicense", "Store License")}</label>
           <input
             type="file"
             name="store_license"
@@ -151,7 +153,7 @@ const StoreProfile: React.FC<StoreProfileProps> = ({ store, setstore }) => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium">Categoria</label>
+          <label className="block text-sm font-medium">{t("Categories", "Category")}</label>
           <select
             name="category"
             value={formData.category}
@@ -159,7 +161,7 @@ const StoreProfile: React.FC<StoreProfileProps> = ({ store, setstore }) => {
             disabled={!editMode}
             className="mt-1 block w-full p-2 border rounded-md"
           >
-            <option value="">Selecione uma categoria</option>
+            <option value="">{t("selectCategory", "Select a category")}</option>
             {categories.map((category) => (
               <option key={category.id} value={category.id}>
                 {category.name}

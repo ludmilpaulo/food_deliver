@@ -2,6 +2,94 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --brand-primary: 37 99 235;
+    --brand-secondary: 14 165 233;
+    --brand-ink: 15 23 42;
+    --brand-muted: 100 116 139;
+    --brand-surface: 255 255 255;
+    --brand-surface-dark: 15 23 42;
+    --brand-ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --brand-motion-fast: 180ms;
+    --brand-motion-normal: 260ms;
+  }
+}
+
+@layer components {
+  .brand-section {
+    @apply rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900;
+  }
+
+  .brand-section-rhythm {
+    @apply px-4 py-5 md:px-6 md:py-6;
+  }
+
+  .brand-h1 {
+    font-size: clamp(1.875rem, 4vw, 3.25rem);
+    line-height: 1.1;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+  }
+
+  .brand-h2 {
+    font-size: clamp(1.125rem, 2vw, 1.5rem);
+    line-height: 1.25;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .brand-muted {
+    color: rgb(var(--brand-muted));
+  }
+
+  .brand-chip {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold;
+    background-color: rgb(239 246 255);
+    color: rgb(37 99 235);
+  }
+
+  .brand-button-primary {
+    @apply inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold shadow;
+    background-color: rgb(var(--brand-surface));
+    color: rgb(var(--brand-primary));
+    transition:
+      transform var(--brand-motion-fast) var(--brand-ease-standard),
+      box-shadow var(--brand-motion-fast) var(--brand-ease-standard),
+      background-color var(--brand-motion-fast) var(--brand-ease-standard);
+  }
+
+  .brand-button-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px -14px rgba(15, 23, 42, 0.7);
+    background-color: rgb(239 246 255);
+  }
+
+  .brand-button-secondary {
+    @apply inline-flex items-center gap-2 rounded-xl border border-white/50 px-5 py-3 text-sm font-semibold text-white;
+    transition:
+      transform var(--brand-motion-fast) var(--brand-ease-standard),
+      background-color var(--brand-motion-fast) var(--brand-ease-standard);
+  }
+
+  .brand-button-secondary:hover {
+    transform: translateY(-1px);
+    background-color: rgba(255, 255, 255, 0.12);
+  }
+
+  .brand-motion-lift {
+    transition:
+      transform var(--brand-motion-normal) var(--brand-ease-standard),
+      box-shadow var(--brand-motion-normal) var(--brand-ease-standard),
+      border-color var(--brand-motion-normal) var(--brand-ease-standard);
+  }
+
+  .brand-motion-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 35px -24px rgba(15, 23, 42, 0.65);
+  }
+}
+
 @layer utilities {
   .animate-wave {
     animation: wave 1.8s infinite;

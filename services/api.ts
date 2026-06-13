@@ -26,6 +26,28 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// When the stored token is invalid/expired the backend returns 401 even for
+// public endpoints. Clear the stale session and retry the request once
+// without the Authorization header so public pages keep working.
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+    const code = error?.response?.data?.code;
+    const config = error?.config;
+    if (status === 401 && code === "token_not_valid" && config && !config._retriedWithoutAuth) {
+      try {
+        localStorage.removeItem("auth_token");
+        localStorage.removeItem("auth_user");
+      } catch {}
+      config._retriedWithoutAuth = true;
+      delete config.headers?.Authorization;
+      return api.request(config);
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;
 
 // Use this `api` instance to make all backend calls

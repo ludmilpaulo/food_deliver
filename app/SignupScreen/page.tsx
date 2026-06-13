@@ -1,8 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { useDispatch } from "react-redux";
-import { loginUser } from "@/redux/slices/authSlice";
 import { Transition } from "@headlessui/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -10,17 +8,22 @@ import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
 import logo from "@/assets/azul.png";
 import { signup } from "@/services/authService";
-import { t, setLanguageFromBrowser, setLanguage, getLanguage } from "@/configs/i18n";
-import { SupportedLocale } from "@/configs/translations";
+import { SupportedLocale, supportedLocales } from "@/configs/translations";
 import { useAppDispatch } from "@/redux/store";
 import { analytics } from "@/utils/mixpanel"; 
+import { useTranslation } from "@/hooks/useTranslation";
+import { fetchBusinessCategories, type BusinessCategory } from "@/services/platformApi";
+import { type LoginResult, loginUser } from "@/redux/slices/authSlice";
 // LANGUAGE SELECT SUPPORT
-const LANGUAGES: { value: SupportedLocale; label: string }[] = [
-  { value: "en", label: "🇬🇧 English" },
-  { value: "pt", label: "🇵🇹 Português" },
-];
+const LANGUAGE_LABELS: Record<SupportedLocale, string> = {
+  en: "English",
+  pt: "Portugues",
+  fr: "Francais",
+  es: "Espanol",
+};
 
 const SignupScreen = () => {
+  const { t, languageCode, changeLanguage } = useTranslation();
   const router = useRouter();
 
   const [signupData, setSignupData] = useState({
@@ -32,6 +35,7 @@ const SignupScreen = () => {
     address: "",
     logo: null as File | null,
     store_license: null as File | null,
+    business_category: "business",
   });
 
   const [loading, setLoading] = useState(false);
@@ -39,20 +43,35 @@ const SignupScreen = () => {
   const [licencaLoading, setLicencaLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState<"client" | "store">("client");
-  const [lang, setLang] = useState<SupportedLocale>(getLanguage());
+  const [businessCategories, setBusinessCategories] = useState<BusinessCategory[]>([]);
 
   const dispatch = useAppDispatch();
 
   // Language setup
   React.useEffect(() => {
-    setLanguageFromBrowser();
-    setLang(getLanguage());
     analytics.trackPageView('Signup Page');
   }, []);
 
+  React.useEffect(() => {
+    if (role !== "store") return;
+    fetchBusinessCategories(languageCode, "web")
+      .then((data) => {
+        setBusinessCategories(data);
+        setSignupData((prev) => ({
+          ...prev,
+          business_category:
+            prev.business_category ||
+            data[0]?.slug ||
+            "business",
+        }));
+      })
+      .catch(() => {
+        setBusinessCategories([]);
+      });
+  }, [languageCode, role]);
+
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setLanguage(e.target.value as SupportedLocale);
-    setLang(getLanguage());
+    changeLanguage(e.target.value as SupportedLocale);
   };
 
   const handleRoleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,7 +112,9 @@ const SignupScreen = () => {
       if (status === 201 || data.status === "201" || data.status === "success") {
         // If your backend returns login token after signup:
         // You may need to adjust payload if backend is different.
-        const loginResult = await dispatch(loginUser({ username: signupData.username, password: signupData.password })).unwrap();
+        const loginResult: LoginResult = await dispatch(
+          loginUser({ username: signupData.username, password: signupData.password }),
+        ).unwrap();
 
         analytics.trackSignup(loginResult.user_id?.toString() || signupData.username, {
           name: signupData.name,
@@ -103,19 +124,24 @@ const SignupScreen = () => {
         });
 
         alert(t("registerSuccess"));
-        router.push(role === "store" ? "/StoreDashboad" : "/HomeScreen");
+        if (role === "store") {
+          router.push(loginResult.business_profile?.dashboardRoute || "/dashboard/business");
+        } else {
+          router.push("/HomeScreen");
+        }
       } else {
         handleErrorResponse(status, data);
       }
-    } catch (err) {
-      analytics.trackError('Signup Failed', { role, error: err?.toString() });
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      analytics.trackError('Signup Failed', { role, error: errorMessage });
       alert(t("registerFailed"));
     } finally {
       setLoading(false);
     }
   };
 
-  const handleErrorResponse = (status: number, data: any) => {
+  const handleErrorResponse = (status: number, data: { message?: string }) => {
     switch (status) {
       case 400:
         alert(data.message || t("fillAllFields"));
@@ -148,13 +174,13 @@ const SignupScreen = () => {
             <Image src={logo} alt="Logo" width={64} height={64} className="rounded-full" />
             <select
               className="ml-2 p-1 rounded bg-white/80 border border-gray-300 text-gray-800 font-semibold text-sm shadow"
-              value={lang}
+              value={languageCode}
               onChange={handleLanguageChange}
               aria-label={t("changeLanguage")}
             >
-              {LANGUAGES.map((langOpt) => (
-                <option key={langOpt.value} value={langOpt.value}>
-                  {langOpt.label}
+              {supportedLocales.map((code) => (
+                <option key={code} value={code}>
+                  {LANGUAGE_LABELS[code]}
                 </option>
               ))}
             </select>
@@ -248,6 +274,27 @@ const SignupScreen = () => {
               </div>
               {role === "store" && (
                 <>
+                  <select
+                    name="business_category"
+                    value={signupData.business_category}
+                    onChange={(e) =>
+                      setSignupData((prev) => ({
+                        ...prev,
+                        business_category: e.target.value,
+                      }))
+                    }
+                    className="p-3 border rounded"
+                    required
+                  >
+                    {businessCategories.length === 0 && (
+                      <option value="business">{t("business", "Business")}</option>
+                    )}
+                    {businessCategories.map((cat) => (
+                      <option key={cat.id} value={cat.slug}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
                   <input
                     name="name"
                     placeholder={t("storeName")}

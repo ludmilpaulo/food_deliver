@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ClientRoot from './ClientRoot';
 import JsonLd from '@/components/JsonLd';
+import { LocationProvider } from '@/contexts/LocationContext';
 import { initLanguage } from '@/configs/i18n';
 import { supportedLocales, SupportedLocale } from '@/configs/translations';
 import { buildRootMetadata } from '@/configs/seo';
@@ -31,14 +32,19 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className="font-sans antialiased text-slate-900">
+      <body
+        className="font-sans antialiased text-slate-900"
+        suppressHydrationWarning
+      >
         <JsonLd />
         <StoreProvider>
-          <ClientRoot>
-            <Navbar initialLocale={locale} />
-            {children}
-            <Footer />
-          </ClientRoot>
+          <LocationProvider>
+            <ClientRoot>
+              <Navbar initialLocale={locale} />
+              {children}
+              <Footer />
+            </ClientRoot>
+          </LocationProvider>
         </StoreProvider>
       </body>
     </html>

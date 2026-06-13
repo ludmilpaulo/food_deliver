@@ -1,11 +1,11 @@
 "use client";
 import { useGetAboutUsQuery } from "@/redux/slices/aboutApi";
-import { getLanguage, t } from "@/configs/i18n";
 import { useMemo } from "react";
 import Link from "next/link";
 import { SocialIcon } from "react-social-icons";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useTranslation } from "@/hooks/useTranslation";
 
 function getUserCountryCode(): string {
   if (typeof window === "undefined") return "ZA";
@@ -23,6 +23,7 @@ const countryMap: Record<string, string> = {
 };
 
 const AboutUs = () => {
+  const { t } = useTranslation();
   const { data: aboutUsEntries = [], isLoading, isError } = useGetAboutUsQuery();
   const userCountryCode =
     typeof window !== "undefined" ? getUserCountryCode() : "ZA";
@@ -81,7 +82,7 @@ const AboutUs = () => {
             >
               <Image
                 src={aboutUsData.logo}
-                alt="Company Logo"
+                alt={t("companyLogoAlt", "Company Logo")}
                 width={80}
                 height={80}
                 className="rounded-full object-contain"
@@ -108,7 +109,7 @@ const AboutUs = () => {
           <div className="flex flex-col gap-2 text-base text-gray-700 w-full md:w-auto">
             {aboutUsData.email && (
               <span>
-                <strong>Email:</strong>{" "}
+                <strong>{t("email", "Email")}:</strong>{" "}
                 <Link
                   href={`mailto:${aboutUsData.email}`}
                   className="text-blue-700 hover:underline"
@@ -162,7 +163,7 @@ const AboutUs = () => {
               whileHover={{ scale: 1.06 }}
               whileTap={{ scale: 0.96 }}
               className="inline-flex items-center px-8 py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-yellow-400 text-white font-bold text-lg shadow-md transition hover:shadow-lg focus:outline-none border-2 border-white"
-              aria-label="See Careers"
+              aria-label={t("seeCareers")}
             >
               <span className="mr-2">🚀</span>
               {t("seeCareers") || "Explore Careers"}

@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import axios from "axios";
 import Image from "next/image";
 import { selectUser } from "@/redux/slices/authSlice";
 import { useSelector } from "react-redux";
 import { baseAPI } from "@/services/types";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface Customer {
   id: number;
@@ -13,11 +14,8 @@ interface Customer {
   address: string;
 }
 
-interface Props {
-  userId: number;
-}
-
 const CustomersList: React.FC = () => {
+  const { t } = useTranslation();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
@@ -26,11 +24,7 @@ const CustomersList: React.FC = () => {
 
   const user_id = user?.user_id || 0;
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const response = await axios.get(
         `${baseAPI}/report/store/customers/${user_id}/`,
@@ -39,7 +33,11 @@ const CustomersList: React.FC = () => {
     } catch (error) {
       console.error("Error fetching customers:", error);
     }
-  };
+  }, [user_id]);
+
+  useEffect(() => {
+    void fetchData();
+  }, [fetchData]);
 
   return (
     <div className="h-full w-full">
@@ -48,14 +46,14 @@ const CustomersList: React.FC = () => {
           <thead>
             <tr>
               <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                <div className="font-normal leading-none opacity-70">Name</div>
+                <div className="font-normal leading-none opacity-70">{t("name", "Name")}</div>
               </th>
               <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                <div className="font-normal leading-none opacity-70">Phone</div>
+                <div className="font-normal leading-none opacity-70">{t("phone", "Phone")}</div>
               </th>
               <th className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
                 <div className="font-normal leading-none opacity-70">
-                  Address
+                  {t("address", "Address")}
                 </div>
               </th>
             </tr>

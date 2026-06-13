@@ -5,8 +5,8 @@ import { SocialIcon } from "react-social-icons";
 import { motion } from "framer-motion";
 import { useGetAboutUsQuery } from "@/redux/slices/aboutApi";
 import Image from "next/image";
-import { t } from "@/configs/i18n";
 import { useMemo } from "react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 function getUserCountryCode(): string {
   if (typeof window === "undefined") return "ZA";
@@ -26,6 +26,7 @@ const countryMap: Record<string, string> = {
 const currentYear = new Date().getFullYear();
 
 const Footer: React.FC = () => {
+  const { t } = useTranslation();
   const { data: aboutUsEntries = [], isLoading, isError } = useGetAboutUsQuery();
   const userCountryCode =
     typeof window !== "undefined" ? getUserCountryCode() : "ZA";
@@ -91,7 +92,7 @@ const Footer: React.FC = () => {
               <Link href="https://apps.apple.com" target="_blank" rel="noopener noreferrer" className="focus:outline-none">
                 <Image
                   src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
-                  alt="Download Kudya on the App Store"
+                  alt={t("downloadKudyaAppStore", "Download Kudya on the App Store")}
                   width={120}
                   height={40}
                   className="rounded-xl shadow hover:scale-105 focus:ring-2 ring-yellow-400/50 transition-all"
@@ -100,7 +101,7 @@ const Footer: React.FC = () => {
               <Link href="https://play.google.com/store/apps/details?id=com.ludmil.kudyaclient" target="_blank" rel="noopener noreferrer" className="focus:outline-none">
                 <Image
                   src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
-                  alt="Get Kudya on Google Play"
+                  alt={t("downloadKudyaGooglePlay", "Get Kudya on Google Play")}
                   width={120}
                   height={40}
                   className="rounded-xl shadow hover:scale-105 focus:ring-2 ring-yellow-400/50 transition-all"

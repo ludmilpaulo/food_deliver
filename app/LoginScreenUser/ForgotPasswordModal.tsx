@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { baseAPI } from "@/services/types";
-import { t } from "@/configs/i18n";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface ForgotPasswordModalProps {
   show: boolean;
@@ -9,6 +9,7 @@ interface ForgotPasswordModalProps {
 }
 
 const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({ show, onClose }) => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [emailSent, setEmailSent] = useState<boolean>(false);

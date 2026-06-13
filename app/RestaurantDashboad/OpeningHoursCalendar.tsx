@@ -5,12 +5,29 @@ import { OpeningHourType } from '@/services/types';
 import { getOpeningHours } from '@/services/apiService';
 import { addDays, format, startOfWeek } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface OpeningHoursCalendarProps {
   storeId: number;
 }
 
+const getDateFromDay = (day: number): Date => {
+  const now = new Date();
+  const start = startOfWeek(now, { locale: ptBR });
+  return addDays(start, day);
+};
+
 const OpeningHoursCalendar: React.FC<OpeningHoursCalendarProps> = ({ storeId }) => {
+  const { t } = useTranslation();
+  const dayLabels = [
+    t("sunday", "Sunday"),
+    t("monday", "Monday"),
+    t("tuesday", "Tuesday"),
+    t("wednesday", "Wednesday"),
+    t("thursday", "Thursday"),
+    t("friday", "Friday"),
+    t("saturday", "Saturday"),
+  ];
   const [openingHours, setOpeningHours] = useState<OpeningHourType[]>([]);
   const [highlightedDates, setHighlightedDates] = useState<Date[]>([]);
 
@@ -28,12 +45,6 @@ const OpeningHoursCalendar: React.FC<OpeningHoursCalendarProps> = ({ storeId }) 
     fetchOpeningHours();
   }, [storeId]);
 
-  const getDateFromDay = (day: number): Date => {
-    const now = new Date();
-    const start = startOfWeek(now, { locale: ptBR });
-    return addDays(start, day);
-  };
-
   const tileClassName = ({ date }: { date: Date }) => {
     return highlightedDates.some(
       highlightedDate =>
@@ -47,7 +58,7 @@ const OpeningHoursCalendar: React.FC<OpeningHoursCalendarProps> = ({ storeId }) 
 
   return (
     <div className="mt-6">
-      <h3 className="text-xl font-bold mb-4">Horário de Funcionamento</h3>
+      <h3 className="text-xl font-bold mb-4">{t("openingHours", "Opening Hours")}</h3>
       <Calendar
         locale="pt-BR"
         tileClassName={tileClassName}
@@ -61,8 +72,8 @@ const OpeningHoursCalendar: React.FC<OpeningHoursCalendarProps> = ({ storeId }) 
       <ul className="mt-4 space-y-2">
         {openingHours.map((hour, index) => (
           <li key={index} className="flex justify-between">
-            <span>{['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'][hour.day]}</span>
-            <span>{hour.is_closed ? "Fechado" : `${hour.from_hour} - ${hour.to_hour}`}</span>
+            <span>{dayLabels[hour.day]}</span>
+            <span>{hour.is_closed ? t("closed", "Closed") : `${hour.from_hour} - ${hour.to_hour}`}</span>
           </li>
         ))}
       </ul>

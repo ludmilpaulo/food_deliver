@@ -11,8 +11,9 @@ import {
   LegalPageData,
   LegalPageKind,
 } from "@/configs/legalPages";
-import { getLanguage, setLanguage, t } from "@/configs/i18n";
+import { getLanguage, setLanguage } from "@/configs/i18n";
 import { SupportedLocale, supportedLocales } from "@/configs/translations";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const countryMap: Record<string, string> = {
   CV: "Cabo Verde",
@@ -62,6 +63,7 @@ type Props = {
 
 export default function LegalPageShell({ kind }: Props) {
   const [lang, setLang] = useState<SupportedLocale>(getLanguage());
+  const { t } = useTranslation(lang);
   const content = getLegalContent(kind, lang);
   const isFaq = kind === "faq";
   const faqContent = isFaq ? (content as FaqPageData) : null;
@@ -160,7 +162,10 @@ export default function LegalPageShell({ kind }: Props) {
         </div>
 
         {!isFaq && legalContent && (
-          <nav className="hidden lg:flex flex-col gap-1 mb-8" aria-label="Page sections">
+          <nav
+            className="hidden lg:flex flex-col gap-1 mb-8"
+            aria-label={t("pageSections", "Page sections")}
+          >
             {legalContent.sections.map((sec) => (
               <button
                 key={sec.id}

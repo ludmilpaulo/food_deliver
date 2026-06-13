@@ -14,17 +14,12 @@ import {
   fetchBackups,
   formatBytes,
 } from "@/services/platformBackupApi";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const STATUS_STYLES: Record<BackupStatus, string> = {
   processing: "bg-amber-100 text-amber-800 border-amber-200",
   completed: "bg-emerald-100 text-emerald-800 border-emerald-200",
   failed: "bg-red-100 text-red-800 border-red-200",
-};
-
-const TYPE_LABELS: Record<BackupType, string> = {
-  full: "Full Backup",
-  database: "Database Only",
-  files: "Files Only",
 };
 
 function formatDate(value: string | null): string {
@@ -33,6 +28,12 @@ function formatDate(value: string | null): string {
 }
 
 export default function BackupExport() {
+  const { t } = useTranslation();
+  const typeLabels: Record<BackupType, string> = {
+    full: t("fullBackup", "Full Backup"),
+    database: t("databaseOnly", "Database Only"),
+    files: t("filesOnly", "Files Only"),
+  };
   const [summary, setSummary] = useState<BackupSummary | null>(null);
   const [backups, setBackups] = useState<PlatformBackup[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,7 +58,7 @@ export default function BackupExport() {
       setSummary(summaryData);
       setBackups(backupData);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load backup data");
+      setError(err instanceof Error ? err.message : t("failedToLoadBackupData", "Failed to load backup data"));
     } finally {
       setLoading(false);
     }
@@ -83,7 +84,7 @@ export default function BackupExport() {
       await createBackup({ backup_type: backupType });
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create backup");
+      setError(err instanceof Error ? err.message : t("failedToCreateBackup", "Failed to create backup"));
     } finally {
       setCreating(null);
     }
@@ -94,18 +95,18 @@ export default function BackupExport() {
       setError(null);
       await downloadBackup(backup.id, backup.name.replace(/[^\w\s-]/g, "").trim() || `backup-${backup.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Download failed");
+      setError(err instanceof Error ? err.message : t("downloadFailed", "Download failed"));
     }
   };
 
   const handleDelete = async (backup: PlatformBackup) => {
-    if (!window.confirm(`Delete backup "${backup.name}"? This cannot be undone.`)) return;
+    if (!window.confirm(t("confirmDeleteBackup", `Delete backup "${backup.name}"? This cannot be undone.`))) return;
     try {
       setError(null);
       await deleteBackup(backup.id);
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Delete failed");
+      setError(err instanceof Error ? err.message : t("deleteFailed", "Delete failed"));
     }
   };
 
@@ -114,25 +115,25 @@ export default function BackupExport() {
       {
         label: "Total Backups",
         value: summary ? String(summary.total_backups) : "—",
-        sub: summary ? `${summary.completed_backups} completed` : "",
+        sub: summary ? `${summary.completed_backups} ${t("completed", "completed")}` : "",
         color: "from-slate-700 to-slate-900",
       },
       {
         label: "Last Backup Date",
-        value: summary?.last_backup_date ? formatDate(summary.last_backup_date) : "Never",
-        sub: "Most recent completed backup",
+        value: summary?.last_backup_date ? formatDate(summary.last_backup_date) : t("never", "Never"),
+        sub: t("mostRecentCompletedBackup", "Most recent completed backup"),
         color: "from-blue-600 to-blue-800",
       },
       {
         label: "Last Backup Size",
         value: summary ? formatBytes(summary.last_backup_size) : "—",
-        sub: "Latest archive size",
+        sub: t("latestArchiveSize", "Latest archive size"),
         color: "from-violet-600 to-violet-800",
       },
       {
         label: "Storage Used",
         value: summary ? formatBytes(summary.storage_used_bytes) : "—",
-        sub: "Total backup storage",
+        sub: t("totalBackupStorage", "Total backup storage"),
         color: "from-emerald-600 to-emerald-800",
       },
     ],
@@ -143,12 +144,14 @@ export default function BackupExport() {
     <div className="p-6 max-w-7xl mx-auto">
       <div className="mb-8">
         <p className="text-xs font-semibold uppercase tracking-wider text-blue-600 mb-1">
-          System Management
+          {t("systemManagement", "System Management")}
         </p>
-        <h1 className="text-3xl font-bold text-slate-900">Backup &amp; Export</h1>
+        <h1 className="text-3xl font-bold text-slate-900">{t("backupExport", "Backup & Export")}</h1>
         <p className="text-slate-500 mt-2 max-w-3xl">
-          Create secure backups of the entire Kudya platform — database records and uploaded files.
-          Backups are stored privately and can only be downloaded by super administrators.
+          {t(
+            "backupExportDescription",
+            "Create secure backups of the entire Kudya platform — database records and uploaded files. Backups are stored privately and can only be downloaded by super administrators.",
+          )}
         </p>
       </div>
 
@@ -172,9 +175,9 @@ export default function BackupExport() {
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-8">
-        <h2 className="text-lg font-semibold text-slate-900 mb-1">Create Backup</h2>
+        <h2 className="text-lg font-semibold text-slate-900 mb-1">{t("createBackup", "Create Backup")}</h2>
         <p className="text-sm text-slate-500 mb-5">
-          Large backups run in the background so the platform stays responsive.
+          {t("largeBackupsRunBackground", "Large backups run in the background so the platform stays responsive.")}
         </p>
         <div className="flex flex-wrap gap-3">
           {(["full", "database", "files"] as BackupType[]).map((type) => (
@@ -188,9 +191,9 @@ export default function BackupExport() {
               {creating === type ? (
                 <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : null}
-              {type === "full" && "Create Full Backup"}
-              {type === "database" && "Backup Database Only"}
-              {type === "files" && "Backup Files Only"}
+              {type === "full" && t("createFullBackup", "Create Full Backup")}
+              {type === "database" && t("backupDatabaseOnly", "Backup Database Only")}
+              {type === "files" && t("backupFilesOnly", "Backup Files Only")}
             </button>
           ))}
         </div>
@@ -198,11 +201,11 @@ export default function BackupExport() {
 
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="p-6 border-b border-slate-100">
-          <h2 className="text-lg font-semibold text-slate-900 mb-4">Backup History</h2>
+          <h2 className="text-lg font-semibold text-slate-900 mb-4">{t("backupHistory", "Backup History")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3">
             <input
               type="search"
-              placeholder="Search by name or creator..."
+              placeholder={t("searchByNameOrCreator", "Search by name or creator...")}
               value={filters.search}
               onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
               className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -214,10 +217,10 @@ export default function BackupExport() {
               }
               className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
             >
-              <option value="">All types</option>
-              <option value="full">Full Backup</option>
-              <option value="database">Database Only</option>
-              <option value="files">Files Only</option>
+              <option value="">{t("allTypes", "All types")}</option>
+              <option value="full">{t("fullBackup", "Full Backup")}</option>
+              <option value="database">{t("databaseOnly", "Database Only")}</option>
+              <option value="files">{t("filesOnly", "Files Only")}</option>
             </select>
             <select
               value={filters.status}
@@ -226,10 +229,10 @@ export default function BackupExport() {
               }
               className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
             >
-              <option value="">All statuses</option>
-              <option value="processing">Processing</option>
-              <option value="completed">Completed</option>
-              <option value="failed">Failed</option>
+              <option value="">{t("allStatuses", "All statuses")}</option>
+              <option value="processing">{t("processing", "Processing")}</option>
+              <option value="completed">{t("completed", "Completed")}</option>
+              <option value="failed">{t("failed", "Failed")}</option>
             </select>
             <input
               type="date"
@@ -252,20 +255,20 @@ export default function BackupExport() {
           </div>
         ) : backups.length === 0 ? (
           <div className="py-16 text-center text-slate-500 text-sm">
-            No backups found. Create your first backup above.
+            {t("noBackupsFoundCreateFirst", "No backups found. Create your first backup above.")}
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead className="bg-slate-50 text-left text-slate-600">
                 <tr>
-                  <th className="px-6 py-3 font-semibold">Backup Name</th>
-                  <th className="px-6 py-3 font-semibold">Date Created</th>
-                  <th className="px-6 py-3 font-semibold">Created By</th>
-                  <th className="px-6 py-3 font-semibold">Type</th>
-                  <th className="px-6 py-3 font-semibold">Size</th>
-                  <th className="px-6 py-3 font-semibold">Status</th>
-                  <th className="px-6 py-3 font-semibold text-right">Actions</th>
+                  <th className="px-6 py-3 font-semibold">{t("backupName", "Backup Name")}</th>
+                  <th className="px-6 py-3 font-semibold">{t("dateCreated", "Date Created")}</th>
+                  <th className="px-6 py-3 font-semibold">{t("createdBy", "Created By")}</th>
+                  <th className="px-6 py-3 font-semibold">{t("type", "Type")}</th>
+                  <th className="px-6 py-3 font-semibold">{t("size", "Size")}</th>
+                  <th className="px-6 py-3 font-semibold">{t("status", "Status")}</th>
+                  <th className="px-6 py-3 font-semibold text-right">{t("actions", "Actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -276,7 +279,7 @@ export default function BackupExport() {
                     <td className="px-6 py-4 text-slate-600">
                       {backup.created_by_name || backup.created_by_email || "—"}
                     </td>
-                    <td className="px-6 py-4 text-slate-600">{TYPE_LABELS[backup.backup_type]}</td>
+                    <td className="px-6 py-4 text-slate-600">{typeLabels[backup.backup_type]}</td>
                     <td className="px-6 py-4 text-slate-600">{backup.file_size_human || "—"}</td>
                     <td className="px-6 py-4">
                       <span
@@ -296,7 +299,7 @@ export default function BackupExport() {
                           onClick={() => handleDownload(backup)}
                           className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-40"
                         >
-                          Download
+                          {t("download", "Download")}
                         </button>
                         <button
                           type="button"
@@ -304,7 +307,7 @@ export default function BackupExport() {
                           onClick={() => handleDelete(backup)}
                           className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 disabled:opacity-40"
                         >
-                          Delete
+                          {t("delete", "Delete")}
                         </button>
                       </div>
                       {backup.status === "failed" && backup.error_message && (
@@ -320,9 +323,18 @@ export default function BackupExport() {
       </div>
 
       <p className="text-xs text-slate-400 mt-6">
-        Each backup archive contains a structured <code className="text-slate-600">database/data.json</code>,
-        a <code className="text-slate-600">media/</code> folder, and a <code className="text-slate-600">metadata.json</code> file
-        for future restore operations. All backup actions are recorded in the platform audit log.
+        {t(
+          "backupArchiveContains",
+          "Each backup archive contains a structured",
+        )}{" "}
+        <code className="text-slate-600">database/data.json</code>,{" "}
+        {t("backupArchiveContainsMedia", "a")} <code className="text-slate-600">media/</code>{" "}
+        {t("backupArchiveContainsMetadata", "folder, and a")}{" "}
+        <code className="text-slate-600">metadata.json</code>{" "}
+        {t(
+          "backupArchiveContainsEnd",
+          "file for future restore operations. All backup actions are recorded in the platform audit log.",
+        )}
       </p>
     </div>
   );

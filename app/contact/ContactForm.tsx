@@ -2,9 +2,10 @@
 import { useState } from "react";
 import { Transition } from "@headlessui/react";
 import { baseAPI } from "@/services/types";
-import { t } from "@/configs/i18n";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const ContactForm = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     subject: "",
     email: "",

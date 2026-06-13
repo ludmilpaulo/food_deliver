@@ -4,7 +4,15 @@ import { Dialog, Transition } from "@headlessui/react";
 import { X } from "lucide-react";
 import axios from "axios";
 import { baseAPI } from "@/services/api";
-import { t } from "@/configs/i18n";
+import { useTranslation } from "@/hooks/useTranslation";
+import { SupportedLocale, supportedLocales } from "@/configs/translations";
+
+const LANGUAGE_LABELS: Record<SupportedLocale, string> = {
+  en: "English",
+  pt: "Portugues",
+  fr: "Francais",
+  es: "Espanol",
+};
 
 interface ApplicationModalProps {
   isOpen: boolean;
@@ -19,11 +27,12 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
   careerTitle,
   careerId,
 }) => {
+  const { t, languageCode } = useTranslation();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [coverLetter, setCoverLetter] = useState("");
   const [resume, setResume] = useState<File | null>(null);
-  const [language, setLanguage] = useState<"en" | "pt">("en");
+  const [language, setLanguage] = useState<SupportedLocale>(languageCode);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,7 +63,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
         setEmail("");
         setCoverLetter("");
         setResume(null);
-        setLanguage("en");
+        setLanguage(languageCode);
       } else {
         alert(t("applicationFailed") || "Failed to submit application.");
       }
@@ -107,10 +116,13 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
                     <select
                       className="border p-2 rounded w-full"
                       value={language}
-                      onChange={(e) => setLanguage(e.target.value as "en" | "pt")}
+                      onChange={(e) => setLanguage(e.target.value as SupportedLocale)}
                     >
-                      <option value="en">English</option>
-                      <option value="pt">Português</option>
+                      {supportedLocales.map((code) => (
+                        <option key={code} value={code}>
+                          {LANGUAGE_LABELS[code]}
+                        </option>
+                      ))}
                     </select>
                   </div>
 

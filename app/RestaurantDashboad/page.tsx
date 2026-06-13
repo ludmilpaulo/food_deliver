@@ -10,69 +10,72 @@ import { MdMenu } from "react-icons/md";
 import { HelpCircle } from "lucide-react";
 import withAuth from "@/components/ProtectedPage";
 import HelpGuideModal from "@/components/HelpGuideModal";
-
-// Dynamically import Sidebar to reduce initial bundle size
-const Sidebar = dynamic(() => import("./Sidebar"), {
-  ssr: false,
-  loading: () => <p>Loading...</p>,
-});
+import { useTranslation } from "@/hooks/useTranslation";
 
 const StoreDashboard: React.FC = () => {
+  const { t } = useTranslation();
   const user = useSelector(selectUser);
   const [fornecedor, setFornecedor] = useState<FornecedorType | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const Sidebar = dynamic(() => import("./Sidebar"), {
+    ssr: false,
+    loading: () => <p>{t("loading")}</p>,
+  });
 
   const helpSections = [
     {
-      title: 'Como usar o Dashboard',
-      content: 'O dashboard do restaurante permite gerenciar pedidos, produtos e perfil.',
+      title: t("dashHelpUseTitle", "How to use the Dashboard"),
+      content: t(
+        "dashHelpUseContent",
+        "The restaurant dashboard lets you manage orders, products, and profile settings.",
+      ),
       steps: [
-        'Navegue pelo menu lateral para acessar diferentes seções',
-        'Visualize pedidos pendentes na página inicial',
-        'Atualize o status dos pedidos conforme progridem',
-        'Gerencie seus produtos e horários de funcionamento',
+        t("dashHelpUseStep1", "Use the side menu to access different sections."),
+        t("dashHelpUseStep2", "View pending orders on the main page."),
+        t("dashHelpUseStep3", "Update order statuses as they progress."),
+        t("dashHelpUseStep4", "Manage products and opening hours."),
       ],
     },
     {
-      title: 'Gerenciamento de Pedidos',
-      content: 'Acompanhe e gerencie todos os seus pedidos em tempo real.',
+      title: t("dashHelpOrdersTitle", "Order Management"),
+      content: t("dashHelpOrdersContent", "Track and manage all your orders in real time."),
       steps: [
-        'Aceite ou rejeite novos pedidos',
-        'Atualize o status do pedido (preparando, pronto, entregue)',
-        'Veja detalhes completos do pedido e informações do cliente',
-        'Entre em contato com entregadores quando necessário',
+        t("dashHelpOrdersStep1", "Accept or reject new orders."),
+        t("dashHelpOrdersStep2", "Update order status (preparing, ready, delivered)."),
+        t("dashHelpOrdersStep3", "View full order details and customer information."),
+        t("dashHelpOrdersStep4", "Contact drivers when needed."),
       ],
     },
     {
-      title: 'Adicionar Produtos',
-      content: 'Adicione e gerencie os produtos do seu restaurante.',
+      title: t("dashHelpProductsTitle", "Add Products"),
+      content: t("dashHelpProductsContent", "Add and manage your restaurant products."),
       steps: [
-        'Clique em "Produtos" no menu',
-        'Adicione fotos, descrições e preços',
-        'Defina categorias para seus produtos',
-        'Ative ou desative produtos conforme disponibilidade',
+        t("dashHelpProductsStep1", 'Click "Products" in the menu.'),
+        t("dashHelpProductsStep2", "Add photos, descriptions, and prices."),
+        t("dashHelpProductsStep3", "Set categories for your products."),
+        t("dashHelpProductsStep4", "Enable or disable products based on availability."),
       ],
     },
     {
-      title: 'Configurar Horários',
-      content: 'Defina seus horários de funcionamento.',
+      title: t("dashHelpHoursTitle", "Set Opening Hours"),
+      content: t("dashHelpHoursContent", "Define your operating schedule."),
       steps: [
-        'Acesse "Perfil" no menu',
-        'Configure horários para cada dia da semana',
-        'Marque dias de fechamento ou feriados',
+        t("dashHelpHoursStep1", 'Open "Profile" in the menu.'),
+        t("dashHelpHoursStep2", "Configure hours for each day of the week."),
+        t("dashHelpHoursStep3", "Mark closed days or holidays."),
       ],
     },
     {
-      title: 'Relatórios e Estatísticas',
-      content: 'Visualize relatórios detalhados sobre seu negócio.',
+      title: t("dashHelpReportsTitle", "Reports and Analytics"),
+      content: t("dashHelpReportsContent", "View detailed reports about your business."),
       steps: [
-        'Acesse "Relatórios" no menu',
-        'Veja vendas por período',
-        'Analise produtos mais vendidos',
-        'Exporte relatórios para análise',
+        t("dashHelpReportsStep1", 'Open "Reports" in the menu.'),
+        t("dashHelpReportsStep2", "View sales by period."),
+        t("dashHelpReportsStep3", "Analyze best-selling products."),
+        t("dashHelpReportsStep4", "Export reports for deeper analysis."),
       ],
     },
   ];
@@ -85,7 +88,7 @@ const StoreDashboard: React.FC = () => {
           const data = await fetchFornecedorData(user.user_id);
           setFornecedor(data);
         } catch (error) {
-          setError("Ocorreu um erro ao buscar os dados");
+          setError(t("errorFetchingData", "An error occurred while fetching data"));
         } finally {
           setLoading(false);
         }
@@ -158,7 +161,7 @@ const StoreDashboard: React.FC = () => {
             <button
               onClick={() => setShowHelp(true)}
               className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-colors"
-              title="Ajuda"
+              title={t("help", "Help")}
             >
               <HelpCircle size={24} />
             </button>
@@ -178,7 +181,7 @@ const StoreDashboard: React.FC = () => {
         isOpen={showHelp}
         onClose={() => setShowHelp(false)}
         sections={helpSections}
-        title="Guia do Dashboard"
+        title={t("dashboardGuide", "Dashboard Guide")}
       />
     </div>
   );

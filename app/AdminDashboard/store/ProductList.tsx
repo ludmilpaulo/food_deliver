@@ -4,8 +4,10 @@ import Image from 'next/image';
 import { Transition } from '@headlessui/react';
 import { baseAPI, Product } from '@/services/types';
 import { getproducts } from '@/services/managerService';
+import { useTranslation } from "@/hooks/useTranslation";
 
 const ProductList: React.FC = () => {
+  const { t } = useTranslation();
   const [products, setproducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -61,7 +63,7 @@ const ProductList: React.FC = () => {
           <div className="flex flex-col md:flex-row justify-between items-center mb-4">
             <input
               type="text"
-              placeholder="Pesquisar refeições..."
+              placeholder={t("searchMeals", "Search meals...")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="p-2 border border-gray-300 rounded mb-2 md:mb-0 md:mr-2"
@@ -71,7 +73,7 @@ const ProductList: React.FC = () => {
               onChange={(e) => setSelectedstore(e.target.value)}
               className="p-2 border border-gray-300 rounded mb-2 md:mb-0 md:mr-2"
             >
-              <option value="">Todos os storees</option>
+              <option value="">{t("allStores", "All stores")}</option>
               {uniquestores.map((store, index) => (
                 <option key={index} value={store}>
                   {store}
@@ -79,17 +81,17 @@ const ProductList: React.FC = () => {
               ))}
             </select>
             <div className="flex items-center space-x-2">
-              <label>Preço:</label>
+              <label>{t("price", "Price")}:</label>
               <input
                 type="number"
-                placeholder="Min"
+                placeholder={t("min", "Min")}
                 value={priceRange[0]}
                 onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
                 className="p-2 border border-gray-300 rounded w-20"
               />
               <input
                 type="number"
-                placeholder="Max"
+                placeholder={t("max", "Max")}
                 value={priceRange[1]}
                 onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
                 className="p-2 border border-gray-300 rounded w-20"
@@ -111,16 +113,20 @@ const ProductList: React.FC = () => {
                     <div className="text-center">
                       <h3 className="text-lg font-semibold">{product.name}</h3>
                       <p className="text-gray-500">{product.description}</p>
-                      <p className="text-gray-700">storee: {product.store_name}</p>
-                      <p className="text-gray-700">Preço Original: {product.original_price.toFixed(2)} Kz</p>
-                      <p className="text-gray-900 font-bold">Preço com Acréscimo: {product.price_with_markup.toFixed(2)} Kz</p>
+                      <p className="text-gray-700">{t("store", "Store")}: {product.store_name}</p>
+                      <p className="text-gray-700">
+                        {t("originalPrice", "Original Price")}: {product.original_price.toFixed(2)} Kz
+                      </p>
+                      <p className="text-gray-900 font-bold">
+                        {t("priceWithMarkup", "Price with Markup")}: {product.price_with_markup.toFixed(2)} Kz
+                      </p>
                     </div>
                   </div>
                 </motion.li>
               ))
             ) : (
               <div className="col-span-4 text-center text-gray-500">
-                Nenhuma refeição encontrada.
+                {t("noMealsFound", "No meals found.")}
               </div>
             )}
           </ul>

@@ -2,9 +2,10 @@
 import React, { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { baseAPI } from "@/services/types";
-import { t } from "@/configs/i18n";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const ResetPassword: React.FC = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");

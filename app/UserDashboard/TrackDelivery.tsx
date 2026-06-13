@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { t } from "@/configs/i18n";
 import { baseAPI } from "@/services/types";
 import useLoadScript from "@/hooks/useLoadScript";
+import { useTranslation } from "@/hooks/useTranslation";
 
 type ActiveDelivery = {
   id: number;
@@ -21,6 +21,7 @@ declare global {
 }
 
 export default function TrackDelivery() {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deliveries, setDeliveries] = useState<ActiveDelivery[]>([]);
@@ -43,7 +44,7 @@ export default function TrackDelivery() {
           credentials: "include",
         });
         if (!mounted) return;
-        if (!res.ok) throw new Error("Failed to load deliveries");
+        if (!res.ok) throw new Error(t("failedToLoadDeliveries", "Failed to load deliveries"));
         const list = await res.json();
         const normalized: ActiveDelivery[] = (list || []).map((d: any) => ({
           id: d.id,
@@ -67,11 +68,11 @@ export default function TrackDelivery() {
           markerRef.current = new window.google.maps.Marker({
             position: { lat: latitude, lng: longitude },
             map: mapInstance.current,
-            title: normalized[0].driver_name || "Driver",
+            title: normalized[0].driver_name || t("driver", "Driver"),
           });
         }
       } catch (e: any) {
-        setError(e?.message || "Failed to load deliveries");
+        setError(e?.message || t("failedToLoadDeliveries", "Failed to load deliveries"));
       } finally {
         setLoading(false);
       }
@@ -105,7 +106,9 @@ export default function TrackDelivery() {
   if (loading) return <div>{t("loading")}</div>;
   if (error) return <div className="text-red-600">{error}</div>;
 
-  if (deliveries.length === 0) return <div className="text-gray-600">No active deliveries</div>;
+  if (deliveries.length === 0) {
+    return <div className="text-gray-600">{t("noActiveDeliveries", "No active deliveries")}</div>;
+  }
 
   const d = deliveries[0];
   return (

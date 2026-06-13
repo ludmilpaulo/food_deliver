@@ -48,9 +48,17 @@ export const fetchUserDetails = async (userId: number, token: string) => {
   };
   
 
-  export const validateCouponRequest = async (couponCode: string) => {
-    const response = await axios.post(`${baseAPI}/order/coupons/validate/`, { coupon_code: couponCode });
-    return response.data;
+  export const validateCouponRequest = async (couponCode: string, subtotal = 0) => {
+    const response = await axios.post(`${baseAPI}/order/coupons/validate/`, {
+      coupon_code: couponCode,
+      subtotal,
+    });
+    return response.data as {
+      valid: boolean;
+      code?: string;
+      discount_amount?: number;
+      message?: string;
+    };
   };
   
   // New function to check if the user has a coupon

@@ -7,6 +7,7 @@ import StoreCard from "./store/StoreCard";
 import { Transition } from '@headlessui/react';
 import useLoadScript from "./store/useLoadScript";
 import { getstores, activatestore, updatestore, deactivatestore, deletestore } from "@/services/managerService";
+import { useTranslation } from "@/hooks/useTranslation";
 
 declare global {
   interface Window {
@@ -15,6 +16,7 @@ declare global {
 }
 
 const Store: React.FC = () => {
+  const { t } = useTranslation();
   const user = useSelector(selectUser);
   const [stores, setStores] = useState<StoreType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -28,12 +30,12 @@ useLoadScript(
     () => {
       window.initMap = (store: StoreType) => {
         if (!store.location) {
-          alert("No location set for this store.");
+          alert(t("noLocationSetForStore", "No location set for this store."));
           return;
         }
         const [latitude, longitude] = store.location.split(',').map(Number);
         if (isNaN(latitude) || isNaN(longitude)) {
-          alert("Invalid location format.");
+          alert(t("invalidLocationFormat", "Invalid location format."));
           return;
         }
         const mapElement = document.getElementById('map');
@@ -50,7 +52,7 @@ useLoadScript(
             title: store.name,
           });
         } else {
-          console.error('Map element not found');
+          console.error(t("mapElementNotFound", "Map element not found"));
         }
       };
     }
@@ -63,7 +65,7 @@ useLoadScript(
         const data = await getstores();
         setStores(data);
       } catch (error) {
-        console.error("Error fetching stores data", error);
+        console.error(t("errorFetchingStoresData", "Error fetching stores data"), error);
       } finally {
         setLoading(false);
       }
@@ -81,7 +83,7 @@ const handleActivate = async (id: number) => {
         )
       );
     } catch (error) {
-      console.error("Error activating store", error);
+      console.error(t("errorActivatingStore", "Error activating store"), error);
     } finally {
       setLoading(false);
     }
@@ -97,7 +99,7 @@ const handleActivate = async (id: number) => {
         )
       );
     } catch (error) {
-      console.error("Error deactivating store", error);
+      console.error(t("errorDeactivatingStore", "Error deactivating store"), error);
     } finally {
       setLoading(false);
     }
@@ -119,7 +121,7 @@ const handleActivate = async (id: number) => {
         );
         setEditData(null);
       } catch (error) {
-        console.error("Error updating store", error);
+      console.error(t("errorUpdatingStore", "Error updating store"), error);
       } finally {
         setLoading(false);
       }
@@ -132,7 +134,7 @@ const handleActivate = async (id: number) => {
       await deletestore(id);
       setStores(prev => prev.filter(store => store.id !== id));
     } catch (error) {
-      console.error("Error deleting store", error);
+      console.error(t("errorDeletingStore", "Error deleting store"), error);
     } finally {
       setLoading(false);
     }
@@ -156,19 +158,19 @@ const handleActivate = async (id: number) => {
           className={`py-2 px-4 ${activeTab === "storees" ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-600"}`}
           onClick={() => setActiveTab("storees")}
         >
-          storees
+          {t("stores", "Stores")}
         </button>
         <button
           className={`py-2 px-4 ${activeTab === "pagamentos" ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-600"}`}
           onClick={() => setActiveTab("pagamentos")}
         >
-          Pagamentos
+          {t("payments", "Payments")}
         </button>
         <button
           className={`py-2 px-4 ${activeTab === "localizacao" ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-600"}`}
           onClick={() => setActiveTab("localizacao")}
         >
-          Localização
+          {t("location", "Location")}
         </button>
       </div>
       <Transition
@@ -208,20 +210,22 @@ const handleActivate = async (id: number) => {
                 className="py-2 px-4 bg-blue-500 text-white rounded-lg mt-2"
                 onClick={() => handleShowMap(store)}
               >
-                Mostrar no mapa
+                {t("showOnMap", "Show on map")}
               </button>
             </div>
           ))}
           {showMap && selectedStore && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
               <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl">
-                <h2 className="text-xl font-bold mb-4">Localização de {selectedStore.name}</h2>
+                <h2 className="text-xl font-bold mb-4">
+                  {t("locationOf", "Location of")} {selectedStore.name}
+                </h2>
                 <div id="map" style={{ height: '400px' }}></div>
                 <button
                   className="py-2 px-4 bg-gray-500 text-white mt-4 rounded-lg"
                   onClick={() => setShowMap(false)}
                 >
-                  Fechar
+                  {t("close", "Close")}
                 </button>
               </div>
             </div>
@@ -231,24 +235,24 @@ const handleActivate = async (id: number) => {
       {editData && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Editar storee</h2>
+            <h2 className="text-xl font-bold mb-4">{t("editStore", "Edit store")}</h2>
             <input
               type="text"
-              placeholder="Nome"
+              placeholder={t("name", "Name")}
               value={editData.name}
               onChange={(e) => setEditData({ ...editData, name: e.target.value })}
               className="mb-4 w-full p-2 border border-gray-300 rounded-lg"
             />
             <input
               type="text"
-              placeholder="Endereço"
+              placeholder={t("address", "Address")}
               value={editData.address}
               onChange={(e) => setEditData({ ...editData, address: e.target.value })}
               className="mb-4 w-full p-2 border border-gray-300 rounded-lg"
             />
             <input
               type="text"
-              placeholder="Telefone"
+              placeholder={t("phone", "Phone")}
               value={editData.phone}
               onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
               className="mb-4 w-full p-2 border border-gray-300 rounded-lg"
@@ -258,13 +262,13 @@ const handleActivate = async (id: number) => {
                 className="py-2 px-4 bg-gray-500 text-white mr-2 rounded-lg"
                 onClick={() => setEditData(null)}
               >
-                Cancelar
+                {t("cancel", "Cancel")}
               </button>
               <button
                 className="py-2 px-4 bg-blue-500 text-white rounded-lg"
                 onClick={handleUpdate}
               >
-                Salvar
+                {t("save", "Save")}
               </button>
             </div>
           </div>

@@ -3,13 +3,14 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { getServiceById, getServiceAvailability, createBooking, type ServiceDetail } from "@/services/serviceApi";
 import Image from "next/image";
-import { t } from "@/configs/i18n";
+import { useTranslation } from "@/hooks/useTranslation";
 import { useAppSelector } from "@/redux/store";
 import { getCurrentUser } from "@/services/authService";
 
 export default function ServiceDetailPage() {
   const params = useParams();
   const { user } = useAppSelector((s) => s.auth);
+  const { t } = useTranslation();
   const id = Number(params?.id);
 
   const [service, setService] = useState<ServiceDetail | null>(null);
@@ -54,7 +55,7 @@ export default function ServiceDetailPage() {
         setSlots(daySlots);
       } catch (e: any) {
         if (!mounted) return;
-        setError(e?.message || "Failed to load service");
+        setError(e?.message || t("serviceLoadFailed", "Failed to load service"));
       } finally {
         if (mounted) setLoading(false);
       }
@@ -78,12 +79,12 @@ export default function ServiceDetailPage() {
 
   const handleBook = async () => {
     if (!user) {
-      setBookingMessage("Please log in first");
+      setBookingMessage(t("pleaseLoginFirst", "Please log in first"));
       return;
     }
     if (!selectedTime || !service) return;
     if (!customerId) {
-      setBookingMessage("Customer profile not found");
+      setBookingMessage(t("customerProfileNotFound", "Customer profile not found"));
       return;
     }
     setBookingLoading(true);
@@ -98,9 +99,9 @@ export default function ServiceDetailPage() {
         customer_notes: note,
         payment_method: "card",
       });
-      setBookingMessage("Booking created!");
+      setBookingMessage(t("bookingCreated", "Booking created!"));
     } catch (e: any) {
-      setBookingMessage(e?.message || "Failed to create booking");
+      setBookingMessage(e?.message || t("bookingCreateFailed", "Failed to create booking"));
     } finally {
       setBookingLoading(false);
     }
@@ -117,7 +118,9 @@ export default function ServiceDetailPage() {
           {service.image ? (
             <Image src={service.image} alt={service.title} fill className="object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
+            <div className="w-full h-full flex items-center justify-center text-gray-400">
+              {t("noImage", "No image")}
+            </div>
           )}
         </div>
         <h1 className="text-2xl font-bold mt-4">{service.title}</h1>
@@ -128,7 +131,7 @@ export default function ServiceDetailPage() {
         <p className="mt-3 text-gray-700 whitespace-pre-line">{service.description}</p>
 
         <div className="mt-6 p-4 border rounded-xl">
-          <h2 className="font-semibold mb-2">Availability</h2>
+          <h2 className="font-semibold mb-2">{t("availability", "Availability")}</h2>
           <div className="flex gap-2 mb-3">
             <input
               type="date"
@@ -139,7 +142,7 @@ export default function ServiceDetailPage() {
           </div>
           <div className="flex flex-wrap gap-2">
             {slots.length === 0 && (
-              <div className="text-gray-500">No slots available</div>
+              <div className="text-gray-500">{t("noSlotsAvailable", "No slots available")}</div>
             )}
             {slots.map((s) => (
               <button
@@ -158,7 +161,7 @@ export default function ServiceDetailPage() {
           <div className="mt-4">
             <textarea
               className="w-full border rounded p-2"
-              placeholder="Notes"
+              placeholder={t("notes", "Notes")}
               value={note}
               onChange={(e) => setNote(e.target.value)}
             />
@@ -169,7 +172,7 @@ export default function ServiceDetailPage() {
             onClick={handleBook}
             disabled={!selectedTime || bookingLoading}
           >
-            {bookingLoading ? t("loading") : "Book Now"}
+            {bookingLoading ? t("loading") : t("bookNow", "Book Now")}
           </button>
 
           {bookingMessage && (

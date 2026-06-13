@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface UploadProofOfPaymentProps {
   orderId: number;
@@ -7,6 +8,7 @@ interface UploadProofOfPaymentProps {
 }
 
 const UploadProofOfPayment: React.FC<UploadProofOfPaymentProps> = ({ orderId, uploadUrl }) => {
+  const { t } = useTranslation();
   const [file, setFile] = useState<File | null>(null);
   const [uploadStatus, setUploadStatus] = useState<string>('');
 
@@ -28,7 +30,7 @@ const UploadProofOfPayment: React.FC<UploadProofOfPaymentProps> = ({ orderId, up
         });
         setUploadStatus(response.data.message);
       } catch (error) {
-        setUploadStatus('Error uploading proof of payment');
+        setUploadStatus(t("errorUploadingProof", "Error uploading proof of payment"));
       }
     }
   };
@@ -36,7 +38,7 @@ const UploadProofOfPayment: React.FC<UploadProofOfPaymentProps> = ({ orderId, up
   return (
     <div>
       <input type="file" onChange={handleFileChange} />
-      <button onClick={handleUpload}>Upload Proof of Payment</button>
+      <button onClick={handleUpload}>{t("uploadProofOfPayment", "Upload Proof of Payment")}</button>
       {uploadStatus && <p>{uploadStatus}</p>}
     </div>
   );

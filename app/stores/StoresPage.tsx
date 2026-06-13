@@ -6,7 +6,7 @@ import { fetchStoresByType } from "@/redux/slices/storesSlice";
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { t } from "@/configs/i18n";
+import { useTranslation } from "@/hooks/useTranslation";
 
 
 // Util for distance calculation (Haversine formula)
@@ -45,6 +45,7 @@ function useUserLocation() {
 }
 
 export default function StoresPage() {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const router = useRouter();
   const params = useSearchParams();

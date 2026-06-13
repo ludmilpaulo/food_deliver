@@ -1,6 +1,7 @@
 // components/PremiumPaginator.tsx
 import React, { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, MoveRight } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface Props {
   page: number;
@@ -9,6 +10,7 @@ interface Props {
 }
 
 const PremiumPaginator: React.FC<Props> = ({ page, totalPages, onChange }) => {
+  const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
   const [jumpVal, setJumpVal] = useState("");
 
@@ -28,7 +30,7 @@ const PremiumPaginator: React.FC<Props> = ({ page, totalPages, onChange }) => {
           onClick={() => onChange(page - 1)}
           disabled={page === 1}
           className={`p-2 rounded-full bg-blue-100 hover:bg-blue-700 hover:text-white text-blue-700 transition shadow-md disabled:opacity-30 disabled:cursor-not-allowed`}
-          aria-label="Previous"
+          aria-label={t("previous", "Previous")}
         >
           <ChevronLeft size={22} />
         </button>
@@ -39,7 +41,7 @@ const PremiumPaginator: React.FC<Props> = ({ page, totalPages, onChange }) => {
           onClick={() => onChange(page + 1)}
           disabled={page === totalPages}
           className={`p-2 rounded-full bg-blue-100 hover:bg-blue-700 hover:text-white text-blue-700 transition shadow-md disabled:opacity-30 disabled:cursor-not-allowed`}
-          aria-label="Next"
+          aria-label={t("next", "Next")}
         >
           <ChevronRight size={22} />
         </button>
@@ -54,13 +56,13 @@ const PremiumPaginator: React.FC<Props> = ({ page, totalPages, onChange }) => {
             onChange={e => setJumpVal(e.target.value)}
             onKeyDown={e => e.key === "Enter" && jumpToPage()}
             className="w-12 px-2 py-1 text-center rounded border border-gray-200 shadow-inner outline-none focus:ring-2 focus:ring-blue-300 transition"
-            placeholder="Pg"
+            placeholder={t("pageAbbrev", "Pg")}
             style={{ fontVariantNumeric: "tabular-nums" }}
           />
           <button
             onClick={jumpToPage}
             className="p-1.5 rounded bg-blue-600 hover:bg-blue-700 text-white shadow transition"
-            aria-label="Go to page"
+            aria-label={t("goToPage", "Go to page")}
             disabled={
               !jumpVal ||
               isNaN(Number(jumpVal)) ||
@@ -74,7 +76,9 @@ const PremiumPaginator: React.FC<Props> = ({ page, totalPages, onChange }) => {
         </div>
       </div>
       <div className="mt-1 text-xs text-gray-500">
-        {`Mostrando ${page} de ${totalPages} páginas`}
+        {t("showingPageOfTotal", `Showing ${page} of ${totalPages} pages`)
+          .replace("{page}", String(page))
+          .replace("{total}", String(totalPages))}
       </div>
     </div>
   );

@@ -1,10 +1,12 @@
 import React from 'react'
+import { useTranslation } from "@/hooks/useTranslation";
 
 type Props = {}
 
 const CustomersList = (props: Props) => {
+  const { t } = useTranslation();
   return (
-    <div>CustomersList</div>
+    <div>{t("customersList", "Customers List")}</div>
   )
 }
 

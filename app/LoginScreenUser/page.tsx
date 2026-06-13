@@ -5,43 +5,52 @@ import { motion } from "framer-motion";
 import { Transition } from "@headlessui/react";
 import { Eye, EyeOff } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/redux/store";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import logo from "@/assets/azul.png";
-import { loginUser, selectAuth } from "@/redux/slices/authSlice";
+import { loginUser, selectAuth, type LoginResult } from "@/redux/slices/authSlice";
+import { resolvePostLoginRoute } from "@/utils/postLoginRoute";
 import ForgotPasswordModal from "./ForgotPasswordModal";
-import { clearAllCart } from "@/redux/slices/basketSlice";
-import { t, setLanguageFromBrowser, setLanguage, getLanguage } from "@/configs/i18n";
-import { SupportedLocale } from "@/configs/translations";
+import { SupportedLocale, supportedLocales } from "@/configs/translations";
 import { analytics } from "@/utils/mixpanel";
+import { useTranslation } from "@/hooks/useTranslation";
+import {
+  DEV_TEST_DOCTOR_LOGIN,
+  DEV_TEST_LOGIN_BUTTON_LABEL,
+  isDevLoginEnabled,
+} from "@/configs/devTestLogin";
 
-const LANGUAGES: { value: SupportedLocale; label: string }[] = [
-  { value: "en", label: "🇬🇧 English" },
-  { value: "pt", label: "🇵🇹 Português" },
-];
+const LANGUAGE_LABELS: Record<SupportedLocale, string> = {
+  en: "English",
+  pt: "Portugues",
+  fr: "Francais",
+  es: "Espanol",
+};
 
 const LoginScreenUser: React.FC = () => {
+  const { t, languageCode, changeLanguage } = useTranslation();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
   const { loading } = useAppSelector(selectAuth);
+  const nextPath = searchParams.get("next");
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
-  const [lang, setLang] = useState<SupportedLocale>(getLanguage());
 
   useEffect(() => {
-    setLanguageFromBrowser();
-    setLang(getLanguage());
-    dispatch(clearAllCart());
     analytics.trackPageView('Login Page');
-    // eslint-disable-next-line
   }, []);
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setLanguage(e.target.value as SupportedLocale);
-    setLang(getLanguage());
+    changeLanguage(e.target.value as SupportedLocale);
+  };
+
+  const handleFillTestLogin = () => {
+    setUsername(DEV_TEST_DOCTOR_LOGIN.username);
+    setPassword(DEV_TEST_DOCTOR_LOGIN.password);
   };
 
   const handleSubmit = async (e?: React.FormEvent) => {
@@ -51,27 +60,30 @@ const LoginScreenUser: React.FC = () => {
       return;
     }
     try {
-      const resultAction = await dispatch(
+      const resultAction: LoginResult = await dispatch(
         loginUser({ username, password })
       ).unwrap();
-      // Result: {token, user_id, is_customer, ...}
-      if (resultAction.is_customer === true) {
-        analytics.trackLogin(resultAction.user_id.toString(), {
-          user_type: 'customer',
-          platform: 'web'
-        });
-        alert(t("loginSuccess"));
-        router.push("/HomeScreen");
-      } else if (resultAction.is_customer === false) {
-        analytics.trackLogin(resultAction.user_id.toString(), {
-          user_type: 'store',
-          platform: 'web'
-        });
-        alert(t("loginSuccess"));
-        router.push("/StoreDashboad");
+      const destination = resolvePostLoginRoute(resultAction, nextPath);
+      const userType = resultAction.is_customer
+        ? "customer"
+        : resultAction.is_platform_admin || resultAction.role === "super_admin"
+          ? "platform_admin"
+          : resultAction.is_driver
+            ? "driver"
+            : "store";
+
+      analytics.trackLogin(resultAction.user_id.toString(), {
+        user_type: userType,
+        platform: "web",
+      });
+      if (typeof window !== "undefined") {
+        window.location.assign(destination);
+      } else {
+        router.replace(destination);
       }
-    } catch (error: any) {
-      analytics.trackError('Login Failed', { username, error: error?.toString() });
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      analytics.trackError('Login Failed', { username, error: errorMessage });
       if (typeof error === "string") {
         alert(error);
       } else {
@@ -92,13 +104,13 @@ const LoginScreenUser: React.FC = () => {
             <Image src={logo} alt="logo" width={64} height={64} className="rounded-full" />
             <select
               className="ml-2 p-1 rounded bg-white/80 border border-gray-300 text-gray-800 font-semibold text-sm shadow"
-              value={lang}
+              value={languageCode}
               onChange={handleLanguageChange}
               aria-label={t("changeLanguage")}
             >
-              {LANGUAGES.map((langOpt) => (
-                <option key={langOpt.value} value={langOpt.value}>
-                  {langOpt.label}
+              {supportedLocales.map((code) => (
+                <option key={code} value={code}>
+                  {LANGUAGE_LABELS[code]}
                 </option>
               ))}
             </select>
@@ -151,6 +163,15 @@ const LoginScreenUser: React.FC = () => {
                 {t("forgotPassword")}
               </span>
             </div>
+            {isDevLoginEnabled() && (
+              <button
+                type="button"
+                onClick={handleFillTestLogin}
+                className="w-full py-2 text-sm font-semibold text-slate-600 bg-slate-100 border border-dashed border-slate-300 rounded hover:bg-slate-200 transition"
+              >
+                {DEV_TEST_LOGIN_BUTTON_LABEL}
+              </button>
+            )}
             <button
               type="submit"
               aria-label={t("login")}

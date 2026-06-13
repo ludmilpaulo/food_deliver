@@ -5,6 +5,7 @@ import translations, {
 } from "./translations";
 
 const DEFAULT_LOCALE: SupportedLocale = "pt";
+export const LANGUAGE_CHANGE_EVENT = "kudya:language-change";
 
 let languageCode: SupportedLocale = DEFAULT_LOCALE;
 
@@ -42,6 +43,13 @@ export function setLanguageFromBrowser() {
 export function setLanguage(code: SupportedLocale) {
   languageCode = code;
   persistLanguage(code);
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(
+      new CustomEvent<{ locale: SupportedLocale }>(LANGUAGE_CHANGE_EVENT, {
+        detail: { locale: code },
+      }),
+    );
+  }
 }
 
 /** Sync client state from cookie/localStorage after hydration (no module-level reads). */
@@ -76,10 +84,18 @@ export function syncLanguageFromClientStorage(): SupportedLocale {
 }
 
 export function t(key: TranslationKey): string {
+  if (languageCode === "pt") {
+    return (
+      translations.pt[key] ||
+      translations.en[key] ||
+      key
+    );
+  }
+
   return (
     translations[languageCode]?.[key] ||
-    translations[DEFAULT_LOCALE][key] ||
-    translations["en"][key] ||
+    translations.en[key] ||
+    translations.pt[key] ||
     key
   );
 }

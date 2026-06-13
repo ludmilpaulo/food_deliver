@@ -11,7 +11,7 @@ import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import { logoutUser } from "@/redux/slices/authSlice";
 import { clearAllCart } from "@/redux/slices/basketSlice";
-import { t, getLanguage } from "@/configs/i18n";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface SidebarProps {
   selectedMenu: string;
@@ -23,37 +23,44 @@ const menuItems = [
   {
     key: "trackOrders",
     icon: <FaTruck size={18} />,
-    label: { en: "Track Orders", pt: "Rastrear Pedidos" },
+    labelKey: "trackOrders",
+    fallback: "Track Orders",
   },
   {
     key: "trackDelivery",
     icon: <FaTruck size={18} />,
-    label: { en: "Track Delivery", pt: "Rastrear Entrega" },
+    labelKey: "trackDelivery",
+    fallback: "Track Delivery",
   },
   {
     key: "updateProfile",
     icon: <FaUserEdit size={18} />,
-    label: { en: "Update Profile", pt: "Atualizar Perfil" },
+    labelKey: "updateProfile",
+    fallback: "Update Profile",
   },
   {
     key: "orderHistory",
     icon: <FaHistory size={18} />,
-    label: { en: "Order History", pt: "Histórico de Pedidos" },
+    labelKey: "orderHistory",
+    fallback: "Order History",
   },
   {
     key: "serviceBookings",
     icon: <FaHistory size={18} />,
-    label: { en: "Service Bookings", pt: "Agendamentos" },
+    labelKey: "serviceBookings",
+    fallback: "Service Bookings",
   },
   {
     key: "downloadInvoice",
     icon: <FaFileInvoice size={18} />,
-    label: { en: "Download Invoice", pt: "Baixar Fatura" },
+    labelKey: "downloadInvoice",
+    fallback: "Download Invoice",
   },
   {
     key: "deactivateAccount",
     icon: <FaUserSlash size={18} />,
-    label: { en: "Deactivate Account", pt: "Desativar Conta" },
+    labelKey: "deactivateAccountTitle",
+    fallback: "Deactivate Account",
     danger: true,
   },
 ];
@@ -63,9 +70,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   setSelectedMenu,
   onDeactivate,
 }) => {
+  const { t } = useTranslation();
   const router = useRouter();
   const dispatch = useDispatch();
-  const lang = getLanguage();
 
   const handleLogout = () => {
     dispatch(logoutUser());
@@ -76,7 +83,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   return (
     <aside className="h-screen w-72 bg-gradient-to-b from-blue-900 via-blue-800 to-blue-600 text-white shadow-2xl flex flex-col sticky top-0 z-30 rounded-r-3xl border-r-2 border-blue-200">
       <div className="py-7 px-8 text-3xl font-black tracking-wide bg-blue-950/80 rounded-tr-3xl rounded-br-3xl mb-4 drop-shadow-xl shadow-blue-800 text-center">
-        {lang === "pt" ? "Painel do Usuário" : "User Dashboard"}
+        {t("userDashboard", "User Dashboard")}
       </div>
       <nav className="flex-1 flex flex-col gap-1 px-2">
         {menuItems.map((item) => (
@@ -98,7 +105,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             aria-current={selectedMenu === item.key}
           >
             {item.icon}
-            <span>{item.label[lang as "en" | "pt"] ?? item.label.en}</span>
+            <span>{t(item.labelKey, item.fallback)}</span>
           </button>
         ))}
       </nav>
@@ -107,7 +114,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         onClick={handleLogout}
       >
         <FaSignOutAlt size={18} />
-        {lang === "pt" ? "Sair" : "Logout"}
+        {t("logout", "Logout")}
       </button>
     </aside>
   );

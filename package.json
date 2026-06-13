@@ -6,10 +6,12 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "deploy:preview": "powershell -ExecutionPolicy Bypass -File scripts/deploy-vercel.ps1",
+    "deploy:production": "powershell -ExecutionPolicy Bypass -File scripts/deploy-vercel.ps1 -Production"
   },
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^41.4.2",

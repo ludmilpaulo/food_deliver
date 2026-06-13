@@ -3,12 +3,14 @@ import { useSelector } from "react-redux";
 import { selectUser } from "@/redux/slices/authSlice";
 import { getstore, getOpeningHours } from "@/services/apiService";
 import { Store as StoreType, OpeningHourType } from "@/services/types";
+import { useTranslation } from "@/hooks/useTranslation";
 
 import OpeningHour from "./OpeningHour";
 import OpeningHoursCalendar from "./OpeningHoursCalendar";
 import StoreProfile from "./StoreProfile";
 
 const Profile: React.FC = () => {
+  const { t } = useTranslation();
   const user = useSelector(selectUser);
   const [store, setstore] = useState<StoreType | null>(null);
   const [openingHours, setOpeningHours] = useState<OpeningHourType[]>([]);
@@ -37,19 +39,19 @@ const Profile: React.FC = () => {
           className={`py-2 px-4 ${activeTab === "perfil" ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-600"}`}
           onClick={() => setActiveTab("perfil")}
         >
-          Perfil do storee
+          {t("storeProfile", "Store Profile")}
         </button>
         <button
           className={`py-2 px-4 ${activeTab === "horario" ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-600"}`}
           onClick={() => setActiveTab("horario")}
         >
-          Horário de Funcionamento
+          {t("openingHours", "Opening Hours")}
         </button>
         <button
           className={`py-2 px-4 ${activeTab === "calendario" ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-600"}`}
           onClick={() => setActiveTab("calendario")}
         >
-          Calendário
+          {t("calendar", "Calendar")}
         </button>
       </div>
       {store ? (
@@ -65,7 +67,7 @@ const Profile: React.FC = () => {
           )}
         </div>
       ) : (
-        <p>Carregando...</p>
+        <p>{t("loading")}</p>
       )}
     </div>
   );

@@ -24,6 +24,7 @@ import { Transition } from "@headlessui/react";
 import CustomersList from "./CustomersList";
 import Report from "./Report";
 import DriverList from "./DriverList";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface SidebarProps {
   fornecedor: FornecedorType | null;
@@ -33,6 +34,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onToggle }) => {
+  const { t } = useTranslation();
   const [showProducts, setShowProducts] = useState(false);
   const [showOrders, setShowOrders] = useState(false);
   const [showReport, setShowReport] = useState(false);
@@ -58,20 +60,20 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
         const location = `${latitude},${longitude}`;
         try {
           await updateLocation(fornecedor?.id || 0, location); // Replace with the correct user ID
-          alert("Localização atualizada com sucesso!");
+          alert(t("locationUpdatedSuccess", "Location updated successfully!"));
         } catch (error) {
           console.error("Erro ao atualizar a localização:", error);
-          alert("Ocorreu um erro ao atualizar a localização.");
+          alert(t("errorUpdatingLocation", "An error occurred while updating location."));
         } finally {
           setLoading(false);
         }
       }, (error) => {
         console.error("Erro ao obter a localização:", error);
-        alert("Ocorreu um erro ao obter a localização.");
+        alert(t("errorGettingLocation", "An error occurred while getting location."));
         setLoading(false);
       });
     } else {
-      alert("Geolocalização não é suportada pelo seu navegador.");
+      alert(t("geolocationNotSupported", "Geolocation is not supported by your browser."));
     }
   };
 
@@ -104,7 +106,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
                     width={500}
                     height={300}
                     className="rounded-full"
-                    alt="Fornecedor Logo"
+                    alt={t("supplierLogo", "Supplier Logo")}
                   />
                   <span className="absolute bottom-0 right-0 block w-3 h-3 bg-green-400 rounded-full"></span>
                 </div>
@@ -117,7 +119,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
             <div className="flex-1">
               <ul className="space-y-4">
                 <li className="text-xs font-semibold tracking-wide uppercase">
-                  Painel
+                  {t("dashboard", "Dashboard")}
                 </li>
                 <motion.li
                   whileHover={{ scale: 1.05 }}
@@ -136,7 +138,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
                 >
                   <div className="flex items-center space-x-3">
                     <MdContacts className="text-lg" />
-                    <span>Produtos</span>
+                    <span>{t("products", "Products")}</span>
                   </div>
                 </motion.li>
                 <motion.li
@@ -151,13 +153,13 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
                     setListOfDriver(false);
                     setShowServices(false);
                     setShowReport(false); 
-                    onNavClick && onNavClick("Pedidos");
+                    onNavClick && onNavClick(t("orders", "Orders"));
                     onToggle();
                   }}
                 >
                   <div className="flex items-center space-x-3">
                     <MdLaptop className="text-lg" />
-                    <span>Pedidos</span>
+                    <span>{t("orders", "Orders")}</span>
                   </div>
                 </motion.li>
                 <motion.li
@@ -165,7 +167,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
                   whileTap={{ scale: 0.95 }}
                   className="p-2 rounded hover:bg-blue-600 cursor-pointer"
                   onClick={() => {
-                    onNavClick && onNavClick("Relatórios");
+                    onNavClick && onNavClick(t("reports", "Reports"));
                     setShowProfile(false);
                     setShowProducts(false);
                     setShowOrders(false);
@@ -178,7 +180,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
                 >
                   <div className="flex items-center space-x-3">
                     <MdBarChart className="text-lg" />
-                    <span>Relatórios</span>
+                    <span>{t("reports", "Reports")}</span>
                   </div>
                 </motion.li>
                 <motion.li
@@ -186,7 +188,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
                   whileTap={{ scale: 0.95 }}
                   className="p-2 rounded hover:bg-blue-600 cursor-pointer"
                   onClick={() => {
-                    onNavClick && onNavClick("Clientes");
+                    onNavClick && onNavClick(t("customers", "Customers"));
                     setShowProfile(false);
                     setShowProducts(false);
                     setShowOrders(false);
@@ -199,7 +201,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
                 >
                   <div className="flex items-center space-x-3">
                     <MdTableBar className="text-lg" />
-                    <span>Clientes</span>
+                    <span>{t("customers", "Customers")}</span>
                   </div>
                 </motion.li>
                 <motion.li
@@ -207,7 +209,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
                   whileTap={{ scale: 0.95 }}
                   className="p-2 rounded hover:bg-blue-600 cursor-pointer"
                   onClick={() => {
-                    onNavClick && onNavClick("Motoristas");
+                    onNavClick && onNavClick(t("drivers", "Drivers"));
                     setShowProfile(false);
                     setShowProducts(false);
                     setShowOrders(false);
@@ -220,7 +222,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
                 >
                   <div className="flex items-center space-x-3">
                     <MdBarChart className="text-lg" />
-                    <span>Motoristas</span>
+                    <span>{t("drivers", "Drivers")}</span>
                   </div>
                 </motion.li>
                 <motion.li
@@ -234,13 +236,13 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
                     setShowReport(false); 
                     setListOfCustomer(false);
                     setListOfDriver(false);
-                    onNavClick && onNavClick("Conta");
+                    onNavClick && onNavClick(t("account", "Account"));
                     onToggle();
                   }}
                 >
                   <div className="flex items-center space-x-3">
                     <MdContacts className="text-lg" />
-                    <span>Perfil</span>
+                    <span>{t("Profile", "Profile")}</span>
                   </div>
                 </motion.li>
               </ul>
@@ -253,7 +255,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
                 onClick={handleUpdateLocation}
               >
                 <MdLocationOn className="text-xl" />
-                <span className="ml-2">Atualizar Localização</span>
+                <span className="ml-2">{t("updateLocation", "Update Location")}</span>
               </motion.button>
               <motion.li
                 whileHover={{ scale: 1.05 }}
@@ -263,7 +265,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
               >
                 <div className="flex items-center space-x-3 text-red-400">
                   <MdLogout className="text-lg" />
-                  <span>Sair</span>
+                  <span>{t("logout", "Logout")}</span>
                 </div>
               </motion.li>
             </div>

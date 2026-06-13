@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import dynamic from "next/dynamic";
 import { baseAPI } from "@/services/types";
+import { useTranslation } from "@/hooks/useTranslation";
 
 // Dynamically import ApexCharts to prevent SSR issues
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
@@ -16,6 +17,7 @@ interface ReportData {
 }
 
 const Report: React.FC = () => {
+  const { t } = useTranslation();
   const [data, setData] = useState<ReportData>({
     revenue: [],
     orders: [],
@@ -32,7 +34,7 @@ const Report: React.FC = () => {
       try {
         const response = await fetch(`${baseAPI}/report/store/${user_id}/`);
         if (!response.ok) {
-          throw new Error("Failed to fetch data");
+          throw new Error(t("failedToFetchData", "Failed to fetch data"));
         }
         const responseData: ReportData = await response.json();
         setData(responseData);
@@ -46,11 +48,11 @@ const Report: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-4">Relatório da loja</h1>
+      <h1 className="text-3xl font-bold mb-4">{t("storeReport", "Store Report")}</h1>
       <div className="grid grid-cols-2 gap-4">
         <div className="border border-gray-300 rounded-lg overflow-hidden">
           <div className="bg-indigo-200 py-2 px-4">
-            <h2 className="text-black font-bold text-lg">Rendimento</h2>
+            <h2 className="text-black font-bold text-lg">{t("revenue", "Revenue")}</h2>
           </div>
           <div className="p-4">
             <Chart
@@ -60,7 +62,7 @@ const Report: React.FC = () => {
                   categories: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
                 },
               }}
-              series={[{ name: "Revenue", data: data.revenue }]}
+              series={[{ name: t("revenue", "Revenue"), data: data.revenue }]}
               type="bar"
             />
           </div>
@@ -69,7 +71,7 @@ const Report: React.FC = () => {
         <div className="border border-gray-300 rounded-lg overflow-hidden">
           <div className="bg-indigo-200 py-2 px-4">
             <h2 className="text-black font-bold text-lg">
-              Número de encomendas
+              {t("numberOfOrders", "Number of orders")}
             </h2>
           </div>
           <div className="p-4">
@@ -80,7 +82,7 @@ const Report: React.FC = () => {
                   categories: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
                 },
               }}
-              series={[{ name: "Number of Orders", data: data.orders }]}
+              series={[{ name: t("numberOfOrders", "Number of Orders"), data: data.orders }]}
               type="bar"
             />
           </div>
@@ -89,7 +91,7 @@ const Report: React.FC = () => {
         <div className="border border-gray-300 rounded-lg overflow-hidden">
           <div className="bg-indigo-200 py-2 px-4">
             <h2 className="text-black font-bold text-lg">
-              3 principais produtos
+              {t("top3Products", "Top 3 products")}
             </h2>
           </div>
           <div className="p-4">
@@ -106,7 +108,7 @@ const Report: React.FC = () => {
         <div className="border border-gray-300 rounded-lg overflow-hidden">
           <div className="bg-indigo-200 py-2 px-4">
             <h2 className="text-black font-bold text-lg">
-              3 principais motoristas
+              {t("top3Drivers", "Top 3 drivers")}
             </h2>
           </div>
           <div className="p-4">
@@ -123,7 +125,7 @@ const Report: React.FC = () => {
         <div className="border border-gray-300 rounded-lg overflow-hidden">
           <div className="bg-indigo-200 py-2 px-4">
             <h2 className="text-black font-bold text-lg">
-              3 principais clientes
+              {t("top3Customers", "Top 3 customers")}
             </h2>
           </div>
           <div className="p-4">

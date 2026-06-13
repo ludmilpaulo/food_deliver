@@ -123,6 +123,28 @@ export const pageSeo: Record<
         'Términos de servicio de Kudya — reglas de uso de entrega, compras y cuenta.',
     },
   },
+  healthDoctors: {
+    en: {
+      title: 'Find a Doctor | Kudya Healthcare',
+      description:
+        'Book trusted doctors and healthcare professionals by country, city, specialty, and consultation type.',
+    },
+    pt: {
+      title: 'Encontrar Médico | Kudya Saúde',
+      description:
+        'Marque consultas com médicos e profissionais de saúde de confiança por país, cidade, especialidade e tipo de consulta.',
+    },
+    fr: {
+      title: 'Trouver un médecin | Kudya Santé',
+      description:
+        'Réservez des médecins et professionnels de santé de confiance par pays, ville, spécialité et type de consultation.',
+    },
+    es: {
+      title: 'Encontrar médico | Kudya Salud',
+      description:
+        'Reserve médicos y profesionales de salud de confianza por país, ciudad, especialidad y tipo de consulta.',
+    },
+  },
   privacy: {
     en: {
       title: 'Privacy Policy',
@@ -241,6 +263,8 @@ export const publicRoutes = [
   '/FAQ',
   '/TermsOfService',
   '/PrivacyPolicy',
+  '/Doctors',
+  '/health/doctors',
   '/LoginScreenUser',
   '/SignupScreen',
 ] as const;

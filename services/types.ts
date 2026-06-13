@@ -44,6 +44,7 @@ export type UserDetails = {
     };
     total: number;
     status: string;
+    status_code: number;
   }
   
 export interface ProductImage {
@@ -111,6 +112,7 @@ export type OpeningHour = {
     id: number;
     name: string;
     slug: string;
+    image?: string | null;
   };
 
 

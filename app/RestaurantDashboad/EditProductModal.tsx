@@ -2,6 +2,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { Combobox } from "@headlessui/react";
 import { Categoria, Product } from "@/services/types";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface EditProductModalProps {
   categorias: Categoria[];
@@ -24,6 +25,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
   handleUpdate,
   errors,
 }) => {
+  const { t } = useTranslation();
   const { register, handleSubmit } = useForm<Product>();
 
   if (!isEditModalOpen || !editingProduct) return null;
@@ -31,37 +33,39 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
   return (
     <div className="fixed top-0 left-0 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
       <div className="w-1/2 bg-white p-6 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold mb-4">Editar Produto</h2>
+        <h2 className="text-2xl font-bold mb-4">{t("editProduct", "Edit Product")}</h2>
         <form onSubmit={handleSubmit(handleUpdate)}>
           <div className="mb-4">
-            <label className="block mb-2">Nome</label>
+            <label className="block mb-2">{t("name", "Name")}</label>
             <input
               {...register("name", { required: true })}
               className="w-full p-2 border rounded"
               defaultValue={editingProduct.name}
             />
-            {errors.name && <span className="text-red-500">Nome é obrigatório</span>}
+            {errors.name && <span className="text-red-500">{t("nameRequired", "Name is required")}</span>}
           </div>
           <div className="mb-4">
-            <label className="block mb-2">Pequena Descrição</label>
+            <label className="block mb-2">{t("shortDescription", "Short Description")}</label>
             <input
               {...register("description", { required: true })}
               className="w-full p-2 border rounded"
               defaultValue={editingProduct.description}
             />
-            {errors.short_description && <span className="text-red-500">Descrição curta é obrigatória</span>}
+            {errors.short_description && (
+              <span className="text-red-500">{t("shortDescriptionRequired", "Short description is required")}</span>
+            )}
           </div>
           <div className="mb-4">
-            <label className="block mb-2">Imagem</label>
+            <label className="block mb-2">{t("image", "Image")}</label>
             <input
               type="file"
               {...register("image_url", { required: false })}
               className="w-full p-2 border rounded"
             />
-            {errors.image && <span className="text-red-500">Imagem é obrigatória</span>}
+            {errors.image && <span className="text-red-500">{t("imageRequired", "Image is required")}</span>}
           </div>
           <div className="mb-4">
-            <label className="block mb-2">Preço</label>
+            <label className="block mb-2">{t("price", "Price")}</label>
             <input
               type="number"
               step="0.01"
@@ -69,10 +73,10 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
               className="w-full p-2 border rounded"
               defaultValue={editingProduct.price}
             />
-            {errors.price && <span className="text-red-500">Preço é obrigatório</span>}
+            {errors.price && <span className="text-red-500">{t("priceRequired", "Price is required")}</span>}
           </div>
           <div className="mb-4">
-            <label className="block mb-2">Categoria</label>
+            <label className="block mb-2">{t("Categories", "Category")}</label>
             <Combobox
               value={selectedCategory}
               onChange={(value) => setSelectedCategory(value ?? "")}
@@ -100,18 +104,18 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                 </Combobox.Options>
               </div>
             </Combobox>
-            {errors.category && <span className="text-red-500">Categoria é obrigatória</span>}
+            {errors.category && <span className="text-red-500">{t("categoryRequired", "Category is required")}</span>}
           </div>
           <div className="flex justify-end">
             <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
-              Atualizar
+              {t("update", "Update")}
             </button>
             <button
               type="button"
               onClick={() => setIsEditModalOpen(false)}
               className="px-4 py-2 ml-4 bg-red-500 text-white rounded hover:bg-red-600"
             >
-              Cancelar
+              {t("cancel", "Cancel")}
             </button>
           </div>
         </form>

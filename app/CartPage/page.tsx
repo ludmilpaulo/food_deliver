@@ -1,13 +1,12 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "@/redux/store";
 import { removeItem, removeLine, clearAllCart, addItem } from "@/redux/slices/basketSlice";
 import { selectUser } from "@/redux/slices/authSlice";
 import Image from "next/image";
 import withAuth from "@/components/ProtectedPage";
 import { formatCurrency, getCurrencyForCountry } from "@/utils/currency";
-import { t, setLanguageFromBrowser, setLanguage, getLanguage } from "@/configs/i18n";
-import { SupportedLocale } from "@/configs/translations";
+import { SupportedLocale, supportedLocales } from "@/configs/translations";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CartItem } from "@/services/types";
@@ -15,34 +14,33 @@ import { FaShoppingCart, FaImage } from "react-icons/fa";
 import { MdRemoveShoppingCart } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
 import { analytics } from "@/utils/mixpanel";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const LANGUAGES: { value: SupportedLocale; label: string }[] = [
-  { value: "en", label: "🇬🇧 English" },
-  { value: "pt", label: "🇵🇹 Português" },
+  { value: "en", label: "English" },
+  { value: "pt", label: "Portugues" },
+  { value: "fr", label: "Francais" },
+  { value: "es", label: "Espanol" },
 ];
 
 const CartPage: React.FC = () => {
+  const { t, languageCode, changeLanguage } = useTranslation();
   const dispatch = useAppDispatch();
   const router = useRouter();
-
-  // System language detection on mount (client-only)
-  const [lang, setLangState] = useState(getLanguage());
-  useEffect(() => {
-    analytics.trackPageView('Cart Page', { items_count: items.length });
-    setLanguageFromBrowser();
-    setLangState(getLanguage());
-  }, []);
-  const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setLanguage(e.target.value as SupportedLocale);
-    setLangState(getLanguage());
-  };
 
   // Redux state
   const items: CartItem[] = useAppSelector((state) => state.basket.items);
   const user = useAppSelector(selectUser);
 
+  useEffect(() => {
+    analytics.trackPageView('Cart Page', { items_count: items.length });
+  }, []);
+  const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    changeLanguage(e.target.value as SupportedLocale);
+  };
+
   // Locale/currency
-  const language = lang || "en";
+  const language = languageCode;
   const regionCode =
     typeof window !== "undefined"
       ? navigator.language.split("-")[1] || "ZA"
@@ -112,13 +110,13 @@ const CartPage: React.FC = () => {
         </div>
         <select
           className="p-1 rounded bg-white/80 border border-gray-300 text-gray-800 font-semibold text-sm shadow ml-auto mt-2 md:mt-0"
-          value={lang}
+          value={languageCode}
           onChange={handleLanguageChange}
           aria-label={t("changeLanguage")}
         >
-          {LANGUAGES.map((langOpt) => (
-            <option key={langOpt.value} value={langOpt.value}>
-              {langOpt.label}
+          {supportedLocales.map((code) => (
+            <option key={code} value={code}>
+              {LANGUAGES.find((langOpt) => langOpt.value === code)?.label ?? code}
             </option>
           ))}
         </select>
@@ -219,7 +217,7 @@ const CartPage: React.FC = () => {
           <div className="max-w-3xl mx-auto px-4 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div className="flex items-center gap-2">
               <span className="text-lg font-extrabold text-gray-800">
-             Total:
+                {t("Total", "Total")}:
               </span>
               <span className="text-xl font-extrabold text-blue-700">
                 {formatCurrency(total, currencyCode, language)}

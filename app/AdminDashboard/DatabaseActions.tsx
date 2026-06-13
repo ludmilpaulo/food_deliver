@@ -1,7 +1,9 @@
 import { baseAPI } from "@/services/types";
 import React, { useState } from "react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const DatabaseActions = () => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
 
   const handleBackup = async () => {
@@ -30,25 +32,27 @@ const DatabaseActions = () => {
 
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Administração de Banco de Dados</h2>
+      <h2 className="text-xl font-bold mb-4">
+        {t("databaseAdministration", "Database Administration")}
+      </h2>
       <div className="space-y-4">
         <button
           onClick={handleBackup}
           className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
-          Backup Database
+          {t("backupDatabase", "Backup Database")}
         </button>
         <button
           onClick={handleDelete}
           className="w-full p-2 bg-red-500 text-white rounded hover:bg-red-600"
         >
-          Delete Database
+          {t("deleteDatabase", "Delete Database")}
         </button>
         <button
           onClick={handleLoad}
           className="w-full p-2 bg-green-500 text-white rounded hover:bg-green-600"
         >
-          Load Database
+          {t("loadDatabase", "Load Database")}
         </button>
       </div>
     </div>

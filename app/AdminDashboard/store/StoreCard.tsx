@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { Store } from "@/services/types";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface StoreCardProps {
   store: Store;
@@ -20,6 +21,7 @@ const StoreCard: React.FC<StoreCardProps> = ({
   onEdit,
   onDelete,
 }) => {
+  const { t } = useTranslation();
   return (
     <div className="mb-4 p-4 border rounded-lg">
       <div className="flex items-center">
@@ -34,7 +36,7 @@ const StoreCard: React.FC<StoreCardProps> = ({
           <h2 className="text-xl font-bold">{store.name}</h2>
           <p>{store.address}</p>
           <p>{store.phone}</p>
-          <p>Status: {store.is_approved ? "Ativo" : "Inativo"}</p>
+          <p>{t("status", "Status")}: {store.is_approved ? t("active", "Active") : t("inactive", "Inactive")}</p>
         </div>
       </div>
       <div className="flex mt-4">
@@ -46,19 +48,19 @@ const StoreCard: React.FC<StoreCardProps> = ({
               : onActivate(store.id)
           }
         >
-          {store.is_approved ? "Desativar" : "Ativar"}
+          {store.is_approved ? t("deactivate", "Deactivate") : t("activate", "Activate")}
         </button>
         <button
           className="py-2 px-4 bg-yellow-500 text-white mr-2"
           onClick={() => onEdit(store)}
         >
-          Editar
+          {t("edit", "Edit")}
         </button>
         <button
           className="py-2 px-4 bg-red-500 text-white"
           onClick={() => onDelete(store.id)}
         >
-          Excluir
+          {t("delete", "Delete")}
         </button>
       </div>
     </div>

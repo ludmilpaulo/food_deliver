@@ -5,11 +5,12 @@ import { fetchServices } from "@/redux/slices/servicesSlice";
 import type { ServiceListItem } from "@/services/serviceApi";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { t } from "@/configs/i18n";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function ServicesPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const { t } = useTranslation();
   const { data, loading, error } = useAppSelector((s) => s.services);
 
   const [search, setSearch] = useState("");
@@ -39,7 +40,7 @@ export default function ServicesPage() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-yellow-300 via-yellow-400 to-blue-500 py-10">
       <div className="max-w-6xl mx-auto px-4">
-        <h1 className="text-3xl font-bold text-white mb-4">Services</h1>
+        <h1 className="text-3xl font-bold text-white mb-4">{t("Services", "Services")}</h1>
 
         <div className="flex items-center bg-white/90 rounded-full px-4 py-3 shadow mb-6">
           <input
@@ -59,7 +60,9 @@ export default function ServicesPage() {
           </div>
         )}
         {!loading && requestedOnce && !error && filtered.length === 0 && (
-          <p className="text-center text-white/90 mt-16">{t("noStores")}</p>
+          <p className="text-center text-white/90 mt-16">
+            {t("noServicesFound", "No services found")}
+          </p>
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
@@ -74,7 +77,7 @@ export default function ServicesPage() {
                   <Image src={svc.image} alt={svc.title} fill className="object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-400">
-                    No Image
+                    {t("noImage", "No image")}
                   </div>
                 )}
               </div>

@@ -1,10 +1,15 @@
 // app/AdminDashboard/Sidebar.tsx
 import React, { useState } from "react";
-import { MdClose, MdContacts, MdBarChart, MdTableBar, MdLogout, MdLocationOn, MdLaptop, MdSettingsBackupRestore } from "react-icons/md";
+import { MdClose, MdContacts, MdBarChart, MdTableBar, MdLogout, MdLaptop, MdSettingsBackupRestore, MdTune, MdAttachMoney, MdTranslate } from "react-icons/md";
 import { motion } from "framer-motion";
 import { Transition } from "@headlessui/react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { useTranslation } from "@/hooks/useTranslation";
+import { supportedLocales } from "@/configs/translations";
+import { logoutUser } from "@/redux/slices/authSlice";
 
 const CustomersList = dynamic(() => import("./CustomersList"));
 
@@ -18,12 +23,21 @@ const ProductList = dynamic(() => import("./store/ProductList"));
 const DatabaseActions = dynamic(() => import("./DatabaseActions"));
 const SuperAppAdmin = dynamic(() => import("@/components/SuperAppAdmin"));
 const BackupExport = dynamic(() => import("@/components/BackupExport"));
+const PlatformModulesAdmin = dynamic(() => import("@/components/admin/PlatformModulesAdmin"));
+const PricingAdmin = dynamic(() => import("@/components/admin/PricingAdmin"));
+const TranslationsAdmin = dynamic(() => import("@/components/admin/TranslationsAdmin"));
+const DoctorVerificationAdmin = dynamic(() => import("@/components/admin/DoctorVerificationAdmin"));
+const LiveSupportAdmin = dynamic(() => import("@/components/admin/LiveSupportAdmin"));
 
 const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, onToggle }) => {
+  const { t, languageCode, changeLanguage } = useTranslation();
+  const dispatch = useDispatch();
+  const router = useRouter();
   const [showProducts, setShowProducts] = useState(false);
   const [showproducts, setShowproducts] = useState(false);
   const [showOrders, setShowOrders] = useState(false);
   const [showstore, setShowstore] = useState(false);
+  const [storeView, setStoreView] = useState<"stores" | "partners">("stores");
   const [showReport, setShowReport] = useState(false);
   const [listOfCustomer, setListOfCustomer] = useState(false);
   const [listOfDriver, setListOfDriver] = useState(false);
@@ -32,6 +46,11 @@ const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, 
   const [showPayouts, setShowPayouts] = useState(false);
   const [showSuperApp, setShowSuperApp] = useState(true);
   const [showBackupExport, setShowBackupExport] = useState(false);
+  const [showPlatformControl, setShowPlatformControl] = useState(false);
+  const [showPricing, setShowPricing] = useState(false);
+  const [showTranslations, setShowTranslations] = useState(false);
+  const [showDoctorVerification, setShowDoctorVerification] = useState(false);
+  const [showLiveSupport, setShowLiveSupport] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const resetPanels = () => {
@@ -47,7 +66,178 @@ const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, 
     setShowPayouts(false);
     setShowDatabaseActions(false);
     setShowBackupExport(false);
+    setShowPlatformControl(false);
+    setShowPricing(false);
+    setShowTranslations(false);
+    setShowDoctorVerification(false);
+    setShowLiveSupport(false);
   };
+
+  const handleLogout = () => {
+    dispatch(logoutUser());
+    router.push("/LoginScreenUser");
+  };
+
+  const openPanel = (panel: () => void) => {
+    resetPanels();
+    panel();
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      onToggle();
+    }
+  };
+
+  type MenuItem = {
+    key: string;
+    label: string;
+    icon: React.ReactNode;
+    active: boolean;
+    onSelect: () => void;
+  };
+
+  const dashboardItems: MenuItem[] = [
+    {
+      key: "superApp",
+      label: t("superApp", "Super App"),
+      icon: <MdBarChart className="text-lg" />,
+      active: showSuperApp,
+      onSelect: () => setShowSuperApp(true),
+    },
+    {
+      key: "stores",
+      label: t("stores", "Stores"),
+      icon: <MdContacts className="text-lg" />,
+      active: showstore && storeView === "stores",
+      onSelect: () => {
+        setStoreView("stores");
+        setShowstore(true);
+      },
+    },
+    {
+      key: "menus",
+      label: t("menus", "Menus"),
+      icon: <MdLaptop className="text-lg" />,
+      active: showproducts,
+      onSelect: () => setShowproducts(true),
+    },
+    {
+      key: "orders",
+      label: t("orders", "Orders"),
+      icon: <MdLaptop className="text-lg" />,
+      active: showOrders,
+      onSelect: () => setShowOrders(true),
+    },
+    {
+      key: "reports",
+      label: t("reports", "Reports"),
+      icon: <MdBarChart className="text-lg" />,
+      active: showReport,
+      onSelect: () => setShowReport(true),
+    },
+    {
+      key: "customers",
+      label: t("customers", "Customers"),
+      icon: <MdTableBar className="text-lg" />,
+      active: listOfCustomer,
+      onSelect: () => setListOfCustomer(true),
+    },
+    {
+      key: "drivers",
+      label: t("drivers", "Drivers"),
+      icon: <MdBarChart className="text-lg" />,
+      active: listOfDriver,
+      onSelect: () => setListOfDriver(true),
+    },
+    {
+      key: "partners",
+      label: t("partners", "Partners"),
+      icon: <MdContacts className="text-lg" />,
+      active: showstore && storeView === "partners",
+      onSelect: () => {
+        setStoreView("partners");
+        setShowstore(true);
+      },
+    },
+    {
+      key: "kyc",
+      label: t("kyc", "KYC"),
+      icon: <MdBarChart className="text-lg" />,
+      active: showKYC,
+      onSelect: () => setShowKYC(true),
+    },
+    {
+      key: "doctorVerification",
+      label: t("doctorVerification", "Doctor verification"),
+      icon: <MdBarChart className="text-lg" />,
+      active: showDoctorVerification,
+      onSelect: () => setShowDoctorVerification(true),
+    },
+    {
+      key: "liveSupport",
+      label: t("liveSupport", "Live support"),
+      icon: <MdContacts className="text-lg" />,
+      active: showLiveSupport,
+      onSelect: () => setShowLiveSupport(true),
+    },
+    {
+      key: "payouts",
+      label: t("payouts", "Payouts"),
+      icon: <MdBarChart className="text-lg" />,
+      active: showPayouts,
+      onSelect: () => setShowPayouts(true),
+    },
+  ];
+
+  const platformItems: MenuItem[] = [
+    {
+      key: "platformControl",
+      label: t("platformControl", "Platform control"),
+      icon: <MdTune className="text-lg" />,
+      active: showPlatformControl,
+      onSelect: () => setShowPlatformControl(true),
+    },
+    {
+      key: "pricing",
+      label: t("pricingAndFees", "Pricing & fees"),
+      icon: <MdAttachMoney className="text-lg" />,
+      active: showPricing,
+      onSelect: () => setShowPricing(true),
+    },
+    {
+      key: "translations",
+      label: t("translationsAdmin", "Translations"),
+      icon: <MdTranslate className="text-lg" />,
+      active: showTranslations,
+      onSelect: () => setShowTranslations(true),
+    },
+  ];
+
+  const systemItems: MenuItem[] = [
+    {
+      key: "backupExport",
+      label: t("backupExport", "Backup & Export"),
+      icon: <MdSettingsBackupRestore className="text-lg" />,
+      active: showBackupExport,
+      onSelect: () => setShowBackupExport(true),
+    },
+  ];
+
+  const renderMenuItem = (item: MenuItem) => (
+    <li key={item.key}>
+      <motion.button
+        type="button"
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        className={`w-full p-2 rounded hover:bg-blue-600 cursor-pointer text-left ${item.active ? "bg-blue-700" : ""}`}
+        onClick={() => openPanel(item.onSelect)}
+        aria-current={item.active ? "page" : undefined}
+      >
+        <div className="flex items-center space-x-3">
+          {item.icon}
+          <span>{item.label}</span>
+        </div>
+      </motion.button>
+    </li>
+  );
 
   return (
     <>
@@ -78,265 +268,61 @@ const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, 
                     width={500}
                     height={300}
                     className="rounded-full"
-                    alt="Fornecedor Logo"
+                    alt={t("supplierLogo", "Supplier Logo")}
                   />
                   <span className="absolute bottom-0 right-0 block w-3 h-3 bg-green-400 rounded-full"></span>
                 </div>
                 <div>
-                  <h5 className="font-semibold">Administrador</h5>
-                  <span>Administrador</span>
+                  <h5 className="font-semibold">{t("administrator", "Administrator")}</h5>
+                  <span>{t("administrator", "Administrator")}</span>
                 </div>
               </div>
             </div>
             <div className="flex-1 overflow-y-auto">
               <ul className="space-y-4">
-                <li className="text-xs font-semibold tracking-wide uppercase">Painel</li>
-                <motion.li
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`p-2 rounded hover:bg-blue-600 cursor-pointer ${showSuperApp ? "bg-blue-700" : ""}`}
-                  onClick={() => {
-                    resetPanels();
-                    setShowSuperApp(true);
-                    onToggle();
-                  }}
-                >
-                  <div className="flex items-center space-x-3">
-                    <MdBarChart className="text-lg" />
-                    <span>Super App</span>
-                  </div>
-                </motion.li>
-                <motion.li
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="p-2 rounded hover:bg-blue-600 cursor-pointer"
-                  onClick={() => {
-                    resetPanels();
-                    setShowstore(true);
-                    onToggle();
-                  }}
-                >
-                  <div className="flex items-center space-x-3">
-                    <MdContacts className="text-lg" />
-                    <span>stores</span>
-                  </div>
-                </motion.li>
-                <motion.li
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="p-2 rounded hover:bg-blue-600 cursor-pointer"
-                  onClick={() => {
-                    setShowProducts(false);
-                    setShowOrders(false);
-                    setShowstore(false);
-                    setShowReport(false);
-                    setListOfCustomer(false);
-                    setListOfDriver(false);
-                    setShowproducts(true);
-                    setShowDatabaseActions(false);
-                    onToggle();
-                  }}
-                >
-                  <div className="flex items-center space-x-3">
-                    <MdLaptop className="text-lg" />
-                    <span>Menus</span>
-                  </div>
-                </motion.li>
-                <motion.li
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="p-2 rounded hover:bg-blue-600 cursor-pointer"
-                  onClick={() => {
-                    setShowProducts(false);
-                    setShowOrders(true);
-                    setShowstore(false);
-                    setShowReport(false);
-                    setListOfCustomer(false);
-                    setListOfDriver(false);
-                    setShowproducts(false);
-                    setShowDatabaseActions(false);
-                    onToggle();
-                  }}
-                >
-                  <div className="flex items-center space-x-3">
-                    <MdLaptop className="text-lg" />
-                    <span>Pedidos</span>
-                  </div>
-                </motion.li>
-                <motion.li
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="p-2 rounded hover:bg-blue-600 cursor-pointer"
-                  onClick={() => {
-                    setShowProducts(false);
-                    setShowOrders(false);
-                    setShowstore(false);
-                    setShowReport(true);
-                    setListOfCustomer(false);
-                    setListOfDriver(false);
-                    setShowproducts(false);
-                    setShowDatabaseActions(false);
-                    onToggle();
-                  }}
-                >
-                  <div className="flex items-center space-x-3">
-                    <MdBarChart className="text-lg" />
-                    <span>Relatórios</span>
-                  </div>
-                </motion.li>
-                <motion.li
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="p-2 rounded hover:bg-blue-600 cursor-pointer"
-                  onClick={() => {
-                    setShowProducts(false);
-                    setShowOrders(false);
-                    setShowstore(false);
-                    setShowReport(false);
-                    setListOfCustomer(true);
-                    setListOfDriver(false);
-                    setShowproducts(false);
-                    setShowDatabaseActions(false);
-                    onToggle();
-                  }}
-                >
-                  <div className="flex items-center space-x-3">
-                    <MdTableBar className="text-lg" />
-                    <span>Clientes</span>
-                  </div>
-                </motion.li>
-                <motion.li
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="p-2 rounded hover:bg-blue-600 cursor-pointer"
-                  onClick={() => {
-                    setShowProducts(false);
-                    setShowOrders(false);
-                    setShowstore(false);
-                    setShowReport(false);
-                    setListOfCustomer(false);
-                    setListOfDriver(true);
-                    setShowproducts(false);
-                    setShowDatabaseActions(false);
-                    onToggle();
-                  }}
-                >
-                  <div className="flex items-center space-x-3">
-                    <MdBarChart className="text-lg" />
-                    <span>Motoristas</span>
-                  </div>
-                </motion.li>
-                <motion.li
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="p-2 rounded hover:bg-blue-600 cursor-pointer"
-                  onClick={() => {
-                    setShowProducts(false);
-                    setShowOrders(false);
-                    setShowstore(true);
-                    setShowReport(false);
-                    setListOfCustomer(false);
-                    setListOfDriver(false);
-                    setShowproducts(false);
-                    setShowDatabaseActions(false);
-                    onToggle();
-                  }}
-                >
-                  <div className="flex items-center space-x-3">
-                    <MdContacts className="text-lg" />
-                    <span>Paeceiros</span>
-                  </div>
-                </motion.li>
-                <motion.li
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="p-2 rounded hover:bg-blue-600 cursor-pointer"
-                  onClick={() => {
-                    setShowProducts(false);
-                    setShowOrders(false);
-                    setShowstore(false);
-                    setShowReport(false);
-                    setListOfCustomer(false);
-                    setListOfDriver(false);
-                    setShowproducts(false);
-                    setShowKYC(true);
-                    setShowPayouts(false);
-                    setShowDatabaseActions(false);
-                    onToggle();
-                  }}
-                >
-                  <div className="flex items-center space-x-3">
-                    <MdBarChart className="text-lg" />
-                  <span>KYC</span>
-                  </div>
-                </motion.li>
-                <motion.li
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="p-2 rounded hover:bg-blue-600 cursor-pointer"
-                  onClick={() => {
-                    setShowProducts(false);
-                    setShowOrders(false);
-                    setShowstore(false);
-                    setShowReport(false);
-                    setListOfCustomer(false);
-                    setListOfDriver(false);
-                    setShowproducts(false);
-                    setShowKYC(false);
-                    setShowPayouts(true);
-                    setShowDatabaseActions(false);
-                    onToggle();
-                  }}
-                >
-                <div className="flex items-center space-x-3">
-                  <MdBarChart className="text-lg" />
-                  <span>Payouts</span>
-                </div>
-                </motion.li>
-                <li className="text-xs font-semibold tracking-wide uppercase mt-6">System Management</li>
-                <motion.li
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`p-2 rounded hover:bg-blue-600 cursor-pointer ${showBackupExport ? "bg-blue-700" : ""}`}
-                  onClick={() => {
-                    resetPanels();
-                    setShowBackupExport(true);
-                    onToggle();
-                  }}
-                >
-                  <div className="flex items-center space-x-3">
-                    <MdSettingsBackupRestore className="text-lg" />
-                    <span>Backup &amp; Export</span>
-                  </div>
-                </motion.li>
+                <li className="text-xs font-semibold tracking-wide uppercase">{t("dashboard", "Dashboard")}</li>
+                {dashboardItems.map(renderMenuItem)}
+                <li className="text-xs font-semibold tracking-wide uppercase mt-6">{t("platformSettings", "Platform")}</li>
+                {platformItems.map(renderMenuItem)}
+                <li className="text-xs font-semibold tracking-wide uppercase mt-6">{t("systemManagement", "System Management")}</li>
+                {systemItems.map(renderMenuItem)}
               </ul>
             </div>
-            <div className="mt-6">
+            <div className="mt-6 space-y-3">
+              <label className="hidden md:block text-xs text-blue-100">
+                {t("language", "Language")}
+                <select
+                  className="mt-1 w-full rounded border-0 px-2 py-1 text-sm text-slate-800"
+                  value={languageCode}
+                  onChange={(e) => changeLanguage(e.target.value as typeof languageCode)}
+                >
+                  {supportedLocales.map((loc) => (
+                    <option key={loc} value={loc}>
+                      {loc.toUpperCase()}
+                    </option>
+                  ))}
+                </select>
+              </label>
               <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center justify-center w-full p-2 bg-green-500 rounded hover:bg-green-600 transition-colors duration-200"
-                onClick={() => { /* handle location update logic */ }}
+                type="button"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full list-none p-2 mt-4 rounded hover:bg-red-500 cursor-pointer text-left"
+                onClick={handleLogout}
               >
-                <MdLocationOn className="text-xl" />
-                <span className="ml-2">Atualizar Localização</span>
-              </motion.button>
-              <motion.li
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="p-2 mt-4 rounded hover:bg-red-500 cursor-pointer"
-                onClick={() => { /* handle logout logic */ }}
-              >
-                <div className="flex items-center space-x-3 text-red-400">
+                <div className="flex items-center space-x-3 text-red-200">
                   <MdLogout className="text-lg" />
-                  <span>Sair</span>
+                  <span>{t("logout", "Logout")}</span>
                 </div>
-              </motion.li>
+              </motion.button>
             </div>
           </nav>
         </div>
         <div className="flex-1 overflow-y-auto bg-gray-100">
           {showSuperApp && <SuperAppAdmin />}
+          {showPlatformControl && <PlatformModulesAdmin />}
+          {showPricing && <PricingAdmin />}
+          {showTranslations && <TranslationsAdmin />}
           {showproducts && <ProductList />}
           {showOrders && <Orders />}
           {showstore && <Store />}
@@ -344,6 +330,8 @@ const Sidebar: React.FC<{ isOpen: boolean; onToggle: () => void }> = ({ isOpen, 
           {listOfCustomer && <CustomersList />}
           {listOfDriver && <DriverList />}
           {showKYC && <KYC />}
+          {showDoctorVerification && <DoctorVerificationAdmin />}
+          {showLiveSupport && <LiveSupportAdmin />}
           {showPayouts && <Payouts />}
           {showDatabaseActions && <DatabaseActions />}
           {showBackupExport && <BackupExport />}

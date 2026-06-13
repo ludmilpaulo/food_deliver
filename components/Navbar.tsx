@@ -72,7 +72,7 @@ const Navbar: React.FC<NavbarProps> = ({ initialLocale }) => {
           <Link href="/" className="flex items-center gap-2 group">
             <Image
               src={logo}
-              alt="Kudya — food delivery and shopping"
+              alt={t("kudyaLogoAlt", "Kudya — food delivery and shopping")}
               width={48}
               height={48}
               priority
@@ -107,7 +107,11 @@ const Navbar: React.FC<NavbarProps> = ({ initialLocale }) => {
             {/* Mobile menu button */}
             <button
               onClick={() => setMenuOpen((prev) => !prev)}
-              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-label={
+                menuOpen
+                  ? t("closeMenu", "Close menu")
+                  : t("openMenu", "Open menu")
+              }
               className="md:hidden p-2 rounded-full bg-blue-50 hover:bg-yellow-100 focus:outline-none shadow transition"
             >
               {menuOpen ? (

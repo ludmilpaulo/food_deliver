@@ -1,6 +1,6 @@
 // Careers.tsx
 "use client";
-import { useState, useEffect } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import axios from 'axios';
 import { Career } from '@/services/types';
 
@@ -9,14 +9,14 @@ const Careers = () => {
   const [newCareer, setNewCareer] = useState<Omit<Career, 'id'>>({ title: '', description: '' });
   const [editingCareer, setEditingCareer] = useState<Career | null>(null);
 
-  useEffect(() => {
-    fetchCareers();
-  }, []);
-
-  const fetchCareers = async () => {
+  const fetchCareers = useCallback(async () => {
     const response = await axios.get<Career[]>('/api/careers/');
     setCareers(response.data);
-  };
+  }, []);
+
+  useEffect(() => {
+    void fetchCareers();
+  }, [fetchCareers]);
 
   const handleCreate = async () => {
     await axios.post('/api/careers/', newCareer);

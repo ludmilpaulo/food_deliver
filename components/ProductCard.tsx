@@ -7,7 +7,7 @@ import { baseAPI, Product } from "@/services/types";
 import { formatCurrency, getCurrencyForCountry } from "@/utils/currency";
 import { FaShoppingCart, FaCheck, FaPlus, FaMinus } from "react-icons/fa";
 import React, { useState, useMemo } from "react";
-import { t } from "@/configs/i18n"; // import your translation function
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface ProductCardProps {
   product: Product;
@@ -16,6 +16,7 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, regionCode, language }) => {
+  const { t } = useTranslation();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const cartItems = useAppSelector(selectCartItems);
@@ -183,7 +184,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, regionCode, language
                 className="w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-xl font-semibold transition shadow"
                 onClick={(e) => {
                   e.stopPropagation();
-                  router.push("/cart");
+                  router.push("/CartPage");
                 }}
               >
                 <FaCheck /> {t("goToCart") || "Go to Cart"}

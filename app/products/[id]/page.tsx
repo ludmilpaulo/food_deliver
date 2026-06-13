@@ -5,7 +5,6 @@ import { useAppDispatch, useAppSelector } from "@/redux/store";
 import { RootState } from "@/redux/store";
 import { baseAPI, Product} from "@/services/types";
 import { addItem } from "@/redux/slices/basketSlice";
-import { t } from "@/configs/i18n";
 import Image from "next/image";
 import { formatCurrency, getCurrencyForCountry } from "@/utils/currency";
 import { fetchRelatedProducts } from "@/redux/slices/relatedProductsSlice";
@@ -14,6 +13,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart as faSolidHeart, faShareNodes, faStar as faSolidStar, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faRegularHeart, faStar as faRegularStar } from "@fortawesome/free-regular-svg-icons";
 import Link from "next/link";
+import { useTranslation } from "@/hooks/useTranslation";
 
 // Define the Review type
 type Review = {
@@ -27,6 +27,7 @@ type Review = {
 type Props = {};
 
 const ProductDetailPage: React.FC<Props> = () => {
+  const { t, languageCode } = useTranslation();
   const router = useRouter();
   const params = useParams();
   const dispatch = useAppDispatch();
@@ -234,7 +235,7 @@ const ProductDetailPage: React.FC<Props> = () => {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-400">
-            No image
+            {t("noImage", "No image")}
           </div>
         )}
       </div>
@@ -247,14 +248,18 @@ const ProductDetailPage: React.FC<Props> = () => {
           {productToShow.on_sale ? (
             <>
               <span className="text-gray-400 line-through text-lg">
-                {formatCurrency(Number(productToShow.price), getCurrencyForCountry(regionCode), "en")}
+                {formatCurrency(
+                  Number(productToShow.price),
+                  getCurrencyForCountry(regionCode),
+                  languageCode,
+                )}
               </span>
               <span className="text-xl font-bold text-green-700">
                 {formatCurrency(
                   Number(productToShow.price) -
                     (Number(productToShow.price) * productToShow.discount_percentage) / 100,
                   getCurrencyForCountry(regionCode),
-                  "en"
+                  languageCode
                 )}
               </span>
               <span className="ml-2 text-xs bg-red-500 text-white rounded px-2">
@@ -422,7 +427,7 @@ const ProductDetailPage: React.FC<Props> = () => {
                       ? rel.price - (rel.price * rel.discount_percentage) / 100
                       : rel.price,
                     getCurrencyForCountry(regionCode),
-                    "en"
+                    languageCode
                   )}
                 </span>
               </Link>

@@ -1,8 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { fetchAllKYC, approveKYC, rejectKYC } from "@/services/adminMarketplaceApi";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function KYCAdmin() {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [list, setList] = useState<any[]>([]);
@@ -13,7 +15,7 @@ export default function KYCAdmin() {
       const data = await fetchAllKYC();
       setList(data);
     } catch (e: any) {
-      setError(e?.message || "Failed to load KYC");
+      setError(e?.message || t("failedToLoadKyc", "Failed to load KYC"));
     } finally {
       setLoading(false);
     }
@@ -26,17 +28,19 @@ export default function KYCAdmin() {
     await load();
   };
   const onReject = async (id: number) => {
-    const reason = prompt("Reason for rejection?") || "Not specified";
+    const reason =
+      prompt(t("reasonForRejection", "Reason for rejection?")) ||
+      t("notSpecified", "Not specified");
     await rejectKYC(id, reason);
     await load();
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div>{t("loading")}</div>;
   if (error) return <div className="text-red-600">{error}</div>;
 
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold mb-3">KYC</h2>
+      <h2 className="text-xl font-bold mb-3">{t("kyc", "KYC")}</h2>
       <div className="space-y-3">
         {list.map((k) => (
           <div key={k.id} className="border rounded-xl p-3 bg-white">
@@ -46,8 +50,12 @@ export default function KYCAdmin() {
             </div>
             <div className="text-sm text-gray-600">{k.full_legal_name} · {k.id_document_type} · {k.id_document_number}</div>
             <div className="mt-2 flex gap-2">
-              <button className="px-3 py-1 rounded bg-green-600 text-white" onClick={() => onApprove(k.id)}>Approve</button>
-              <button className="px-3 py-1 rounded bg-red-600 text-white" onClick={() => onReject(k.id)}>Reject</button>
+              <button className="px-3 py-1 rounded bg-green-600 text-white" onClick={() => onApprove(k.id)}>
+                {t("approve", "Approve")}
+              </button>
+              <button className="px-3 py-1 rounded bg-red-600 text-white" onClick={() => onReject(k.id)}>
+                {t("reject", "Reject")}
+              </button>
             </div>
           </div>
         ))}

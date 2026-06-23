@@ -1,16 +1,14 @@
 "use client";
+import { useEffect } from "react";
 import { Provider } from "react-redux";
 import { store } from "./store";
 import { hydrateAuthFromStorage } from "./slices/authSlice";
 
-let authHydrated = false;
-function ensureAuthHydrated() {
-  if (typeof window === "undefined" || authHydrated) return;
-  store.dispatch(hydrateAuthFromStorage());
-  authHydrated = true;
-}
-
 export default function StoreProvider({ children }: { children: React.ReactNode }) {
-  ensureAuthHydrated();
+  // Restore auth after mount so the first client render matches SSR (user=null).
+  useEffect(() => {
+    store.dispatch(hydrateAuthFromStorage());
+  }, []);
+
   return <Provider store={store}>{children}</Provider>;
 }

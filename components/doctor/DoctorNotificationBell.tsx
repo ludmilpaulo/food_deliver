@@ -32,14 +32,16 @@ export default function DoctorNotificationBell({ onNewBooking }: Props) {
   const { dt } = useDoctorTranslation();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const seenBookingIdsRef = useRef<Set<number>>(new Set());
+  const seenBookingIdsRef = useRef<Set<string>>(new Set());
 
-  const { data: notifications = [], refetch } = useGetNotificationsQuery(undefined, {
-    pollingInterval: 45000,
-  });
-  const { data: unreadData } = useGetUnreadNotificationCountQuery(undefined, {
-    pollingInterval: 45000,
-  });
+  const { data: notifications = [], refetch } = useGetNotificationsQuery(
+    { module: "doctor" },
+    { pollingInterval: 45000 },
+  );
+  const { data: unreadData } = useGetUnreadNotificationCountQuery(
+    { module: "doctor" },
+    { pollingInterval: 45000 },
+  );
   const [markRead] = useMarkNotificationReadMutation();
   const [markAllRead] = useMarkAllNotificationsReadMutation();
 
@@ -74,7 +76,7 @@ export default function DoctorNotificationBell({ onNewBooking }: Props) {
     void refetch();
   };
 
-  const handleMarkRead = async (id: number) => {
+  const handleMarkRead = async (id: string) => {
     await markRead(id);
   };
 

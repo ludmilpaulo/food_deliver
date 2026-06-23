@@ -7,6 +7,7 @@ import dynamic from "next/dynamic";
 import { useTranslation } from "@/hooks/useTranslation";
 import { supportedLocales } from "@/configs/translations";
 import AdminRouteGuard from "@/components/admin/AdminRouteGuard";
+import { AdminPanelContent, type AdminPanelId } from "./adminPanels";
 
 const Sidebar = dynamic(() => import("./Sidebar"), {
   ssr: false,
@@ -16,6 +17,7 @@ const Sidebar = dynamic(() => import("./Sidebar"), {
 const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { t, languageCode, changeLanguage } = useTranslation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activePanel, setActivePanel] = useState<AdminPanelId>("superApp");
   const handleSidebarToggle = () => setIsSidebarOpen((open) => !open);
 
   return (
@@ -38,8 +40,16 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             ))}
           </select>
         </div>
-        <Sidebar isOpen={isSidebarOpen} onToggle={handleSidebarToggle} />
-        <main className="flex-1 overflow-y-auto bg-gray-100 pt-12 md:pt-0">{children}</main>
+        <Sidebar
+          isOpen={isSidebarOpen}
+          onToggle={handleSidebarToggle}
+          activePanel={activePanel}
+          onSelectPanel={setActivePanel}
+        />
+        <main className="flex-1 min-w-0 overflow-y-auto bg-gray-100 pt-12 md:pt-0">
+          {children}
+          <AdminPanelContent activePanel={activePanel} />
+        </main>
       </div>
     </AdminRouteGuard>
   );

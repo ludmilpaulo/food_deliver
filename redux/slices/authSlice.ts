@@ -49,6 +49,7 @@ export interface AuthState {
   loading: boolean;
   error: string | null;
   message: string | null;
+  hydratedFromStorage: boolean;
 }
 
 const initialState: AuthState = {
@@ -60,6 +61,7 @@ const initialState: AuthState = {
   loading: false,
   error: null,
   message: null,
+  hydratedFromStorage: false,
 };
 
 // ---- Thunk for Login ----
@@ -110,34 +112,38 @@ const authSlice = createSlice({
       if (typeof window === 'undefined') return;
       try {
         const tokenRaw = localStorage.getItem('auth_token');
-        if (!tokenRaw) return;
-        const token = JSON.parse(tokenRaw) as string | null;
-        if (!token) return;
-        state.token = token;
-        const userRaw = localStorage.getItem('auth_user');
-        if (userRaw) {
-          const stored = JSON.parse(userRaw) as {
-            user_id?: number;
-            username?: string;
-            role?: string;
-            is_platform_admin?: boolean;
-          };
-          if (stored.user_id && stored.username) {
-            state.user_id = stored.user_id;
-            state.username = stored.username;
-            state.user = {
-              user_id: stored.user_id,
-              username: stored.username,
-              token,
-              role: stored.role,
-              is_platform_admin: stored.is_platform_admin,
-              is_customer: true,
-              is_driver: false,
-            };
+        if (tokenRaw) {
+          const token = JSON.parse(tokenRaw) as string | null;
+          if (token) {
+            state.token = token;
+            const userRaw = localStorage.getItem('auth_user');
+            if (userRaw) {
+              const stored = JSON.parse(userRaw) as {
+                user_id?: number;
+                username?: string;
+                role?: string;
+                is_platform_admin?: boolean;
+              };
+              if (stored.user_id && stored.username) {
+                state.user_id = stored.user_id;
+                state.username = stored.username;
+                state.user = {
+                  user_id: stored.user_id,
+                  username: stored.username,
+                  token,
+                  role: stored.role,
+                  is_platform_admin: stored.is_platform_admin,
+                  is_customer: true,
+                  is_driver: false,
+                };
+              }
+            }
           }
         }
       } catch {
         // ignore corrupt storage
+      } finally {
+        state.hydratedFromStorage = true;
       }
     },
     persistBookingSession(
@@ -232,6 +238,9 @@ export const { logoutUser, clearAuthMessage, hydrateAuthFromStorage, persistBook
 
 // User only
 export const selectUser = (state: { auth: AuthState }) => state.auth.user;
+
+export const selectAuthHydrated = (state: { auth: AuthState }) =>
+  state.auth.hydratedFromStorage;
 
 // Whole auth slice (status, errors, etc.)
 export const selectAuth = (state: { auth: AuthState }) => state.auth;

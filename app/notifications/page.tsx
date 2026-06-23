@@ -61,7 +61,11 @@ export default function NotificationsPage() {
                 <div>
                   <p className="font-semibold text-slate-900">{notification.title}</p>
                   <p className="mt-1 text-sm text-slate-600">{notification.message}</p>
-                  <p className="mt-2 text-xs text-slate-400">{notification.createdAt}</p>
+                  <p className="mt-2 text-xs text-slate-400">
+                    {notification.createdAt
+                      ? new Date(notification.createdAt).toLocaleString()
+                      : ""}
+                  </p>
                 </div>
                 {!notification.isRead ? (
                   <button

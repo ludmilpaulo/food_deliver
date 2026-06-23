@@ -1,159 +1,97 @@
 
-import axios from "axios";
-import { baseAPI, Categoria, FornecedorType, OpeningHourType, OrderTypes, Product, Store as StoreType } from "./types";
+import {
+  advancePartnerOrderStatus,
+  createPartnerOpeningHour,
+  createPartnerProduct,
+  deletePartnerProduct,
+  fetchPartnerOpeningHours,
+  fetchPartnerOrders,
+  fetchPartnerProductCategories,
+  fetchPartnerProducts,
+  fetchPartnerStore,
+  updatePartnerLocation,
+  updatePartnerProduct,
+  updatePartnerStore,
+} from '@/features/partner/api/partnerDashboardApi';
+import { Categoria, FornecedorType, OpeningHourType, OrderTypes, Product, Store as StoreType } from './types';
 
-export const fetchFornecedorData = async (userId: number): Promise<FornecedorType | null> => {
-    try {
-      const response = await fetch(`${baseAPI}/store/get_fornecedor/?user_id=${userId}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch fornecedor data");
-      }
-      const data = await response.json();
-      if (data.fornecedor && data.fornecedor.length > 0) {
-        return data.fornecedor[0];
-      }
-      return null;
-    } catch (error) {
-      console.error("An error occurred while fetching fornecedor data:", error);
-      throw error;
-    }
-  };
+export const fetchFornecedorData = async (_userId: number): Promise<FornecedorType | null> => {
+  try {
+    const data = await fetchPartnerStore();
+    return data as FornecedorType;
+  } catch (error) {
+    console.error('An error occurred while fetching fornecedor data:', error);
+    throw error;
+  }
+};
 
-
-
-
-  export const updateLocation = async (userId: number, location: string) => {
-    try {
-      const response = await axios.post(`${baseAPI}/store/update-location/`, { user_id: userId, location });
-      return response.data;
-    } catch (error) {
-      console.error("Error updating location:", error);
-      throw error;
-    }
-  };
-
-
-
-
-
+export const updateLocation = async (_userId: number, location: string) => {
+  try {
+    return await updatePartnerLocation(location);
+  } catch (error) {
+    console.error('Error updating location:', error);
+    throw error;
+  }
+};
 
 export const fetchCategorias = async (): Promise<Categoria[]> => {
-  const response = await fetch(`${baseAPI}/store/product-categories/`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch categories");
-  }
-  return response.json();
+  return fetchPartnerProductCategories();
 };
 
 export const fetchstoreCategory = async (): Promise<Categoria[]> => {
-    const response = await fetch(`${baseAPI}/store/store-categories/`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch categories");
-    }
-    return response.json();
-  };
+  return fetchPartnerProductCategories();
+};
 
-export const fetchProducts = async (userId: number): Promise<Product[]> => {
-  const response = await fetch(`${baseAPI}/store/get_products/?user_id=${userId}`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch products");
-  }
-  return response.json();
+export const fetchProducts = async (_userId: number): Promise<Product[]> => {
+  return fetchPartnerProducts();
 };
 
 export const addProduct = async (formData: FormData): Promise<Product> => {
-    const response = await fetch(`${baseAPI}/store/add-product/`, {
-      method: "POST",
-      body: formData,
-    });
-  
-    if (!response.ok) {
-      const errorData = await response.json();
-      const errorMessage = errorData.error || "Failed to add product";
-      throw new Error(errorMessage);
-    }
-  
-    return response.json();
-  };
-  
-  export const updateProduct = async (productId: number, formData: FormData): Promise<void> => {
-    const response = await fetch(`${baseAPI}/store/update-product/${productId}/`, {
-      method: "PUT",
-      body: formData,
-    });
-    if (!response.ok) {
-      const errorData = await response.json();
-      const errorMessage = errorData.error || "Failed to update product";
-      throw new Error(errorMessage);
-    }
-  };
-  
-
-export const deleteProduct = async (productId: number, userId: number): Promise<void> => {
-  const response = await fetch(`${baseAPI}/store/delete-product/${productId}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ user_id: userId }),
-  });
-  if (!response.ok) {
-    throw new Error("Failed to delete product");
+  const stripped = new FormData();
+  for (const [key, value] of formData.entries()) {
+    if (key === 'user_id' || key === 'access_token') continue;
+    stripped.append(key, value);
   }
+  return createPartnerProduct(stripped);
 };
 
+export const updateProduct = async (productId: number, formData: FormData): Promise<void> => {
+  const stripped = new FormData();
+  for (const [key, value] of formData.entries()) {
+    if (key === 'user_id' || key === 'access_token') continue;
+    stripped.append(key, value);
+  }
+  await updatePartnerProduct(productId, stripped);
+};
 
-export const fetchOrders = async (userId: number): Promise<OrderTypes[]> => {
-    const response = await fetch(`${baseAPI}/store/store/orders/?user_id=${userId}`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch orders");
-    }
-    return response.json();
-  };
+export const deleteProduct = async (productId: number, _userId: number): Promise<void> => {
+  await deletePartnerProduct(productId);
+};
 
-  export const updateOrderStatus = async (userId: number, orderId: number): Promise<void> => {
-    console.log("order status");
-    const response = await fetch(`${baseAPI}/store/store/status/`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ user_id: userId, id: orderId }),
-    });
-    if (!response.ok) {
-      throw new Error("Falha ao atualizar o status do pedido");
-    }
-  };
-  
+export const fetchOrders = async (_userId: number): Promise<OrderTypes[]> => {
+  return fetchPartnerOrders();
+};
 
+export const updateOrderStatus = async (_userId: number, orderId: number): Promise<void> => {
+  await advancePartnerOrderStatus(orderId);
+};
 
-const API_URL = baseAPI;
-
-export const getstore = async (userId: number): Promise<StoreType> => {
-    const response = await axios.get(`${API_URL}/store/stores/${userId}/`);
-    return response.data;
+export const getstore = async (_userId: number): Promise<StoreType> => {
+  return fetchPartnerStore();
 };
 
 export const fetchstoreCategorias = async () => {
-  const response = await axios.get(`${API_URL}/store/store-categories/`);
-  return response.data;
+  return fetchPartnerProductCategories();
 };
 
-export const updatestore = async (userId: number, data: FormData): Promise<StoreType> => {
-    const response = await axios.put(`${API_URL}/store/stores/${userId}/`, data, {
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        }
-    });
-    return response.data;
+export const updatestore = async (_userId: number, data: FormData): Promise<StoreType> => {
+  return updatePartnerStore(data);
 };
 
-export const getOpeningHours = async (storeId: number): Promise<OpeningHourType[]> => {
-    const response = await axios.get(`${API_URL}/store/stores/${storeId}/opening_hours/`);
-    return response.data;
+export const getOpeningHours = async (_storeId: number): Promise<OpeningHourType[]> => {
+  return fetchPartnerOpeningHours();
 };
 
-export const createOpeningHour = async (storeId: number, data: OpeningHourType): Promise<OpeningHourType> => {
-    const response = await axios.post(`${API_URL}/store/stores/${storeId}/opening_hours/`, data);
-    return response.data;
+export const createOpeningHour = async (_storeId: number, data: OpeningHourType): Promise<OpeningHourType> => {
+  return createPartnerOpeningHour(data as unknown as Record<string, unknown>);
 };

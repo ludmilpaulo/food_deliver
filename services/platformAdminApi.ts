@@ -186,7 +186,7 @@ export async function fetchAdminDashboardStats() {
     deliveries_today: number;
     active_drivers: number;
     total_users: number;
-  }>("/api/admin/dashboard/");
+  }>("/api/v1/admin/dashboard/");
   return data;
 }
 

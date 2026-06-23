@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { selectUser } from '@/redux/slices/authSlice';
-import { baseAPI, OrderTypes } from '@/services/types';
+import { OrderTypes } from '@/services/types';
 import { fetchOrders, updateOrderStatus } from '@/services/apiService';
 import { Transition } from '@headlessui/react';
 import { useTranslation } from "@/hooks/useTranslation";
@@ -52,13 +52,11 @@ const Order: React.FC = () => {
   useEffect(() => {
     fetchOrderData();
 
-    const eventSource = new EventSource(`${baseAPI}/store/sse?user_id=${user?.user_id}`);
-    eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      setOrders(data);
-    };
+    const eventSourcePoll = window.setInterval(() => {
+      fetchOrderData();
+    }, 5000);
 
-    return () => eventSource.close();
+    return () => window.clearInterval(eventSourcePoll);
   }, [fetchOrderData, user?.user_id]);
 
   return (

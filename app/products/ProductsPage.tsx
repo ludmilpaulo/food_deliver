@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/store";
 import { fetchProductsByStore } from "@/redux/slices/productsSlice";
+import type { MarketplaceVertical } from "@/features/marketplace/lib/normalizeStores";
 import { addItem, removeItem, selectCartItems } from "@/redux/slices/basketSlice";
 import Image from "next/image";
 import { Carousel } from "react-responsive-carousel";
@@ -30,6 +31,9 @@ export default function ProductsPage() {
 
   const storeId = Number(searchParams.get("storeId"));
   const storeName = searchParams.get("storeName") || t("Stores");
+  const verticalParam = searchParams.get("vertical");
+  const vertical =
+    verticalParam === "food" || verticalParam === "groceries" ? verticalParam : undefined;
 
   // Redux state
   const products = useAppSelector((state) => state.products.data);
@@ -47,9 +51,9 @@ export default function ProductsPage() {
 
   useEffect(() => {
     if (typeof storeId === "number" && !Number.isNaN(storeId)) {
-      dispatch(fetchProductsByStore(storeId));
+      dispatch(fetchProductsByStore({ storeId, vertical }));
     }
-  }, [storeId, dispatch]);
+  }, [storeId, vertical, dispatch]);
 
   // --- Categories (all as string) ---
   const categories = useMemo(() => {

@@ -166,7 +166,18 @@ export default function StoreTypesPage() {
                       transition={{ delay: idx * 0.08, duration: 0.4 }}
                     >
                       <motion.button
-                        onClick={() => router.push(`/stores?storeTypeId=${type.id}`)}
+                        onClick={() => {
+                          const key = (type?.name ?? "").toLowerCase();
+                          if (key.includes("restaurant")) {
+                            router.push("/food");
+                            return;
+                          }
+                          if (key.includes("grocery") || key.includes("pharmacy")) {
+                            router.push("/groceries");
+                            return;
+                          }
+                          router.push(`/stores?storeTypeId=${type.id}`);
+                        }}
                         aria-label={type?.name ?? t("store")}
                         whileHover={{ y: -4, transition: { duration: 0.2 } }}
                         whileTap={{ scale: 0.98 }}

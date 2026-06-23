@@ -1,19 +1,26 @@
 // redux/slices/storesSlice.ts
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { Store } from '@/services/types'; // Adjust path as needed
-import API from '@/services/api';         // Adjust path as needed
+import { Store } from '@/services/types';
+import API from '@/services/api';
+import {
+  MarketplaceVertical,
+  normalizeV1Stores,
+  verticalApiPath,
+} from '@/features/marketplace/lib/normalizeStores';
 
 interface StoresState {
   data: Store[];
   loading: boolean;
   error: string | null;
+  vertical: MarketplaceVertical | null;
 }
 
 const initialState: StoresState = {
   data: [],
   loading: false,
   error: null,
+  vertical: null,
 };
 
 export const fetchStoresByType = createAsyncThunk<Store[], number>(
@@ -21,6 +28,14 @@ export const fetchStoresByType = createAsyncThunk<Store[], number>(
   async (storeTypeId) => {
     const response = await API.get(`/store/stores/?store_type=${storeTypeId}`);
     return response.data;
+  }
+);
+
+export const fetchStoresByVertical = createAsyncThunk<Store[], MarketplaceVertical>(
+  'stores/fetchByVertical',
+  async (vertical) => {
+    const response = await API.get(verticalApiPath(vertical));
+    return normalizeV1Stores(response.data);
   }
 );
 
@@ -39,6 +54,20 @@ const storesSlice = createSlice({
         state.loading = false;
       })
       .addCase(fetchStoresByType.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to fetch stores';
+      })
+      .addCase(fetchStoresByVertical.pending, (state, action) => {
+        state.loading = true;
+        state.error = null;
+        state.vertical = action.meta.arg;
+      })
+      .addCase(fetchStoresByVertical.fulfilled, (state, action) => {
+        state.data = action.payload;
+        state.loading = false;
+        state.vertical = action.meta.arg;
+      })
+      .addCase(fetchStoresByVertical.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch stores';
       });

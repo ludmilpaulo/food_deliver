@@ -1,49 +1,28 @@
-import axios from 'axios';
-import { baseAPI, Product, Store as StoreType } from './types';
+import { Product, Store as StoreType } from './types';
+import {
+  activateAdminStore,
+  deactivateAdminStore,
+  deleteAdminStore,
+  fetchAdminProducts,
+  fetchAdminStores,
+  updateAdminStore,
+} from '@/features/admin/api/adminMarketplaceApi';
 
+export const getstores = async (): Promise<StoreType[]> => fetchAdminStores();
 
+export const activatestore = async (id: number) => activateAdminStore(id);
 
-export const getstores = async () => {
-  const response = await axios.get(`${baseAPI}/store/api/stores/`);
-  return response.data;
+export const deactivatestore = async (id: number) => deactivateAdminStore(id);
+
+export const updatestore = async (id: number, data: Partial<StoreType>) => updateAdminStore(id, data);
+
+export const deletestore = async (id: number) => deleteAdminStore(id);
+
+export const getproducts = async (): Promise<Product[]> => {
+  try {
+    return await fetchAdminProducts();
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    throw error;
+  }
 };
-
-export const activatestore = async (id: number) => {
-  const response = await axios.post(`${baseAPI}/store/api/stores/${id}/activate/`);
-  return response.data;
-};
-
-export const deactivatestore = async (id: number) => {
-  const response = await axios.post(`${baseAPI}/store/api/stores/${id}/deactivate/`);
-  return response.data;
-};
-
-export const updatestore = async (id: number, data: Partial<StoreType>) => {
-  const response = await axios.put(`${baseAPI}/store/api/stores/${id}/`, data);
-  return response.data;
-};
-
-export const deletestore = async (id: number) => {
-  const response = await axios.delete(`${baseAPI}/store/api/stores/${id}/`);
-  return response.data;
-};
-
-
-
-
- 
-
-  export const getproducts = async (): Promise<Product[]> => {
-    try {
-      const response = await axios.get<{ products: Product[] }>(`${baseAPI}/store/api/products/`);
-      const products = response.data.products.map(product => ({
-        ...product,
-        original_price: Number(product.original_price),
-        price_with_markup: Number(product.price_with_markup),
-      }));
-      return products;
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      throw error;
-    }
-  };

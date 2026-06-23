@@ -8,12 +8,13 @@ import { MdHome } from "react-icons/md";
 import { FiPackage } from "react-icons/fi";
 import Image from "next/image";
 import logo from "@/assets/azul.png";
-import { selectUser } from "@/redux/slices/authSlice";
+import { selectUser, selectAuthHydrated } from "@/redux/slices/authSlice";
 import { useAppSelector } from "@/redux/store";
 import { initLanguage } from "@/configs/i18n";
 import { SupportedLocale } from "@/configs/translations";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "@/hooks/useTranslation";
+import NotificationBellLink from "@/features/notifications/components/NotificationBellLink";
 
 const LANGUAGES: { value: SupportedLocale; label: string }[] = [
   { value: "en", label: "🇬🇧 English" },
@@ -40,6 +41,7 @@ const Navbar: React.FC<NavbarProps> = ({ initialLocale }) => {
   };
 
   const user = useAppSelector(selectUser);
+  const authHydrated = useAppSelector(selectAuthHydrated);
   const cartItems = useAppSelector((state) => state.basket.items);
   const cartQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -56,8 +58,11 @@ const Navbar: React.FC<NavbarProps> = ({ initialLocale }) => {
           </span>
         )}
       </NavLink>
-      {user ? (
-        <NavLink href="/UserDashboard" icon={<IoMdPerson size={20} className="text-indigo-700" />} label={t("Profile")} />
+      {authHydrated && user ? (
+        <>
+          <NotificationBellLink />
+          <NavLink href="/UserDashboard" icon={<IoMdPerson size={20} className="text-indigo-700" />} label={t("Profile")} />
+        </>
       ) : (
         <NavLink href="/LoginScreenUser" icon={<IoMdPerson size={20} className="text-indigo-700" />} label={t("login")} />
       )}

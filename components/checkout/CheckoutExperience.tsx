@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/redux/store';
-import { selectUser } from '@/redux/slices/authSlice';
+import { selectUser, selectAuthHydrated } from '@/redux/slices/authSlice';
 import { clearAllCart } from '@/redux/slices/basketSlice';
 import { readAuthToken } from '@/lib/authToken';
 import { baseAPI } from '@/services/types';
@@ -57,6 +57,7 @@ export default function CheckoutExperience() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
+  const authHydrated = useAppSelector(selectAuthHydrated);
   const token = useAppSelector((state) => state.auth.token);
   const items = useAppSelector((state) => state.basket.items);
 
@@ -79,16 +80,18 @@ export default function CheckoutExperience() {
   const total = Math.max(subtotal + deliveryFee - couponDiscount, 0);
 
   useEffect(() => {
+    if (!authHydrated) return;
     if (!user && !token) {
       router.replace('/LoginScreenUser?next=/Checkout');
     }
-  }, [user, token, router]);
+  }, [authHydrated, user, token, router]);
 
   useEffect(() => {
+    if (!authHydrated) return;
     if (items.length === 0 && !loading) {
       router.replace('/CartPage');
     }
-  }, [items.length, loading, router]);
+  }, [authHydrated, items.length, loading, router]);
 
   const handleApplyCoupon = async () => {
     setCouponMessage(null);
@@ -140,7 +143,7 @@ export default function CheckoutExperience() {
     };
 
     try {
-      const response = await fetch(`${baseAPI}/order/orders/add-multiple/`, {
+      const response = await fetch(`${baseAPI}/api/v1/marketplace/checkout/multiple/`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -163,7 +166,7 @@ export default function CheckoutExperience() {
     }
   };
 
-  if (!user || items.length === 0) {
+  if (!authHydrated || !user || items.length === 0) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16 text-center text-slate-600">
         {t('loadingCheckout', 'Loading checkout…')}

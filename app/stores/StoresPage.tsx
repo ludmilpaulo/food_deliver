@@ -2,7 +2,8 @@
 import React, { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/store";
-import { fetchStoresByType } from "@/redux/slices/storesSlice";
+import { fetchStoresByType, fetchStoresByVertical } from "@/redux/slices/storesSlice";
+import type { MarketplaceVertical } from "@/features/marketplace/lib/normalizeStores";
 
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -44,12 +45,14 @@ function useUserLocation() {
   return location;
 }
 
-export default function StoresPage() {
+export default function StoresPage({ forcedVertical }: { forcedVertical?: MarketplaceVertical }) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const router = useRouter();
   const params = useSearchParams();
   const storeTypeId = Number(params.get("storeTypeId"));
+  const vertical =
+    forcedVertical ?? (params.get("vertical") as MarketplaceVertical | null);
 
   const stores = useAppSelector((state) => state.stores.data);
   const loading = useAppSelector((state) => state.stores.loading);
@@ -57,9 +60,20 @@ export default function StoresPage() {
 
   const userLocation = useUserLocation();
 
+  const pageTitle =
+    vertical === "food"
+      ? t("food", "Food")
+      : vertical === "groceries"
+        ? t("groceries", "Groceries")
+        : t("Stores");
+
   useEffect(() => {
+    if (vertical === "food" || vertical === "groceries") {
+      dispatch(fetchStoresByVertical(vertical));
+      return;
+    }
     if (storeTypeId) dispatch(fetchStoresByType(storeTypeId));
-  }, [storeTypeId, dispatch]);
+  }, [storeTypeId, vertical, dispatch]);
 
   // Add distances to stores
   const storesWithDistance = useMemo(() => {
@@ -96,7 +110,7 @@ export default function StoresPage() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-yellow-300 via-yellow-400 to-blue-500 py-10">
       <div className="max-w-5xl mx-auto px-4">
-        <h1 className="text-3xl font-bold text-white mb-6">{t("Stores")}</h1>
+        <h1 className="text-3xl font-bold text-white mb-6">{pageTitle}</h1>
 
         {loading && (
           <div className="flex flex-col items-center py-24">
@@ -126,7 +140,14 @@ export default function StoresPage() {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: idx * 0.06, type: "spring", stiffness: 120 }}
                 className="bg-white/90 hover:bg-blue-50 transition rounded-2xl shadow-lg w-full sm:w-[48%] md:w-[31%] p-5 flex flex-col items-center mb-4 cursor-pointer"
-                onClick={() => router.push(`/products?storeId=${store.id}&storeName=${encodeURIComponent(store.name)}`)}
+                onClick={() => {
+                  const query = new URLSearchParams({
+                    storeId: String(store.id),
+                    storeName: store.name,
+                  });
+                  if (vertical) query.set('vertical', vertical);
+                  router.push(`/products?${query.toString()}`);
+                }}
               >
                 {store.images ? (
                   <Image

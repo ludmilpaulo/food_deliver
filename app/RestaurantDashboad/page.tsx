@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/redux/slices/authSlice";
 import dynamic from "next/dynamic";
@@ -24,6 +24,52 @@ const StoreDashboard: React.FC = () => {
     ssr: false,
     loading: () => <p>{t("loading")}</p>,
   });
+  const locationIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const locationDeniedRef = useRef(false);
+
+  const stopLocationTracking = () => {
+    if (locationIntervalRef.current) {
+      clearInterval(locationIntervalRef.current);
+      locationIntervalRef.current = null;
+    }
+  };
+
+  const updateLocationWithRetry = async (userId: number, location: string, retries = 2) => {
+    try {
+      await updateLocation(userId, location);
+    } catch {
+      if (retries > 0) {
+        setTimeout(() => {
+          void updateLocationWithRetry(userId, location, retries - 1);
+        }, 5000);
+      }
+    }
+  };
+
+  const syncStoreLocation = (userId: number) => {
+    if (locationDeniedRef.current || typeof window === "undefined" || !navigator.geolocation) {
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        void updateLocationWithRetry(userId, `${latitude},${longitude}`);
+      },
+      (error) => {
+        // Permission denied is expected in dev / when the user blocks location.
+        if (error.code === error.PERMISSION_DENIED) {
+          locationDeniedRef.current = true;
+          stopLocationTracking();
+          return;
+        }
+        if (process.env.NODE_ENV === "development") {
+          console.warn("Store location unavailable:", error.message || error.code);
+        }
+      },
+      { enableHighAccuracy: false, maximumAge: 60_000, timeout: 15_000 },
+    );
+  };
 
   const helpSections = [
     {
@@ -97,43 +143,17 @@ const StoreDashboard: React.FC = () => {
     fetchData();
   }, [user]);
 
-  const updateLocationWithRetry = async (userId: number, location: string, retries: number = 3) => {
-    try {
-      const response = await updateLocation(userId, location);
-      console.log("Location update response:", response);
-    } catch (error) {
-      console.error("Error updating location:", error);
-      if (retries > 0) {
-        setTimeout(() => {
-          updateLocationWithRetry(userId, location, retries - 1);
-        }, 100000);
-      } else {
-        console.error("Failed to update location after multiple attempts");
-      }
-    }
-  };
-
   useEffect(() => {
-    const updateLocationPeriodically = () => {
-      if (user?.user_id) {
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            const { latitude, longitude } = position.coords;
-            const location = `${latitude},${longitude}`;
-            console.log("Updating location to:", location);
-            await updateLocationWithRetry(user.user_id, location);
-          },
-          (error) => {
-            console.error("Error fetching location:", error);
-          },
-          { enableHighAccuracy: true }
-        );
-      }
-    };
+    if (!user?.user_id) return;
 
-    const intervalId = setInterval(updateLocationPeriodically, 5000); // Update every 5 seconds for testing
-    return () => clearInterval(intervalId);
-  }, [user]);
+    syncStoreLocation(user.user_id);
+    locationIntervalRef.current = setInterval(
+      () => syncStoreLocation(user.user_id),
+      5 * 60 * 1000,
+    );
+
+    return () => stopLocationTracking();
+  }, [user?.user_id]);
 
   const handleSidebarToggle = () => {
     setIsSidebarOpen(!isSidebarOpen);

@@ -2,14 +2,16 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/redux/store";
-import { selectUser } from "@/redux/slices/authSlice";
+import { selectUser, selectAuthHydrated } from "@/redux/slices/authSlice";
 import ProfileUpdateModal from "@/components/ProfileUpdateModal";
 import { getCurrentUser, updateUserDetails } from "@/services/authService";
+import { isDevLoginEnabled, isSeedTestUsername } from "@/configs/devTestLogin";
 
 const withAuth = (WrappedComponent: React.ComponentType<any>) => {
   const Wrapper: React.FC<any> = (props) => {
     const router = useRouter();
     const user = useAppSelector(selectUser);
+    const authHydrated = useAppSelector(selectAuthHydrated);
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(true);
 
@@ -24,6 +26,8 @@ const withAuth = (WrappedComponent: React.ComponentType<any>) => {
       }>({});
 
     useEffect(() => {
+      if (!authHydrated) return;
+
       if (!user || !user.user_id || !user.token) {
         router.replace("/LoginScreenUser");
         return;
@@ -31,16 +35,14 @@ const withAuth = (WrappedComponent: React.ComponentType<any>) => {
 
       const fetchProfile = async () => {
         setLoading(true);
+        const skipProfileModal =
+          isDevLoginEnabled() && isSeedTestUsername(user.username);
+
         try {
-          // Use token for authentication
-          const profileRes = await getCurrentUser(user.user_id); // ✅ THIS IS CORRECT, user_id is a number!
-
-
-          // Use correct path for data if needed (depends on backend response structure)
+          const profileRes = await getCurrentUser(user.user_id);
           const profile = profileRes.customer_details || profileRes;
-          
-          // Check if profile is incomplete
-          if (!profile || !profile.phone || !profile.address) {
+
+          if (!skipProfileModal && (!profile || !profile.phone || !profile.address)) {
             setShowModal(true);
             setProfileData({
               phone: profile?.phone || "",
@@ -48,19 +50,22 @@ const withAuth = (WrappedComponent: React.ComponentType<any>) => {
               location: profile?.location || "",
               avatar: profile?.avatar || "",
             });
+          } else {
+            setShowModal(false);
           }
-        } catch (e) {
-          // If fetch fails (e.g., not found), show modal for first-time profile
-          setShowModal(true);
+        } catch {
+          if (!skipProfileModal) {
+            setShowModal(true);
+          }
         } finally {
           setLoading(false);
         }
       };
 
       fetchProfile();
-    }, [user, router]);
+    }, [authHydrated, user, router]);
 
-    if (!user || loading) return null;
+    if (!authHydrated || !user || loading) return null;
 
     return (
       <>

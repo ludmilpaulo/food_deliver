@@ -2,7 +2,7 @@ import { selectUser } from "@/redux/slices/authSlice";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import dynamic from "next/dynamic";
-import { baseAPI } from "@/services/types";
+import { fetchPartnerReport } from "@/features/partner/api/partnerReportsApi";
 
 // Dynamically import ApexCharts to prevent SSR issues
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
@@ -28,20 +28,16 @@ const Report: React.FC = () => {
   const user_id = user?.user_id || 0;
 
   useEffect(() => {
-    const fetchData = async () => {
+    const loadReport = async () => {
       try {
-        const response = await fetch(`${baseAPI}/report/store/${user_id}/`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
-        const responseData: ReportData = await response.json();
+        const responseData = await fetchPartnerReport();
         setData(responseData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
-    fetchData();
+    loadReport();
   }, [user]);
 
   return (

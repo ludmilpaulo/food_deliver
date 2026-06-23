@@ -1,5 +1,14 @@
-import ModuleStoreLanding from '@/components/marketplace/ModuleStoreLanding';
+"use client";
+
+import React, { Suspense } from "react";
+import StoresPage from "../stores/StoresPage";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function FoodPage() {
-  return <ModuleStoreLanding module="food" />;
+  const { t } = useTranslation();
+  return (
+    <Suspense fallback={<div>{t("loading")}</div>}>
+      <StoresPage forcedVertical="food" />
+    </Suspense>
+  );
 }

@@ -15,8 +15,12 @@ import { SupportedLocale, supportedLocales } from "@/configs/translations";
 import { analytics } from "@/utils/mixpanel";
 import { useTranslation } from "@/hooks/useTranslation";
 import {
+  DEV_TEST_CUSTOMER_LOGIN,
   DEV_TEST_DOCTOR_LOGIN,
-  DEV_TEST_LOGIN_BUTTON_LABEL,
+  DEV_TEST_STORE_LOGIN,
+  DEV_TEST_CUSTOMER_LOGIN_BUTTON_LABEL,
+  DEV_TEST_DOCTOR_LOGIN_BUTTON_LABEL,
+  DEV_TEST_STORE_LOGIN_BUTTON_LABEL,
   isDevLoginEnabled,
 } from "@/configs/devTestLogin";
 
@@ -48,9 +52,19 @@ const LoginScreenUser: React.FC = () => {
     changeLanguage(e.target.value as SupportedLocale);
   };
 
-  const handleFillTestLogin = () => {
+  const handleFillTestDoctorLogin = () => {
     setUsername(DEV_TEST_DOCTOR_LOGIN.username);
     setPassword(DEV_TEST_DOCTOR_LOGIN.password);
+  };
+
+  const handleFillTestStoreLogin = () => {
+    setUsername(DEV_TEST_STORE_LOGIN.username);
+    setPassword(DEV_TEST_STORE_LOGIN.password);
+  };
+
+  const handleFillTestCustomerLogin = () => {
+    setUsername(DEV_TEST_CUSTOMER_LOGIN.username);
+    setPassword(DEV_TEST_CUSTOMER_LOGIN.password);
   };
 
   const handleSubmit = async (e?: React.FormEvent) => {
@@ -164,13 +178,29 @@ const LoginScreenUser: React.FC = () => {
               </span>
             </div>
             {isDevLoginEnabled() && (
-              <button
-                type="button"
-                onClick={handleFillTestLogin}
-                className="w-full py-2 text-sm font-semibold text-slate-600 bg-slate-100 border border-dashed border-slate-300 rounded hover:bg-slate-200 transition"
-              >
-                {DEV_TEST_LOGIN_BUTTON_LABEL}
-              </button>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                <button
+                  type="button"
+                  onClick={handleFillTestCustomerLogin}
+                  className="w-full py-2 text-xs font-semibold text-slate-600 bg-slate-100 border border-dashed border-slate-300 rounded hover:bg-slate-200 transition"
+                >
+                  {DEV_TEST_CUSTOMER_LOGIN_BUTTON_LABEL}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleFillTestStoreLogin}
+                  className="w-full py-2 text-xs font-semibold text-slate-600 bg-slate-100 border border-dashed border-slate-300 rounded hover:bg-slate-200 transition"
+                >
+                  {DEV_TEST_STORE_LOGIN_BUTTON_LABEL}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleFillTestDoctorLogin}
+                  className="w-full py-2 text-xs font-semibold text-slate-600 bg-slate-100 border border-dashed border-slate-300 rounded hover:bg-slate-200 transition"
+                >
+                  {DEV_TEST_DOCTOR_LOGIN_BUTTON_LABEL}
+                </button>
+              </div>
             )}
             <button
               type="submit"

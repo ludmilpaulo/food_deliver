@@ -15,9 +15,11 @@ import { SupportedLocale, supportedLocales } from "@/configs/translations";
 import { analytics } from "@/utils/mixpanel";
 import { useTranslation } from "@/hooks/useTranslation";
 import {
+  DEV_TEST_ADMIN_LOGIN,
   DEV_TEST_CUSTOMER_LOGIN,
   DEV_TEST_DOCTOR_LOGIN,
   DEV_TEST_STORE_LOGIN,
+  DEV_TEST_ADMIN_LOGIN_BUTTON_LABEL,
   DEV_TEST_CUSTOMER_LOGIN_BUTTON_LABEL,
   DEV_TEST_DOCTOR_LOGIN_BUTTON_LABEL,
   DEV_TEST_STORE_LOGIN_BUTTON_LABEL,
@@ -50,6 +52,11 @@ const LoginScreenUser: React.FC = () => {
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     changeLanguage(e.target.value as SupportedLocale);
+  };
+
+  const handleFillTestAdminLogin = () => {
+    setUsername(DEV_TEST_ADMIN_LOGIN.username);
+    setPassword(DEV_TEST_ADMIN_LOGIN.password);
   };
 
   const handleFillTestDoctorLogin = () => {
@@ -178,7 +185,14 @@ const LoginScreenUser: React.FC = () => {
               </span>
             </div>
             {isDevLoginEnabled() && (
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={handleFillTestAdminLogin}
+                  className="w-full py-2 text-xs font-semibold text-indigo-700 bg-indigo-50 border border-dashed border-indigo-300 rounded hover:bg-indigo-100 transition sm:col-span-2"
+                >
+                  {DEV_TEST_ADMIN_LOGIN_BUTTON_LABEL}
+                </button>
                 <button
                   type="button"
                   onClick={handleFillTestCustomerLogin}
@@ -196,7 +210,7 @@ const LoginScreenUser: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleFillTestDoctorLogin}
-                  className="w-full py-2 text-xs font-semibold text-slate-600 bg-slate-100 border border-dashed border-slate-300 rounded hover:bg-slate-200 transition"
+                  className="w-full py-2 text-xs font-semibold text-slate-600 bg-slate-100 border border-dashed border-slate-300 rounded hover:bg-slate-200 transition sm:col-span-2"
                 >
                   {DEV_TEST_DOCTOR_LOGIN_BUTTON_LABEL}
                 </button>

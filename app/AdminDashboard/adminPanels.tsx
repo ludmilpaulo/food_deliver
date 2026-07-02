@@ -11,9 +11,13 @@ const Orders = dynamic(() => import("./Orders"));
 const Store = dynamic(() => import("./Store"));
 const Report = dynamic(() => import("./Report"));
 const CustomersList = dynamic(() => import("./CustomersList"));
+const GlobalDriverOperationsDashboard = dynamic(
+  () => import("@/features/admin/drivers/GlobalDriverOperationsDashboard"),
+);
 const DriverList = dynamic(() => import("./DriverList"));
 const KYC = dynamic(() => import("./KYC"));
 const DoctorVerificationAdmin = dynamic(() => import("@/components/admin/DoctorVerificationAdmin"));
+const DriverVerificationAdmin = dynamic(() => import("@/components/admin/DriverVerificationAdmin"));
 const LiveSupportAdmin = dynamic(() => import("@/components/admin/LiveSupportAdmin"));
 const Payouts = dynamic(() => import("./Payouts"));
 const DatabaseActions = dynamic(() => import("./DatabaseActions"));
@@ -30,6 +34,7 @@ export type AdminPanelId =
   | "partners"
   | "kyc"
   | "doctorVerification"
+  | "driverVerification"
   | "liveSupport"
   | "payouts"
   | "platformControl"
@@ -59,11 +64,13 @@ export function AdminPanelContent({ activePanel }: { activePanel: AdminPanelId }
     case "customers":
       return <CustomersList />;
     case "drivers":
-      return <DriverList />;
+      return <GlobalDriverOperationsDashboard />;
     case "kyc":
       return <KYC />;
     case "doctorVerification":
       return <DoctorVerificationAdmin />;
+    case "driverVerification":
+      return <DriverVerificationAdmin />;
     case "liveSupport":
       return <LiveSupportAdmin />;
     case "payouts":

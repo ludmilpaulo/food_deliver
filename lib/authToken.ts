@@ -10,6 +10,24 @@ export function readAuthToken(): string | null {
   }
 }
 
+export type StoredAuthUser = {
+  user_id?: number;
+  username?: string;
+  role?: string;
+  is_platform_admin?: boolean;
+};
+
+export function readStoredAuthUser(): StoredAuthUser | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem('auth_user');
+    if (!raw) return null;
+    return JSON.parse(raw) as StoredAuthUser;
+  } catch {
+    return null;
+  }
+}
+
 export function writeAuthToken(token: string): void {
   if (typeof window === 'undefined') return;
   try {

@@ -1,21 +1,21 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { fetchAllKYC, approveKYC, rejectKYC } from "@/services/adminMarketplaceApi";
+import { fetchAllKYC, approveKYC, rejectKYC, type AdminKYC } from "@/services/adminMarketplaceApi";
 import { useTranslation } from "@/hooks/useTranslation";
 
 export default function KYCAdmin() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [list, setList] = useState<any[]>([]);
+  const [list, setList] = useState<AdminKYC[]>([]);
 
   const load = async () => {
     try {
       setLoading(true);
       const data = await fetchAllKYC();
       setList(data);
-    } catch (e: any) {
-      setError(e?.message || t("failedToLoadKyc", "Failed to load KYC"));
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : t("failedToLoadKyc", "Failed to load KYC"));
     } finally {
       setLoading(false);
     }

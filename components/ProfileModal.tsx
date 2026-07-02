@@ -14,11 +14,19 @@ type ImageInfo = {
   type: string;
 };
 
+type UserProfileDetails = {
+  address?: string;
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
+  avatar?: string;
+};
+
 type ProfileModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  userDetails: any;
-  onUpdate: (updatedDetails: any) => void;
+  userDetails: UserProfileDetails;
+  onUpdate: (updatedDetails: UserProfileDetails) => void;
 };
 
 const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, userDetails, onUpdate }) => {

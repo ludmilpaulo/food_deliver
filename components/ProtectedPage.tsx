@@ -7,8 +7,8 @@ import ProfileUpdateModal from "@/components/ProfileUpdateModal";
 import { getCurrentUser, updateUserDetails } from "@/services/authService";
 import { isDevLoginEnabled, isSeedTestUsername } from "@/configs/devTestLogin";
 
-const withAuth = (WrappedComponent: React.ComponentType<any>) => {
-  const Wrapper: React.FC<any> = (props) => {
+const withAuth = <P extends object>(WrappedComponent: React.ComponentType<P>) => {
+  const Wrapper: React.FC<P> = (props) => {
     const router = useRouter();
     const user = useAppSelector(selectUser);
     const authHydrated = useAppSelector(selectAuthHydrated);

@@ -20,7 +20,7 @@ const DriverList: React.FC = () => {
   const fetchData = useCallback(async () => {
     try {
       const response = await fetchPartnerReportDrivers();
-      setDrivers(response);
+      setDrivers(response as Driver[]);
     } catch (error) {
       console.error("Error fetching customers:", error);
     }

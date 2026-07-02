@@ -146,6 +146,38 @@ const authSlice = createSlice({
         state.hydratedFromStorage = true;
       }
     },
+    syncAuthProfile(
+      state,
+      action: PayloadAction<{
+        user_id: number;
+        username: string;
+        role?: string;
+        is_platform_admin?: boolean;
+      }>,
+    ) {
+      const { user_id, username, role, is_platform_admin } = action.payload;
+      state.user_id = user_id;
+      state.username = username;
+      const token = state.token;
+      state.user = {
+        user_id,
+        username,
+        token: token ?? '',
+        role,
+        is_platform_admin,
+        is_customer: state.user?.is_customer ?? true,
+        is_driver: state.user?.is_driver ?? false,
+        business_profile: state.user?.business_profile,
+      };
+      try {
+        localStorage.setItem(
+          'auth_user',
+          JSON.stringify({ user_id, username, role, is_platform_admin }),
+        );
+      } catch {
+        // ignore storage failures
+      }
+    },
     persistBookingSession(
       state,
       action: PayloadAction<{ accessToken: string; refreshToken?: string; username?: string }>,
@@ -234,7 +266,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { logoutUser, clearAuthMessage, hydrateAuthFromStorage, persistBookingSession } = authSlice.actions;
+export const { logoutUser, clearAuthMessage, hydrateAuthFromStorage, persistBookingSession, syncAuthProfile } = authSlice.actions;
 
 // User only
 export const selectUser = (state: { auth: AuthState }) => state.auth.user;

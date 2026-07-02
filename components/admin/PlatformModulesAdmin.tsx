@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import {
   fetchAdminModules,
@@ -22,26 +22,35 @@ export default function PlatformModulesAdmin() {
   const [error, setError] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<number | null>(null);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const [mods, cats] = await Promise.all([
-        fetchAdminModules(),
-        fetchAdminBusinessCategories(),
-      ]);
-      setModules(mods);
-      setCategories(cats);
-    } catch {
-      setError(t("adminLoadFailed", "Failed to load platform data."));
-    } finally {
-      setLoading(false);
-    }
-  }, [t]);
-
   useEffect(() => {
+    let cancelled = false;
+
+    const load = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const [mods, cats] = await Promise.all([
+          fetchAdminModules(),
+          fetchAdminBusinessCategories(),
+        ]);
+        if (cancelled) return;
+        setModules(mods);
+        setCategories(cats);
+      } catch {
+        if (!cancelled) {
+          setError(t("adminLoadFailed", "Failed to load platform data."));
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
     void load();
-  }, [load]);
+    return () => {
+      cancelled = true;
+    };
+    // Load once on mount; `t` from useTranslation is recreated each render.
+  }, []);
 
   const saveModule = async (item: PlatformModuleAdmin) => {
     setSavingId(item.id);

@@ -1,21 +1,21 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { fetchAllPayouts, markPayoutCompleted, markPayoutProcessing } from "@/services/adminMarketplaceApi";
+import { fetchAllPayouts, markPayoutCompleted, markPayoutProcessing, type AdminPayout } from "@/services/adminMarketplaceApi";
 import { useTranslation } from "@/hooks/useTranslation";
 
 export default function PayoutsAdmin() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [list, setList] = useState<any[]>([]);
+  const [list, setList] = useState<AdminPayout[]>([]);
 
   const load = async () => {
     try {
       setLoading(true);
       const data = await fetchAllPayouts();
       setList(data);
-    } catch (e: any) {
-      setError(e?.message || t("failedToLoadPayouts", "Failed to load payouts"));
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : t("failedToLoadPayouts", "Failed to load payouts"));
     } finally {
       setLoading(false);
     }

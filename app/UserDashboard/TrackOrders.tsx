@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
+import api from '@/services/api';
 import { baseAPI } from '@/services/types';
 import { selectUser } from '@/redux/slices/authSlice';
 import { useSelector } from 'react-redux';
@@ -12,6 +13,33 @@ import { faComments } from '@fortawesome/free-solid-svg-icons';
 interface LocationType {
   latitude: number;
   longitude: number;
+}
+
+interface TrackOrder {
+  id: number;
+  status?: string;
+}
+
+interface DriverLocationEntry {
+  order_id: number;
+  driver_location: string;
+  store?: string;
+  secret_pin?: string;
+}
+
+interface ChatMessage {
+  id: number;
+  message: string;
+  sender_username?: string;
+}
+
+interface DistanceInfo {
+  distance: string;
+  duration: string;
+}
+
+interface LeafletIconPrototype {
+  _getIconUrl?: unknown;
 }
 
 const toRadians = (degrees: number) => degrees * (Math.PI / 180);
@@ -44,12 +72,14 @@ const toLatLng = (loc: LocationType) => [loc.latitude, loc.longitude] as [number
 const DEFAULT_CENTER: LocationType = { latitude: -8.8399876, longitude: 13.2894368 }; // Fallback: Luanda
 
 const TrackOrders: React.FC = () => {
-  const [orders, setOrders] = useState<any[]>([]);
-  const [currentOrder, setCurrentOrder] = useState<any>(null);
-  const [orderLocations, setOrderLocations] = useState<{ [key: number]: any }>({});
+  const [orders, setOrders] = useState<TrackOrder[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [currentOrder, setCurrentOrder] = useState<TrackOrder | null>(null);
+  const [orderLocations, setOrderLocations] = useState<Record<number, DriverLocationEntry>>({});
   const [userLocation, setUserLocation] = useState<LocationType | null>(null);
-  const [chatMessages, setChatMessages] = useState<any[]>([]);
-  const [distances, setDistances] = useState<{ [key: number]: any }>({});
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [distances, setDistances] = useState<Record<number, DistanceInfo>>({});
   const [lastMessageId, setLastMessageId] = useState<number | null>(null);
   const [newMessageCount, setNewMessageCount] = useState<number>(0);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
@@ -59,7 +89,7 @@ const TrackOrders: React.FC = () => {
 
   // Fix leaflet marker icon for Next.js
   useEffect(() => {
-    delete (L.Icon.Default as any).prototype._getIconUrl;
+    delete (L.Icon.Default.prototype as LeafletIconPrototype)._getIconUrl;
     L.Icon.Default.mergeOptions({
       iconRetinaUrl: '/leaflet/marker-icon-2x.png',
       iconUrl: '/leaflet/marker-icon.png',
@@ -70,20 +100,25 @@ const TrackOrders: React.FC = () => {
   // Fetch orders & driver locations
   useEffect(() => {
     if (!user?.token) return;
-    axios
-      .post(`${baseAPI}/customer/customer/order/latest/`, { access_token: user.token })
-      .then((response) => setOrders(response.data.orders || []))
-      .catch((error) => console.error('Error fetching the orders:', error));
-    axios
-      .post(`${baseAPI}/customer/customer/driver/location/`, { access_token: user.token })
-      .then((response) => {
-        const locations = response.data.order_locations.reduce((acc: any, loc: any) => {
-          acc[loc.order_id] = loc;
-          return acc;
-        }, {});
+    setLoading(true);
+    setFetchError(null);
+    Promise.all([
+      axios.post(`${baseAPI}/customer/customer/order/latest/`, { access_token: user.token }),
+      axios.post(`${baseAPI}/customer/customer/driver/location/`, { access_token: user.token }),
+    ])
+      .then(([ordersRes, locationsRes]) => {
+        setOrders(ordersRes.data.orders || []);
+        const locations = (locationsRes.data.order_locations as DriverLocationEntry[]).reduce(
+          (acc: Record<number, DriverLocationEntry>, loc) => {
+            acc[loc.order_id] = loc;
+            return acc;
+          },
+          {},
+        );
         setOrderLocations(locations);
       })
-      .catch((error) => console.error('Error fetching driver locations:', error));
+      .catch(() => setFetchError('Failed to load orders.'))
+      .finally(() => setLoading(false));
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
         setUserLocation({
@@ -118,9 +153,9 @@ const TrackOrders: React.FC = () => {
   }, [userLocation, orders, orderLocations, calculateDistanceAndTime]);
 
   // Fetch chat messages for an order
-  const fetchChatMessages = useCallback((order: any) => {
-    axios
-      .get(`${baseAPI}/info/get_order_chat/${order.id}/`)
+  const fetchChatMessages = useCallback((order: TrackOrder) => {
+    api
+      .get(`/info/get_order_chat/${order.id}/`)
       .then((response) => {
         const newMessages = response.data;
         if (newMessages.length > 0) {
@@ -146,7 +181,7 @@ const TrackOrders: React.FC = () => {
     }
   }, [currentOrder, fetchChatMessages]);
 
-  const handleOrderSelection = (order: any) => {
+  const handleOrderSelection = (order: TrackOrder) => {
     setCurrentOrder(order);
     fetchChatMessages(order);
     setIsChatOpen(true);
@@ -155,9 +190,8 @@ const TrackOrders: React.FC = () => {
 
   const handleNewUserMessage = () => {
     if (currentOrder && chatInput.trim()) {
-      axios
-        .post(`${baseAPI}/info/send_chat_message/`, {
-          user_id: user?.user_id,
+      api
+        .post('/info/send_chat_message/', {
           order_id: currentOrder.id,
           message: chatInput.trim(),
         })
@@ -177,7 +211,11 @@ const TrackOrders: React.FC = () => {
   return (
     <div className="p-4 bg-gray-100 min-h-screen">
       <h1 className="text-3xl font-bold mb-6 text-center text-blue-600">Rastrear Pedidos</h1>
-      {orders.length > 0 ? (
+      {loading ? (
+        <p className="text-center text-gray-700">Carregando informações dos pedidos...</p>
+      ) : fetchError ? (
+        <p className="text-center text-red-600">{fetchError}</p>
+      ) : orders.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {orders.map((order) => (
             <div key={order.id} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
@@ -242,7 +280,7 @@ const TrackOrders: React.FC = () => {
           ))}
         </div>
       ) : (
-        <p className="text-center text-gray-700">Carregando informações dos pedidos...</p>
+        <p className="text-center text-gray-700">Nenhum pedido activo encontrado.</p>
       )}
       {/* Floating chat button */}
       <div className="fixed bottom-4 right-4">

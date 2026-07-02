@@ -29,7 +29,8 @@ const Orders: React.FC = () => {
     };
 
     loadOrders();
-  }, [filterBy, t]);
+    // `t` is recreated each render; only refetch when the filter changes.
+  }, [filterBy]);
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setFilterBy(event.target.value);

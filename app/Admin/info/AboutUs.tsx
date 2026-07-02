@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import ModalForm from './ModalForm';
 import { fetchAboutUs, createAboutUs, updateAboutUs, deleteAboutUs } from '@/services/adminService';
+import type { AboutUsRecord, CmsWritePayload } from '@/services/adminTypes';
+import { toCmsWritePayload } from '@/services/adminTypes';
 
 const AboutUsPage = () => {
-  const [items, setItems] = useState<any[]>([]);
-  const [formData, setFormData] = useState<any>({ about: '' });
+  const [items, setItems] = useState<AboutUsRecord[]>([]);
+  const [formData, setFormData] = useState<CmsWritePayload>({ about: '' });
   const [message, setMessage] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -25,7 +27,7 @@ const AboutUsPage = () => {
     });
   };
 
-  const handleEditorChange = (event: any, editor: any) => {
+  const handleEditorChange = (_event: unknown, editor: { getData(): string }) => {
     const data = editor.getData();
     setFormData({
       ...formData,
@@ -52,8 +54,8 @@ const AboutUsPage = () => {
     }
   };
 
-  const handleEdit = (item: any) => {
-    setFormData(item);
+  const handleEdit = (item: AboutUsRecord) => {
+    setFormData(toCmsWritePayload(item));
     setCurrentId(item.id);
     setIsEditing(true);
     setIsModalOpen(true);

@@ -2,6 +2,7 @@
 import Sidebar from './Sidebar';
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
+import AdminRouteGuard from '@/components/admin/AdminRouteGuard';
 
 const Users = dynamic(() => import('./user/Users'));
 const SiteInfo = dynamic(() => import('./info/SiteInfo'));
@@ -39,4 +40,10 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+const AdminPage = () => (
+  <AdminRouteGuard>
+    <Dashboard />
+  </AdminRouteGuard>
+);
+
+export default AdminPage;

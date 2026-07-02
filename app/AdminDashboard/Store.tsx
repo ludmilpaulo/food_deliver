@@ -1,19 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/redux/slices/authSlice";
 
 import { Store as StoreType } from "@/services/types";
 import StoreCard from "./store/StoreCard";
 import { Transition } from '@headlessui/react';
-import useLoadScript from "./store/useLoadScript";
+import { useGoogleMapsScript } from "@/hooks/useGoogleMapsScript";
 import { getstores, activatestore, updatestore, deactivatestore, deletestore } from "@/services/managerService";
 import { useTranslation } from "@/hooks/useTranslation";
-
-declare global {
-  interface Window {
-    initMap: (store: StoreType) => void;
-  }
-}
 
 const Store: React.FC = () => {
   const { t } = useTranslation();
@@ -25,37 +19,38 @@ const Store: React.FC = () => {
   const [selectedStore, setSelectedStore] = useState<StoreType | null>(null);
   const [showMap, setShowMap] = useState<boolean>(false);
 
-useLoadScript(
-    `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}&callback=initMap`,
-    () => {
-      window.initMap = (store: StoreType) => {
-        if (!store.location) {
-          alert(t("noLocationSetForStore", "No location set for this store."));
-          return;
-        }
-        const [latitude, longitude] = store.location.split(',').map(Number);
-        if (isNaN(latitude) || isNaN(longitude)) {
-          alert(t("invalidLocationFormat", "Invalid location format."));
-          return;
-        }
-        const mapElement = document.getElementById('map');
-        if (mapElement) {
-          // @ts-ignore
-          const map = new google.maps.Map(mapElement, {
-            center: { lat: latitude, lng: longitude },
-            zoom: 15,
-          });
-          // @ts-ignore
-          new google.maps.Marker({
-            position: { lat: latitude, lng: longitude },
-            map: map,
-            title: store.name,
-          });
-        } else {
-          console.error(t("mapElementNotFound", "Map element not found"));
-        }
-      };
-    }
+  const { ready: mapsReady } = useGoogleMapsScript({
+    apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
+    enabled: showMap,
+  });
+
+  const renderStoreMap = useCallback(
+    (store: StoreType) => {
+      if (!store.location) {
+        alert(t("noLocationSetForStore", "No location set for this store."));
+        return;
+      }
+      const [latitude, longitude] = store.location.split(",").map(Number);
+      if (isNaN(latitude) || isNaN(longitude)) {
+        alert(t("invalidLocationFormat", "Invalid location format."));
+        return;
+      }
+      const mapElement = document.getElementById("map");
+      if (!mapElement || !window.google?.maps) {
+        console.error(t("mapElementNotFound", "Map element not found"));
+        return;
+      }
+      const map = new window.google.maps.Map(mapElement, {
+        center: { lat: latitude, lng: longitude },
+        zoom: 15,
+      });
+      new window.google.maps.Marker({
+        position: { lat: latitude, lng: longitude },
+        map,
+        title: store.name,
+      });
+    },
+    [t],
   );
 
    useEffect(() => {
@@ -146,10 +141,10 @@ const handleActivate = async (id: number) => {
   };
 
   useEffect(() => {
-    if (showMap && selectedStore) {
-      window.initMap(selectedStore);
+    if (showMap && selectedStore && mapsReady) {
+      renderStoreMap(selectedStore);
     }
-  }, [showMap, selectedStore]);
+  }, [showMap, selectedStore, mapsReady, renderStoreMap]);
 
   return (
     <div className="relative p-6 bg-white rounded-lg shadow-md">

@@ -1,5 +1,5 @@
 import React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type FieldErrors } from "react-hook-form";
 import { Combobox } from "@headlessui/react";
 import { Categoria, Product } from "@/services/types";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -11,7 +11,7 @@ interface AddProductModalProps {
   isAddModalOpen: boolean;
   setIsAddModalOpen: (value: boolean) => void;
   onSubmit: (data: Product) => void;
-  errors: any;
+  errors: FieldErrors<Product>;
 }
 
 const AddProductModal: React.FC<AddProductModalProps> = ({
@@ -47,7 +47,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({
               {...register("description", { required: true })}
               className="w-full p-2 border rounded"
             />
-            {errors.short_description && (
+            {errors.description && (
               <span className="text-red-500">{t("shortDescriptionRequired", "Short description is required")}</span>
             )}
           </div>
@@ -58,7 +58,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({
               {...register("image_url", { required: true })}
               className="w-full p-2 border rounded"
             />
-            {errors.image && <span className="text-red-500">{t("imageRequired", "Image is required")}</span>}
+            {errors.image_url && <span className="text-red-500">{t("imageRequired", "Image is required")}</span>}
           </div>
           <div className="mb-4">
             <label className="block mb-2">{t("price", "Price")}</label>

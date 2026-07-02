@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { baseAPI } from "@/services/types";
+import api from "@/services/api";
 import { useTranslation } from "@/hooks/useTranslation";
 
 type Booking = {
@@ -26,19 +26,15 @@ export default function Bookings() {
     (async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${baseAPI}/services/bookings/`, {
-          headers: { Accept: "application/json" },
-          credentials: "include",
-        });
+        const res = await api.get<Booking[]>("/services/bookings/");
         if (!mounted) return;
-        if (!res.ok) throw new Error(t("failedToLoadBookings", "Failed to load bookings"));
-        const json = await res.json();
+        const json = res.data;
         // Map into UI-friendly shape
-        const mapped: Booking[] = (json || []).map((b: any) => ({
+        const mapped: Booking[] = (json as Booking[]).map((b) => ({
           id: b.id,
           booking_number: b.booking_number,
-          service_title: b.service_title || b.service?.title,
-          parceiro_name: b.parceiro_name || b.service?.parceiro_name,
+          service_title: b.service_title || (b as Booking & { service?: { title?: string } }).service?.title || "",
+          parceiro_name: b.parceiro_name || (b as Booking & { service?: { parceiro_name?: string } }).service?.parceiro_name || "",
           booking_date: b.booking_date,
           booking_time: b.booking_time,
           status: b.status,
@@ -46,8 +42,8 @@ export default function Bookings() {
           currency: b.currency || "AOA",
         }));
         setData(mapped);
-      } catch (e: any) {
-        setError(e?.message || t("failedToLoadBookings", "Failed to load bookings"));
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : t("failedToLoadBookings", "Failed to load bookings"));
       } finally {
         setLoading(false);
       }

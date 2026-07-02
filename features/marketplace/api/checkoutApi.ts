@@ -61,7 +61,7 @@ export async function validateCouponV1(couponCode: string, subtotal = 0, vertica
 }
 
 export async function fetchProductsByStore(storeId: number, vertical: MarketplaceVertical) {
-  const { data } = await v1Client.get(`/${vertical}/products/`, {
+  const { data } = await v1Client.get<unknown[] | { results: unknown[] }>(`/${vertical}/products/`, {
     params: { store: storeId },
   });
   return Array.isArray(data) ? data : data.results ?? [];

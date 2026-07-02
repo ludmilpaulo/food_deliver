@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import ModalForm from './ModalForm';
 import { fetchWhyChooseUs, createWhyChooseUs, updateWhyChooseUs, deleteWhyChooseUs } from '@/services/adminService';
+import type { CmsWritePayload, WhyChooseUsRecord } from '@/services/adminTypes';
+import { toCmsWritePayload } from '@/services/adminTypes';
 
 const WhyChooseUsPage = () => {
-  const [items, setItems] = useState<any[]>([]);
-  const [formData, setFormData] = useState<any>({});
+  const [items, setItems] = useState<WhyChooseUsRecord[]>([]);
+  const [formData, setFormData] = useState<CmsWritePayload>({});
   const [message, setMessage] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -44,8 +46,8 @@ const WhyChooseUsPage = () => {
     }
   };
 
-  const handleEdit = (item: any) => {
-    setFormData(item);
+  const handleEdit = (item: WhyChooseUsRecord) => {
+    setFormData(toCmsWritePayload(item));
     setCurrentId(item.id);
     setIsEditing(true);
     setIsModalOpen(true);

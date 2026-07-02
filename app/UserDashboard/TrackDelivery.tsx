@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { baseAPI } from "@/services/types";
-import useLoadScript from "@/hooks/useLoadScript";
+import api from "@/services/api";
+import { useGoogleMapsScript } from "@/hooks/useGoogleMapsScript";
 import { useTranslation } from "@/hooks/useTranslation";
 
 type ActiveDelivery = {
@@ -16,37 +16,32 @@ type ActiveDelivery = {
   path?: Array<{ latitude: number; longitude: number; recorded_at?: string }>;
 };
 
-declare global {
-  interface Window { google: any }
-}
-
 export default function TrackDelivery() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deliveries, setDeliveries] = useState<ActiveDelivery[]>([]);
   const mapRef = useRef<HTMLDivElement | null>(null);
-  const mapInstance = useRef<any>(null);
-  const markerRef = useRef<any>(null);
+  const mapInstance = useRef<google.maps.Map | null>(null);
+  const markerRef = useRef<google.maps.Marker | null>(null);
 
-  // Load Google Maps JS (replace with your API key if needed)
-  useLoadScript(
-    `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || ""}&libraries=places`,
-    () => {}
-  );
+  const { ready: mapsReady } = useGoogleMapsScript({
+    apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY,
+    libraries: "places",
+  });
 
   useEffect(() => {
+    if (!mapsReady) return;
     let mounted = true;
     (async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${baseAPI}/drivers/api/deliveries/?status=in_transit`, {
-          credentials: "include",
+        const res = await api.get<ActiveDelivery[]>("/drivers/api/deliveries/", {
+          params: { status: "in_transit" },
         });
         if (!mounted) return;
-        if (!res.ok) throw new Error(t("failedToLoadDeliveries", "Failed to load deliveries"));
-        const list = await res.json();
-        const normalized: ActiveDelivery[] = (list || []).map((d: any) => ({
+        const list = res.data;
+        const normalized: ActiveDelivery[] = (list || []).map((d) => ({
           id: d.id,
           request_number: d.request_number,
           pickup_address: d.pickup_address,
@@ -71,8 +66,8 @@ export default function TrackDelivery() {
             title: normalized[0].driver_name || t("driver", "Driver"),
           });
         }
-      } catch (e: any) {
-        setError(e?.message || t("failedToLoadDeliveries", "Failed to load deliveries"));
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : t("failedToLoadDeliveries", "Failed to load deliveries"));
       } finally {
         setLoading(false);
       }
@@ -80,7 +75,7 @@ export default function TrackDelivery() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [mapsReady, t]);
 
   // Poll for live location updates
   useEffect(() => {
@@ -88,9 +83,10 @@ export default function TrackDelivery() {
       try {
         const active = deliveries[0];
         if (!active) return;
-        const res = await fetch(`${baseAPI}/drivers/api/deliveries/${active.id}/track/`, { credentials: "include" });
-        if (!res.ok) return;
-        const data = await res.json();
+        const res = await api.get<{ driver_location?: { latitude: number; longitude: number } }>(
+          `/drivers/api/deliveries/${active.id}/track/`,
+        );
+        const data = res.data;
         const latest = data?.driver_location;
         if (latest && markerRef.current && mapInstance.current) {
           const lat = Number(latest.latitude);

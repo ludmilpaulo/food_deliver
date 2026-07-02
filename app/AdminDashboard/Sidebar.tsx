@@ -51,6 +51,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, activePanel, onSele
     { key: "partners", label: t("partners", "Partners"), icon: <MdContacts className="text-lg" /> },
     { key: "kyc", label: t("kyc", "KYC"), icon: <MdBarChart className="text-lg" /> },
     { key: "doctorVerification", label: t("doctorVerification", "Doctor verification"), icon: <MdBarChart className="text-lg" /> },
+    { key: "driverVerification", label: t("driverVerification", "Driver verification"), icon: <MdBarChart className="text-lg" /> },
     { key: "liveSupport", label: t("liveSupport", "Live support"), icon: <MdContacts className="text-lg" /> },
     { key: "payouts", label: t("payouts", "Payouts"), icon: <MdBarChart className="text-lg" /> },
   ];

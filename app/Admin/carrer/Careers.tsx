@@ -1,7 +1,7 @@
 // Careers.tsx
 "use client";
 import { useCallback, useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '@/services/api';
 import { Career } from '@/services/types';
 
 const Careers = () => {
@@ -10,8 +10,9 @@ const Careers = () => {
   const [editingCareer, setEditingCareer] = useState<Career | null>(null);
 
   const fetchCareers = useCallback(async () => {
-    const response = await axios.get<Career[]>('/api/careers/');
-    setCareers(response.data);
+    const response = await api.get<Career[] | { results: Career[] }>('/careers/careers/');
+    const data = response.data;
+    setCareers(Array.isArray(data) ? data : data.results ?? []);
   }, []);
 
   useEffect(() => {
@@ -19,19 +20,19 @@ const Careers = () => {
   }, [fetchCareers]);
 
   const handleCreate = async () => {
-    await axios.post('/api/careers/', newCareer);
+    await api.post('/careers/careers/', newCareer);
     setNewCareer({ title: '', description: '' });
     fetchCareers();
   };
 
   const handleUpdate = async (career: Career) => {
-    await axios.put(`/api/careers/${career.id}/`, career);
+    await api.put(`/careers/careers/${career.id}/`, career);
     setEditingCareer(null);
     fetchCareers();
   };
 
   const handleDelete = async (id: number) => {
-    await axios.delete(`/api/careers/${id}/`);
+    await api.delete(`/careers/careers/${id}/`);
     fetchCareers();
   };
 

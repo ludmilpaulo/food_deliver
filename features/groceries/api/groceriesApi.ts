@@ -24,6 +24,6 @@ export async function fetchGroceryCategories() {
 }
 
 export async function fetchGroceryProducts(params?: { store?: number; category?: number }) {
-  const { data } = await v1Client.get('/groceries/products/', { params });
+  const { data } = await v1Client.get<unknown[] | { results: unknown[] }>('/groceries/products/', { params });
   return Array.isArray(data) ? data : data.results ?? [];
 }

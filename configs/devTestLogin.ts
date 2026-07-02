@@ -1,3 +1,8 @@
+export const DEV_TEST_ADMIN_LOGIN = {
+  username: "admin@kudya.shop",
+  password: "seedpass123",
+} as const;
+
 export const DEV_TEST_DOCTOR_LOGIN = {
   username: "doctor@kudya.shop",
   password: "seedpass123",
@@ -13,6 +18,7 @@ export const DEV_TEST_CUSTOMER_LOGIN = {
   password: "seedpass123",
 } as const;
 
+export const DEV_TEST_ADMIN_LOGIN_BUTTON_LABEL = "Fill test admin login";
 export const DEV_TEST_DOCTOR_LOGIN_BUTTON_LABEL = "Fill test doctor login";
 export const DEV_TEST_STORE_LOGIN_BUTTON_LABEL = "Fill test store login";
 export const DEV_TEST_CUSTOMER_LOGIN_BUTTON_LABEL = "Fill test customer login";

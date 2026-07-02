@@ -9,7 +9,7 @@ export default defineConfig([
     rules: {
       "@typescript-eslint/ban-ts-comment": "warn",
       "@typescript-eslint/no-empty-object-type": "off",
-      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-explicit-any": "error",
       "@typescript-eslint/no-require-imports": "off",
       "prefer-const": "warn",
       "react-hooks/set-state-in-effect": "off",

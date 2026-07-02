@@ -1,23 +1,28 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useAppSelector } from "@/redux/store";
-import { fetchServiceCategories, fetchMyServices, createService, updateService, fetchAvailability, createAvailability, fetchBlackouts, createBlackout, getAvailableBalance, requestPayout } from "@/services/partnerApi";
+import { fetchServiceCategories, fetchMyServices, createService, updateService, fetchAvailability, createAvailability, fetchBlackouts, createBlackout, getAvailableBalance, requestPayout, type Availability, type Blackout, type PartnerService, type ServiceCategory } from "@/services/partnerApi";
 import { useTranslation } from "@/hooks/useTranslation";
+import withAuth from "@/components/ProtectedPage";
 
-export default function PartnerDashboard() {
+function PartnerDashboard() {
   const { t } = useTranslation();
   const { user } = useAppSelector((s) => s.auth);
-  const [categories, setCategories] = useState<any[]>([]);
-  const [services, setServices] = useState<any[]>([]);
+  const [categories, setCategories] = useState<ServiceCategory[]>([]);
+  const [services, setServices] = useState<PartnerService[]>([]);
   const [selectedService, setSelectedService] = useState<number | null>(null);
-  const [availability, setAvailability] = useState<any[]>([]);
-  const [blackouts, setBlackouts] = useState<any[]>([]);
+  const [availability, setAvailability] = useState<Availability[]>([]);
+  const [blackouts, setBlackouts] = useState<Blackout[]>([]);
   const [balance, setBalance] = useState<{ available_balance: number; currency: string } | null>(null);
-  const parceiroId = user?.user_id; // assuming store has same user id; adapt if needed
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const parceiroId = user?.user_id;
 
   useEffect(() => {
     (async () => {
       try {
+        setLoading(true);
+        setError(null);
         const [cats, bal] = await Promise.all([
           fetchServiceCategories(),
           getAvailableBalance().catch(() => null),
@@ -28,9 +33,13 @@ export default function PartnerDashboard() {
           const my = await fetchMyServices(parceiroId);
           setServices(my);
         }
-      } catch {}
+      } catch {
+        setError(t("loadFailed", "Failed to load partner dashboard."));
+      } finally {
+        setLoading(false);
+      }
     })();
-  }, [parceiroId]);
+  }, [parceiroId, t]);
 
   const loadServiceDetails = async (serviceId: number) => {
     setSelectedService(serviceId);
@@ -93,6 +102,9 @@ export default function PartnerDashboard() {
         <h1 className="text-3xl font-bold text-white mb-6">
           {t("partnerDashboard", "Partner Dashboard")}
         </h1>
+
+        {loading && <p className="text-white">{t("loading")}</p>}
+        {error && <p className="text-red-100 bg-red-600/80 rounded-lg p-3 mb-4">{error}</p>}
 
         <section className="bg-white/90 rounded-2xl p-5 shadow mb-6">
           <div className="flex items-center justify-between">
@@ -160,4 +172,4 @@ export default function PartnerDashboard() {
   );
 }
 
-
+export default withAuth(PartnerDashboard);

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { IoMdMenu, IoMdClose, IoMdCart, IoMdPerson } from "react-icons/io";
 import { MdStore } from "react-icons/md";
@@ -42,8 +42,15 @@ const Navbar: React.FC<NavbarProps> = ({ initialLocale }) => {
 
   const user = useAppSelector(selectUser);
   const authHydrated = useAppSelector(selectAuthHydrated);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const cartItems = useAppSelector((state) => state.basket.items);
   const cartQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  const isLoggedIn = mounted && authHydrated && Boolean(user);
 
   const navLinks = (
     <>
@@ -58,7 +65,7 @@ const Navbar: React.FC<NavbarProps> = ({ initialLocale }) => {
           </span>
         )}
       </NavLink>
-      {authHydrated && user ? (
+      {isLoggedIn ? (
         <>
           <NotificationBellLink />
           <NavLink href="/UserDashboard" icon={<IoMdPerson size={20} className="text-indigo-700" />} label={t("Profile")} />

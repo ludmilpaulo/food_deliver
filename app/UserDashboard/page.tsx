@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import DownloadInvoice from "./DownloadInvoice";
 import OrderHistory from "./OrderHistory";
 import UpdateProfile from "./UpdateProfile";
@@ -7,21 +8,34 @@ import dynamic from "next/dynamic";
 import Sidebar from "./Sidebar";
 import Bookings from "./Bookings";
 import { useTranslation } from "@/hooks/useTranslation";
+import withAuth from "@/components/ProtectedPage";
+import { useAppDispatch } from "@/redux/store";
+import { logoutUser } from "@/redux/slices/authSlice";
+import api from "@/services/api";
 
 const TrackOrders = dynamic(() => import("./TrackOrders"), { ssr: false });
 const TrackDelivery = dynamic(() => import("./TrackDelivery"), { ssr: false });
 
 const UserDashboard: React.FC = () => {
   const { t } = useTranslation();
+  const router = useRouter();
+  const dispatch = useAppDispatch();
   const [selectedMenu, setSelectedMenu] = useState<string>("trackOrders");
   const [deactivateModal, setDeactivateModal] = useState(false);
+  const [deactivating, setDeactivating] = useState(false);
 
-  // Replace this with your real deactivation API call
-  const handleConfirmDeactivate = () => {
-    setDeactivateModal(false);
-    // TODO: Call your deactivate user API
-    alert(t("accountDeactivated", "Your account has been deactivated."));
-    // Optionally redirect/logout
+  const handleConfirmDeactivate = async () => {
+    setDeactivating(true);
+    try {
+      await api.post("/api/auth/deactivate/");
+      dispatch(logoutUser());
+      setDeactivateModal(false);
+      router.replace("/LoginScreenUser");
+    } catch {
+      alert(t("deactivateFailed", "Could not deactivate your account. Please try again or contact support."));
+    } finally {
+      setDeactivating(false);
+    }
   };
 
   const renderComponent = () => {
@@ -61,7 +75,6 @@ const UserDashboard: React.FC = () => {
         </div>
       </main>
 
-      {/* Deactivate Modal */}
       {deactivateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
           <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
@@ -76,14 +89,16 @@ const UserDashboard: React.FC = () => {
             </p>
             <div className="flex gap-4 justify-center">
               <button
-                className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold shadow"
+                className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold shadow disabled:opacity-50"
                 onClick={handleConfirmDeactivate}
+                disabled={deactivating}
               >
-                {t("yesDeactivate", "Yes, Deactivate")}
+                {deactivating ? t("loading") : t("yesDeactivate", "Yes, Deactivate")}
               </button>
               <button
                 className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl font-semibold"
                 onClick={() => setDeactivateModal(false)}
+                disabled={deactivating}
               >
                 {t("cancel", "Cancel")}
               </button>
@@ -95,4 +110,4 @@ const UserDashboard: React.FC = () => {
   );
 };
 
-export default UserDashboard;
+export default withAuth(UserDashboard);

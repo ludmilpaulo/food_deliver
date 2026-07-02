@@ -1,146 +1,172 @@
-import axios from 'axios';
-import { baseAPI } from './types';
-import { User } from './adminTypes';
+import api from './api';
+import { isPlatformAdminUser } from '@/utils/postLoginRoute';
+import type {
+  AboutUsRecord,
+  AuthMeResponse,
+  CmsWritePayload,
+  ContactRecord,
+  MarketplaceCustomerRow,
+  TeamRecord,
+  User,
+  WhyChooseUsRecord,
+} from './adminTypes';
 
+const INFO_PREFIX = '/info';
 
-
-const API_URL = baseAPI;
-
-
-
-const api = axios.create({
-  baseURL: baseAPI,
-});
-
-export const fetchAboutUs = async () => {
-  const response = await api.get(`${baseAPI}/info/aboutus/`);
+export const fetchAboutUs = async (): Promise<AboutUsRecord[]> => {
+  const response = await api.get<AboutUsRecord[]>(`${INFO_PREFIX}/aboutus/`);
   return response.data;
 };
 
-export const createAboutUs = async (data: any) => {
-  const response = await api.post(`${baseAPI}/info/aboutus/`, data);
+export const createAboutUs = async (data: CmsWritePayload): Promise<AboutUsRecord> => {
+  const response = await api.post<AboutUsRecord>(`${INFO_PREFIX}/aboutus/`, data);
   return response.data;
 };
 
-export const updateAboutUs = async (id: number, data: any) => {
-  const response = await api.put(`${baseAPI}/info/aboutus/${id}/`, data);
+export const updateAboutUs = async (id: number, data: CmsWritePayload): Promise<AboutUsRecord> => {
+  const response = await api.put<AboutUsRecord>(`${INFO_PREFIX}/aboutus/${id}/`, data);
   return response.data;
 };
 
-export const deleteAboutUs = async (id: number) => {
-  const response = await api.delete(`${baseAPI}/info/aboutus/${id}/`);
+export const deleteAboutUs = async (id: number): Promise<void> => {
+  await api.delete(`${INFO_PREFIX}/aboutus/${id}/`);
+};
+
+export const fetchWhyChooseUs = async (): Promise<WhyChooseUsRecord[]> => {
+  const response = await api.get<WhyChooseUsRecord[]>(`${INFO_PREFIX}/whychooseus/`);
   return response.data;
 };
 
-export const fetchWhyChooseUs = async () => {
-  const response = await api.get(`${baseAPI}/info/whychooseus/`);
+export const createWhyChooseUs = async (data: CmsWritePayload): Promise<WhyChooseUsRecord> => {
+  const response = await api.post<WhyChooseUsRecord>(`${INFO_PREFIX}/whychooseus/`, data);
   return response.data;
 };
 
-export const createWhyChooseUs = async (data: any) => {
-  const response = await api.post('${baseAPI}/info/whychooseus/', data);
+export const updateWhyChooseUs = async (
+  id: number,
+  data: CmsWritePayload,
+): Promise<WhyChooseUsRecord> => {
+  const response = await api.put<WhyChooseUsRecord>(`${INFO_PREFIX}/whychooseus/${id}/`, data);
   return response.data;
 };
 
-export const updateWhyChooseUs = async (id: number, data: any) => {
-  const response = await api.put(`${baseAPI}/info/whychooseus/${id}/`, data);
+export const deleteWhyChooseUs = async (id: number): Promise<void> => {
+  await api.delete(`${INFO_PREFIX}/whychooseus/${id}/`);
+};
+
+export const fetchTeams = async (): Promise<TeamRecord[]> => {
+  const response = await api.get<TeamRecord[]>(`${INFO_PREFIX}/teams/`);
   return response.data;
 };
 
-export const deleteWhyChooseUs = async (id: number) => {
-  const response = await api.delete(`${baseAPI}/info/whychooseus/${id}/`);
+export const createTeam = async (data: CmsWritePayload): Promise<TeamRecord> => {
+  const response = await api.post<TeamRecord>(`${INFO_PREFIX}/teams/`, data);
   return response.data;
 };
 
-export const fetchTeams = async () => {
-  const response = await api.get(`${baseAPI}/info/teams/`);
+export const updateTeam = async (id: number, data: CmsWritePayload): Promise<TeamRecord> => {
+  const response = await api.put<TeamRecord>(`${INFO_PREFIX}/teams/${id}/`, data);
   return response.data;
 };
 
-export const createTeam = async (data: any) => {
-  const response = await api.post('${baseAPI}/info/teams/', data);
+export const deleteTeam = async (id: number): Promise<void> => {
+  await api.delete(`${INFO_PREFIX}/teams/${id}/`);
+};
+
+export const fetchContacts = async (): Promise<ContactRecord[]> => {
+  const response = await api.get<ContactRecord[]>(`${INFO_PREFIX}/contacts/`);
   return response.data;
 };
 
-export const updateTeam = async (id: number, data: any) => {
-  const response = await api.put(`${baseAPI}/info/teams/${id}/`, data);
+export const createContact = async (data: CmsWritePayload): Promise<ContactRecord> => {
+  const response = await api.post<ContactRecord>(`${INFO_PREFIX}/contacts/`, data);
   return response.data;
 };
 
-export const deleteTeam = async (id: number) => {
-  const response = await api.delete(`${baseAPI}/info/teams/${id}/`);
+export const updateContact = async (id: number, data: CmsWritePayload): Promise<ContactRecord> => {
+  const response = await api.put<ContactRecord>(`${INFO_PREFIX}/contacts/${id}/`, data);
   return response.data;
 };
 
-export const fetchContacts = async () => {
-  const response = await api.get('/contacts/');
-  return response.data;
+export const deleteContact = async (id: number): Promise<void> => {
+  await api.delete(`${INFO_PREFIX}/contacts/${id}/`);
 };
 
-export const createContact = async (data: any) => {
-  const response = await api.post('${baseAPI}/info/contacts/', data);
-  return response.data;
+/** Uses `/api/auth/me/` — legacy `/users/:id/` does not exist on the API. */
+export const checkAdmin = async (_userId: number): Promise<boolean> => {
+  const { data } = await api.get<AuthMeResponse>('/api/auth/me/');
+  return isPlatformAdminUser({
+    role: data.role,
+    is_platform_admin: data.is_platform_admin,
+  });
 };
 
-export const updateContact = async (id: number, data: any) => {
-  const response = await api.put(`${baseAPI}/info/contacts/${id}/`, data);
-  return response.data;
-};
-
-export const deleteContact = async (id: number) => {
-  const response = await api.delete(`${baseAPI}/info/contacts/${id}/`);
-  return response.data;
-};
-
-
-export const checkAdmin = async (user_id: number) => {
-    const response = await api.get(`/users/${user_id}/`);
-    return response.data.is_admin;
+function mapCustomerToUser(row: MarketplaceCustomerRow): User {
+  const parts = row.name.trim().split(/\s+/);
+  const first_name = parts[0] ?? row.name;
+  const last_name = parts.slice(1).join(' ');
+  return {
+    id: row.id,
+    username: row.name,
+    email: row.phone,
+    first_name,
+    last_name,
+    is_customer: true,
+    is_driver: false,
   };
+}
 
+/** Marketplace customers from the platform admin API (replaces broken root GET). */
 export const getUsers = async (): Promise<User[]> => {
-  const response = await axios.get(API_URL);
-  return response.data;
+  const { data } = await api.get<MarketplaceCustomerRow[]>(
+    '/api/v1/admin/marketplace/customers/',
+  );
+  return data.map(mapCustomerToUser);
 };
 
 export const getUser = async (id: number): Promise<User> => {
-  const response = await axios.get(`${API_URL}/${id}/`);
-  return response.data;
+  const users = await getUsers();
+  const match = users.find((user) => user.id === id);
+  if (!match) {
+    throw new Error(`Customer ${id} not found`);
+  }
+  return match;
 };
 
-export const createUser = async (user: User): Promise<User> => {
-  const response = await axios.post(API_URL, user);
-  return response.data;
+export const createUser = async (_user: User): Promise<User> => {
+  throw new Error('User creation is not supported via this legacy admin screen.');
 };
 
-export const updateUser = async (id: number, user: User): Promise<User> => {
-  const response = await axios.put(`${API_URL}/${id}/`, user);
-  return response.data;
+export const updateUser = async (_id: number, _user: User): Promise<User> => {
+  throw new Error('User updates are not supported via this legacy admin screen.');
 };
 
-export const deleteUser = async (id: number): Promise<void> => {
-  await axios.delete(`${API_URL}/${id}/`);
+export const deleteUser = async (_id: number): Promise<void> => {
+  throw new Error('User deletion is not supported via this legacy admin screen.');
 };
 
-
-
-
-export const fetchResources = async (resource: string) => {
+export const fetchResources = async (resource: string): Promise<unknown> => {
   const response = await api.get(`/${resource}/`);
   return response.data;
 };
 
-export const createResource = async (resource: string, data: any) => {
+export const createResource = async (
+  resource: string,
+  data: CmsWritePayload,
+): Promise<unknown> => {
   const response = await api.post(`/${resource}/`, data);
   return response.data;
 };
 
-export const updateResource = async (resource: string, id: number, data: any) => {
+export const updateResource = async (
+  resource: string,
+  id: number,
+  data: CmsWritePayload,
+): Promise<unknown> => {
   const response = await api.put(`/${resource}/${id}/`, data);
   return response.data;
 };
 
-export const deleteResource = async (resource: string, id: number) => {
-  const response = await api.delete(`/${resource}/${id}/`);
-  return response.data;
+export const deleteResource = async (resource: string, id: number): Promise<void> => {
+  await api.delete(`/${resource}/${id}/`);
 };

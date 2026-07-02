@@ -23,6 +23,6 @@ export async function fetchFoodCategories() {
 }
 
 export async function fetchFoodProducts(params?: { store?: number; category?: number }) {
-  const { data } = await v1Client.get('/food/products/', { params });
+  const { data } = await v1Client.get<unknown[] | { results: unknown[] }>('/food/products/', { params });
   return Array.isArray(data) ? data : data.results ?? [];
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type FieldErrors } from "react-hook-form";
 import { Combobox } from "@headlessui/react";
 import { Categoria, Product } from "@/services/types";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -12,7 +12,7 @@ interface EditProductModalProps {
   setIsEditModalOpen: (value: boolean) => void;
   editingProduct: Product | null;
   handleUpdate: (data: Product) => void;
-  errors: any;
+  errors: FieldErrors<Product>;
 }
 
 const EditProductModal: React.FC<EditProductModalProps> = ({
@@ -51,7 +51,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
               className="w-full p-2 border rounded"
               defaultValue={editingProduct.description}
             />
-            {errors.short_description && (
+            {errors.description && (
               <span className="text-red-500">{t("shortDescriptionRequired", "Short description is required")}</span>
             )}
           </div>
@@ -62,7 +62,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
               {...register("image_url", { required: false })}
               className="w-full p-2 border rounded"
             />
-            {errors.image && <span className="text-red-500">{t("imageRequired", "Image is required")}</span>}
+            {errors.image_url && <span className="text-red-500">{t("imageRequired", "Image is required")}</span>}
           </div>
           <div className="mb-4">
             <label className="block mb-2">{t("price", "Price")}</label>

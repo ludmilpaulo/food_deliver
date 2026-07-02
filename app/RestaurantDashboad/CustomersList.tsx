@@ -20,7 +20,7 @@ const CustomersList: React.FC = () => {
   const fetchData = useCallback(async () => {
     try {
       const response = await fetchPartnerReportCustomers();
-      setCustomers(response);
+      setCustomers(response as Customer[]);
     } catch (error) {
       console.error("Error fetching customers:", error);
     }

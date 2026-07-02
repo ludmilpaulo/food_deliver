@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, ComponentType } from 'react';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
 import { selectUser } from '@/redux/slices/authSlice';
 import { checkAdmin } from '@/services/adminService';
 
-const withAdmin = (WrappedComponent: React.ComponentType) => {
-  const WithAdmin = (props: any) => {
+const withAdmin = <P extends object>(WrappedComponent: ComponentType<P>) => {
+  const WithAdmin = (props: P) => {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);

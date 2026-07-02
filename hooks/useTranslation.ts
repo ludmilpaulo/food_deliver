@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   detectBrowserLanguage,
   getLanguage,
@@ -113,11 +113,14 @@ export function useTranslation(initialLocale?: SupportedLocale) {
       });
   };
 
-  const t = (key: string, fallback?: string) => {
-    if (apiTranslations[key]) return apiTranslations[key];
-    const localValue = localT(key as TranslationKey);
-    return localValue === key ? fallback ?? key : localValue;
-  };
+  const t = useCallback(
+    (key: string, fallback?: string) => {
+      if (apiTranslations[key]) return apiTranslations[key];
+      const localValue = localT(key as TranslationKey);
+      return localValue === key ? fallback ?? key : localValue;
+    },
+    [apiTranslations],
+  );
 
   return { t, languageCode, changeLanguage, apiTranslations };
 }

@@ -21,11 +21,11 @@ export async function fetchPartnerReport(params?: {
 }
 
 export async function fetchPartnerReportCustomers() {
-  const { data } = await v1Client.get('/partner/reports/customers/');
+  const { data } = await v1Client.get<unknown[] | { results: unknown[] }>('/partner/reports/customers/');
   return Array.isArray(data) ? data : data.results ?? [];
 }
 
 export async function fetchPartnerReportDrivers() {
-  const { data } = await v1Client.get('/partner/reports/drivers/');
+  const { data } = await v1Client.get<unknown[] | { results: unknown[] }>('/partner/reports/drivers/');
   return Array.isArray(data) ? data : data.results ?? [];
 }

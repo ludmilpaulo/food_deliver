@@ -47,7 +47,12 @@ export const loginUserService = async (username: string, password: string) => {
   }
 
   if (!response.ok) {
-    throw new Error(String(data.detail || data.message || "Login failed. Check username and password."));
+    const detail = String(data.detail || data.message || "Login failed. Check username and password.");
+    const apiHint =
+      process.env.NODE_ENV === "development"
+        ? ` (API: ${baseAPI})`
+        : "";
+    throw new Error(`${detail}${apiHint}`);
   }
 
   const token = String(data.token || data.access || "");

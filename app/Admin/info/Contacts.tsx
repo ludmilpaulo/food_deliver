@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import ModalForm from './ModalForm';
 import { fetchContacts, createContact, updateContact, deleteContact } from '@/services/adminService';
+import type { CmsWritePayload, ContactRecord } from '@/services/adminTypes';
+import { toCmsWritePayload } from '@/services/adminTypes';
 
 const ContactsPage = () => {
-  const [items, setItems] = useState<any[]>([]);
-  const [formData, setFormData] = useState<any>({});
+  const [items, setItems] = useState<ContactRecord[]>([]);
+  const [formData, setFormData] = useState<CmsWritePayload>({});
   const [message, setMessage] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -44,8 +46,8 @@ const ContactsPage = () => {
     }
   };
 
-  const handleEdit = (item: any) => {
-    setFormData(item);
+  const handleEdit = (item: ContactRecord) => {
+    setFormData(toCmsWritePayload(item));
     setCurrentId(item.id);
     setIsEditing(true);
     setIsModalOpen(true);

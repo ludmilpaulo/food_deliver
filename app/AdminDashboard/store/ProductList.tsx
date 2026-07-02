@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Transition } from '@headlessui/react';
-import { baseAPI, Product } from '@/services/types';
+import { Product } from '@/services/types';
+import { resolveProductImageUrl } from '@/lib/resolveMediaUrl';
 import { getproducts } from '@/services/managerService';
 import { useTranslation } from "@/hooks/useTranslation";
 
@@ -109,7 +110,13 @@ const ProductList: React.FC = () => {
                   className="p-4 rounded shadow-lg hover:bg-blue-100 cursor-pointer bg-white"
                 >
                   <div className="flex flex-col items-center">
-                    <Image src={`${baseAPI}${product.images}`} alt={product.name} width={100} height={100} className="rounded mb-2" />
+                    <Image
+                      src={resolveProductImageUrl(product.image_url, product.images)}
+                      alt={product.name}
+                      width={100}
+                      height={100}
+                      className="rounded mb-2"
+                    />
                     <div className="text-center">
                       <h3 className="text-lg font-semibold">{product.name}</h3>
                       <p className="text-gray-500">{product.description}</p>

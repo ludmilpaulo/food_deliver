@@ -13,12 +13,20 @@ export type PlatformRole =
   | 'grocery_store_owner'
   | 'super_admin'
   | 'country_admin'
-  | 'city_admin';
+  | 'city_admin'
+  | 'support'
+  | 'finance_admin'
+  | 'compliance_admin'
+  | 'safety_admin';
 
 const ADMIN_ROLES: PlatformRole[] = [
   'super_admin',
   'country_admin',
   'city_admin',
+  'support',
+  'finance_admin',
+  'compliance_admin',
+  'safety_admin',
 ];
 
 export function isPlatformAdmin(role?: string | null): boolean {

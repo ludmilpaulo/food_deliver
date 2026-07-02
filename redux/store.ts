@@ -1,5 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
+import locationReducer from "./slices/locationSlice";
+import driverLocationReducer from "./slices/driverLocationSlice";
 import storeTypeReducer from "./slices/storeTypeSlice";
 import basketReducer, { saveBasketState } from "./slices/basketSlice";
 import { aboutApi } from "./slices/aboutApi";
@@ -11,15 +13,20 @@ import allProductsReducer from "./slices/allProductsSlice";
 import relatedProductsReducer from "./slices/relatedProductsSlice";
 import servicesReducer from "./slices/servicesSlice";
 import { doctorApi, appointmentsApi, adminDoctorApi } from "./slices/doctorApi";
+import { adminDriverApi } from "./slices/driverAdminApi";
 import { healthcareApi } from "./slices/healthcareApi";
 import { notificationApi } from "./slices/notificationApi";
 import { languageApi } from "./slices/languageApi";
+import { adminDriversOperationsApi } from "./slices/adminDriversOperationsApi";
+import { adminVehicleApi } from "./slices/adminVehicleApi";
 import { marketplaceApi } from "./slices/marketplaceApi";
 
 
 export const store = configureStore({
   reducer: {
     storeTypes: storeTypeReducer,
+    location: locationReducer,
+    driverLocation: driverLocationReducer,
     basket: basketReducer,
     stores: storesReducer,
     allStores: allStoresReducer,
@@ -33,8 +40,11 @@ export const store = configureStore({
     [healthcareApi.reducerPath]: healthcareApi.reducer,
     [appointmentsApi.reducerPath]: appointmentsApi.reducer,
     [adminDoctorApi.reducerPath]: adminDoctorApi.reducer,
+    [adminDriverApi.reducerPath]: adminDriverApi.reducer,
     [notificationApi.reducerPath]: notificationApi.reducer,
     [languageApi.reducerPath]: languageApi.reducer,
+    [adminVehicleApi.reducerPath]: adminVehicleApi.reducer,
+    [adminDriversOperationsApi.reducerPath]: adminDriversOperationsApi.reducer,
     [marketplaceApi.reducerPath]: marketplaceApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
@@ -44,8 +54,11 @@ export const store = configureStore({
       .concat(healthcareApi.middleware)
       .concat(appointmentsApi.middleware)
       .concat(adminDoctorApi.middleware)
+      .concat(adminDriverApi.middleware)
       .concat(notificationApi.middleware)
       .concat(languageApi.middleware)
+      .concat(adminVehicleApi.middleware)
+      .concat(adminDriversOperationsApi.middleware)
       .concat(marketplaceApi.middleware),
 });
 

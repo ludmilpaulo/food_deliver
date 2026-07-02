@@ -57,7 +57,8 @@ const currencySymbols: Record<CurrencyCode, string> = {
 
 export function getCurrencyForCountry(region?: string): CurrencyCode {
   if (!region) return "USD";
-  return (regionCurrencyMap as any)[region] || "USD";
+  const code = regionCurrencyMap[region as RegionCode];
+  return code ?? "USD";
 }
 
 export function formatCurrency(

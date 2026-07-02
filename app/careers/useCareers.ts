@@ -17,8 +17,8 @@ export const useCareers = () => {
         if (!response.ok) throw new Error("Network response was not ok.");
         const data: CareersResponse = await response.json();
         setCareers(data);
-      } catch (err: any) {
-        setError(err.message || "Failed to fetch");
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Failed to fetch");
       }
       setLoading(false);
     };

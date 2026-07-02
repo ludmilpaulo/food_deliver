@@ -53,9 +53,9 @@ export default function ServiceDetailPage() {
         if (!mounted) return;
         const daySlots = avail.available_slots[selectedDate] || [];
         setSlots(daySlots);
-      } catch (e: any) {
+      } catch (e: unknown) {
         if (!mounted) return;
-        setError(e?.message || t("serviceLoadFailed", "Failed to load service"));
+        setError(e instanceof Error ? e.message : t("serviceLoadFailed", "Failed to load service"));
       } finally {
         if (mounted) setLoading(false);
       }
@@ -72,7 +72,7 @@ export default function ServiceDetailPage() {
       const avail = await getServiceAvailability(id, date, date);
       const daySlots = avail.available_slots[date] || [];
       setSlots(daySlots);
-    } catch (e: any) {
+    } catch {
       setSlots([]);
     }
   };
@@ -100,8 +100,8 @@ export default function ServiceDetailPage() {
         payment_method: "card",
       });
       setBookingMessage(t("bookingCreated", "Booking created!"));
-    } catch (e: any) {
-      setBookingMessage(e?.message || t("bookingCreateFailed", "Failed to create booking"));
+    } catch (e: unknown) {
+      setBookingMessage(e instanceof Error ? e.message : t("bookingCreateFailed", "Failed to create booking"));
     } finally {
       setBookingLoading(false);
     }

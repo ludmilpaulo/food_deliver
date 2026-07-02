@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import ModalForm from './ModalForm';
 import { fetchTeams, createTeam, updateTeam, deleteTeam } from '@/services/adminService';
+import type { CmsWritePayload, TeamRecord } from '@/services/adminTypes';
+import { toCmsWritePayload } from '@/services/adminTypes';
 
 const TeamsPage = () => {
-  const [items, setItems] = useState<any[]>([]);
-  const [formData, setFormData] = useState<any>({});
+  const [items, setItems] = useState<TeamRecord[]>([]);
+  const [formData, setFormData] = useState<CmsWritePayload>({});
   const [message, setMessage] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -44,8 +46,8 @@ const TeamsPage = () => {
     }
   };
 
-  const handleEdit = (item: any) => {
-    setFormData(item);
+  const handleEdit = (item: TeamRecord) => {
+    setFormData(toCmsWritePayload(item));
     setCurrentId(item.id);
     setIsEditing(true);
     setIsModalOpen(true);

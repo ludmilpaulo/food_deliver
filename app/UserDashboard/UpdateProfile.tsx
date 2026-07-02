@@ -6,10 +6,15 @@ import { fetchUserDetails } from '@/services/checkoutService';
 import { useAppSelector } from '@/redux/store';
 
 
+type CustomerProfile = {
+  phone?: string;
+  address?: string;
+};
+
 const UpdateProfile: React.FC = () => {
    const user = useAppSelector(selectUser);
   const dispatch = useDispatch();
-  const [userDetails, setUserDetails] = useState<any>({});
+  const [userDetails, setUserDetails] = useState<CustomerProfile>({});
   const [avatar, setAvatar] = useState<File | null>(null);
   const [phone, setPhone] = useState<string>('');
   const [address, setAddress] = useState<string>('');
@@ -23,8 +28,8 @@ const UpdateProfile: React.FC = () => {
       fetchUserDetails(user.user_id, user.token)
         .then((data) => {
           setUserDetails(data);
-          setPhone(data.phone);
-          setAddress(data.address);
+          setPhone(data.phone ?? '');
+          setAddress(data.address ?? '');
           setLoading(false);
         })
         .catch((error) => {

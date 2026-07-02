@@ -1,16 +1,24 @@
 import React from 'react';
+import type { ComponentType } from 'react';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import type { CmsWritePayload } from '@/services/adminTypes';
 
-const CKEditorComponent = CKEditor as any;
+type CKEditorEditor = { getData(): string };
+
+const CKEditorComponent = CKEditor as unknown as ComponentType<{
+  editor: typeof ClassicEditor;
+  data: string;
+  onChange: (event: unknown, editor: CKEditorEditor) => void;
+}>;
 
 interface ModalFormProps {
   isOpen: boolean;
   onRequestClose: () => void;
   onSubmit: (e: React.FormEvent) => void;
-  formData: any;
+  formData: CmsWritePayload;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  handleEditorChange?: (event: any, editor: any) => void;
+  handleEditorChange?: (event: unknown, editor: CKEditorEditor) => void;
   title: string;
   isAboutUs?: boolean;
 }
@@ -42,14 +50,14 @@ const ModalForm: React.FC<ModalFormProps> = ({
             type="text"
             name="title"
             placeholder="Title"
-            value={formData.title || ''}
+            value={String(formData.title ?? '')}
             onChange={handleChange}
             className="w-full p-2 border rounded"
           />
           {isAboutUs && handleEditorChange && (
             <CKEditorComponent
               editor={ClassicEditor}
-              data={formData.about || ''}
+              data={String(formData.about ?? '')}
               onChange={handleEditorChange}
             />
           )}
@@ -57,7 +65,7 @@ const ModalForm: React.FC<ModalFormProps> = ({
             type="date"
             name="born_date"
             placeholder="Born Date"
-            value={formData.born_date || ''}
+            value={String(formData.born_date ?? '')}
             onChange={handleChange}
             className="w-full p-2 border rounded"
           />
@@ -65,7 +73,7 @@ const ModalForm: React.FC<ModalFormProps> = ({
             type="text"
             name="address"
             placeholder="Address"
-            value={formData.address || ''}
+            value={String(formData.address ?? '')}
             onChange={handleChange}
             className="w-full p-2 border rounded"
           />
@@ -73,7 +81,7 @@ const ModalForm: React.FC<ModalFormProps> = ({
             type="text"
             name="phone"
             placeholder="Phone"
-            value={formData.phone || ''}
+            value={String(formData.phone ?? '')}
             onChange={handleChange}
             className="w-full p-2 border rounded"
           />
@@ -81,7 +89,7 @@ const ModalForm: React.FC<ModalFormProps> = ({
             type="email"
             name="email"
             placeholder="Email"
-            value={formData.email || ''}
+            value={String(formData.email ?? '')}
             onChange={handleChange}
             className="w-full p-2 border rounded"
           />
@@ -89,7 +97,7 @@ const ModalForm: React.FC<ModalFormProps> = ({
             type="text"
             name="github"
             placeholder="GitHub"
-            value={formData.github || ''}
+            value={String(formData.github ?? '')}
             onChange={handleChange}
             className="w-full p-2 border rounded"
           />
@@ -97,7 +105,7 @@ const ModalForm: React.FC<ModalFormProps> = ({
             type="text"
             name="linkedin"
             placeholder="LinkedIn"
-            value={formData.linkedin || ''}
+            value={String(formData.linkedin ?? '')}
             onChange={handleChange}
             className="w-full p-2 border rounded"
           />
@@ -105,7 +113,7 @@ const ModalForm: React.FC<ModalFormProps> = ({
             type="text"
             name="facebook"
             placeholder="Facebook"
-            value={formData.facebook || ''}
+            value={String(formData.facebook ?? '')}
             onChange={handleChange}
             className="w-full p-2 border rounded"
           />
@@ -113,7 +121,7 @@ const ModalForm: React.FC<ModalFormProps> = ({
             type="text"
             name="twitter"
             placeholder="Twitter"
-            value={formData.twitter || ''}
+            value={String(formData.twitter ?? '')}
             onChange={handleChange}
             className="w-full p-2 border rounded"
           />
@@ -121,7 +129,7 @@ const ModalForm: React.FC<ModalFormProps> = ({
             type="text"
             name="instagram"
             placeholder="Instagram"
-            value={formData.instagram || ''}
+            value={String(formData.instagram ?? '')}
             onChange={handleChange}
             className="w-full p-2 border rounded"
           />

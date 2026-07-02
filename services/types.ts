@@ -1,5 +1,5 @@
 export const baseAPI: string =
-  process.env.NEXT_PUBLIC_BASE_API || "https://kudya-api.onrender.com";
+  process.env.NEXT_PUBLIC_BASE_API || "https://www.kudya.store";
 import { ReactNode } from "react";
 
 export type UserDetails = {

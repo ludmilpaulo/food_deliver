@@ -71,7 +71,7 @@ export default function SuperAppAdmin() {
       <p className="text-xs text-slate-400 mt-6">
         {t("adminApiDocs", "Platform admin APIs")}:{" "}
         <a
-          href={`${process.env.NEXT_PUBLIC_BASE_API || "https://kudya-api.onrender.com"}/api/docs/`}
+          href={`${process.env.NEXT_PUBLIC_BASE_API || "https://www.kudya.store"}/api/docs/`}
           className="text-blue-600 underline"
           target="_blank"
           rel="noreferrer"

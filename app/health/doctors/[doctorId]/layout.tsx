@@ -6,7 +6,7 @@ type Props = {
 };
 
 async function fetchDoctorName(doctorId: string): Promise<{ name: string; specialty: string; city: string } | null> {
-  const base = process.env.NEXT_PUBLIC_BASE_API || 'https://kudya-api.onrender.com';
+  const base = process.env.NEXT_PUBLIC_BASE_API || 'https://www.kudya.store';
   try {
     const res = await fetch(`${base}/api/doctors/${doctorId}/`, { next: { revalidate: 300 } });
     if (!res.ok) return null;

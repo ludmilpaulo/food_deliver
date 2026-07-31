@@ -25,7 +25,7 @@ Write-Host "  Root Directory: food_deliver"
 Write-Host "  Framework: Next.js"
 Write-Host ""
 Write-Host "Set these Environment Variables in Vercel (Production + Preview):" -ForegroundColor Yellow
-Write-Host "  NEXT_PUBLIC_BASE_API=https://kudya-api.onrender.com"
+Write-Host "  NEXT_PUBLIC_BASE_API=https://www.kudya.store"
 Write-Host "  NEXT_PUBLIC_APP_URL=https://www.sdkudya.com"
 Write-Host "  NEXT_PUBLIC_GOOGLE_API_KEY=<your Google Maps key>"
 Write-Host ""

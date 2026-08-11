@@ -1,6 +1,7 @@
 "use client";
 import axios from "axios";
 import { baseAPI as backend } from "./types";
+import { readAuthToken } from "@/lib/authToken";
 
 export const baseAPI = backend;
 
@@ -17,12 +18,10 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
   const language = localStorage.getItem("language") || "en"; // Default to English
   config.headers["Accept-Language"] = language;
-  try {
-    const token = JSON.parse(localStorage.getItem("auth_token") || "null");
-    if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
-    }
-  } catch {}
+  const token = readAuthToken();
+  if (token) {
+    config.headers["Authorization"] = `Bearer ${token}`;
+  }
   return config;
 });
 

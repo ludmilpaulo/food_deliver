@@ -1,7 +1,7 @@
 // redux/slices/allProductsSlice.ts
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { baseAPI, Product } from "@/services/types";
-import API from "@/services/api";
+import { assertOkJson, unwrapListPayload } from "@/utils/unwrapListPayload";
 
 interface AllProductsState {
   data: Product[];
@@ -19,9 +19,10 @@ export const fetchAllProducts = createAsyncThunk<Product[]>(
   "allProducts/fetchAll",
   async () => {
     const res = await fetch(`${baseAPI}/customer/products/all/`);
-     const data = await res.json();
-    return data;
-  }
+    const data: unknown = await res.json();
+    assertOkJson(res, data, "Failed to fetch products");
+    return unwrapListPayload<Product>(data);
+  },
 );
 
 const allProductsSlice = createSlice({
@@ -40,6 +41,7 @@ const allProductsSlice = createSlice({
       })
       .addCase(fetchAllProducts.rejected, (state, action) => {
         state.loading = false;
+        state.data = [];
         state.error = action.error.message || "Failed to fetch products";
       });
   },

@@ -62,7 +62,9 @@ type Props = {
 };
 
 export default function LegalPageShell({ kind }: Props) {
-  const [lang, setLang] = useState<SupportedLocale>(getLanguage());
+  const [lang, setLang] = useState<SupportedLocale>(() =>
+    kind === "privacy" ? "en" : getLanguage(),
+  );
   const { t } = useTranslation(lang);
   const content = getLegalContent(kind, lang);
   const isFaq = kind === "faq";
@@ -292,10 +294,25 @@ export default function LegalPageShell({ kind }: Props) {
           className="mt-16 rounded-2xl bg-white border border-blue-100 shadow-lg p-8"
         >
           <h3 className="text-xl font-bold text-blue-950 mb-4">{t("contactUs")}</h3>
+          <div className="space-y-2 text-slate-700 mb-4">
+            <p className="font-semibold text-blue-900">Kudya</p>
+            <a href="mailto:privacy@kudya.store" className="block text-blue-700 hover:underline">
+              privacy@kudya.store
+            </a>
+            <a href="mailto:support@kudya.store" className="block text-blue-700 hover:underline">
+              support@kudya.store
+            </a>
+            <a
+              href="https://sd-kudya.vercel.app/PrivacyPolicy"
+              className="block text-blue-700 hover:underline break-all"
+            >
+              https://sd-kudya.vercel.app/PrivacyPolicy
+            </a>
+          </div>
           {isLoading ? (
-            <p className="text-blue-500 animate-pulse">{t("loading")}</p>
+            <p className="text-sm text-slate-500">{t("loading")}</p>
           ) : aboutUsData ? (
-            <div className="space-y-2 text-slate-700">
+            <div className="space-y-2 text-slate-700 border-t border-blue-50 pt-4">
               <p className="font-semibold text-blue-900">{aboutUsData.title}</p>
               <p>{aboutUsData.address}</p>
               {aboutUsData.phone && (
@@ -309,9 +326,7 @@ export default function LegalPageShell({ kind }: Props) {
                 </a>
               )}
             </div>
-          ) : (
-            <p className="text-slate-500">{t("error")}</p>
-          )}
+          ) : null}
           <Link
             href="/contact"
             className="inline-flex mt-6 items-center px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-700 to-blue-900 text-white font-bold text-sm shadow hover:shadow-md transition"

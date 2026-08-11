@@ -14,6 +14,7 @@ import type {
   AdminDoctorVerificationDetail,
   AdminDoctorVerificationListItem,
 } from "@/types/doctor";
+import { mapMetricComparison } from "@/utils/analyticsExport";
 
 function asString(value: unknown, fallback = ""): string {
   return typeof value === "string" ? value : fallback;
@@ -28,6 +29,16 @@ function asBool(value: unknown, fallback = false): boolean {
 }
 
 export function mapDashboardStats(raw: Record<string, unknown>): DoctorDashboardStats {
+  const analyticsRaw = (raw.analytics ?? {}) as Record<string, unknown>;
+  const topRaw = (analyticsRaw.top_services ?? {}) as Record<string, unknown>;
+  const comparisonRaw = (analyticsRaw.comparison ?? {}) as Record<string, unknown>;
+  const mapSeries = (value: unknown): DoctorDashboardStats["analytics"]["appointmentsByDay"] => {
+    const row = (value ?? {}) as Record<string, unknown>;
+    return {
+      labels: Array.isArray(row.labels) ? row.labels.map((item) => asString(item)) : [],
+      data: Array.isArray(row.data) ? row.data.map((item) => asNumber(item)) : [],
+    };
+  };
   return {
     clinicName: asString(raw.clinic_name),
     specialtyName: asString(raw.specialty_name),
@@ -45,6 +56,27 @@ export function mapDashboardStats(raw: Record<string, unknown>): DoctorDashboard
     reviewCount: asNumber(raw.review_count),
     monthlyEarnings: asString(raw.monthly_earnings, "0"),
     currency: asString(raw.currency, "AOA"),
+    analyticsDays: asNumber(raw.analytics_days, 7),
+    analytics: {
+      days: asNumber(analyticsRaw.days, 7),
+      periodStart: asString(analyticsRaw.period_start) || undefined,
+      periodEnd: asString(analyticsRaw.period_end) || undefined,
+      previousPeriodStart: asString(analyticsRaw.previous_period_start) || undefined,
+      previousPeriodEnd: asString(analyticsRaw.previous_period_end) || undefined,
+      appointmentsByDay: mapSeries(analyticsRaw.appointments_by_day),
+      appointmentsByStatus: mapSeries(analyticsRaw.appointments_by_status),
+      appointmentTypeBreakdown: mapSeries(analyticsRaw.appointment_type_breakdown),
+      earningsByDay: mapSeries(analyticsRaw.earnings_by_day),
+      topServices: {
+        labels: Array.isArray(topRaw.labels) ? topRaw.labels.map((item) => asString(item)) : [],
+        data: Array.isArray(topRaw.data) ? topRaw.data.map((item) => asNumber(item)) : [],
+        ids: Array.isArray(topRaw.ids) ? topRaw.ids.map((item) => asNumber(item)) : [],
+      },
+      comparison: {
+        appointments: mapMetricComparison(comparisonRaw.appointments),
+        earnings: mapMetricComparison(comparisonRaw.earnings),
+      },
+    },
   };
 }
 

@@ -28,7 +28,7 @@ export type FaqPageData = {
 
 export type LegalPageKind = 'terms' | 'privacy' | 'faq';
 
-const lastUpdate = 'June 2025';
+const lastUpdate = 'August 2026';
 
 const termsEn: LegalPageData = {
   title: 'Terms of Service',
@@ -99,52 +99,113 @@ const termsEn: LegalPageData = {
 const privacyEn: LegalPageData = {
   title: 'Privacy Policy',
   intro:
-    'Your privacy matters. This policy explains how Kudya collects, uses, and protects personal information when you use our platform in Southern Africa.',
+    'Your privacy matters. This policy explains how Kudya (operated by Ludmil Paulo / Kudya) collects, uses, shares, and protects personal information when you use the Kudya customer app, partner app, websites, and related services in Southern Africa. By using Kudya you acknowledge this policy.',
   lastUpdate: `Last updated: ${lastUpdate}`,
   sections: [
+    {
+      id: 'who',
+      title: 'Who We Are',
+      paragraphs: [
+        'Kudya provides food delivery, shopping, services, rides, healthcare bookings, and property listings through web and mobile applications. For privacy questions contact privacy@kudya.store or support@kudya.store. Postal enquiries: Ludmil Paulo / Kudya, Southern Africa operations.',
+      ],
+    },
     {
       id: 'collect',
       title: 'Information We Collect',
       bullets: [
-        'Account details: name, email, phone, address, and registration data.',
-        'Usage data: device, IP, location (if permitted), and in-app interactions.',
-        'Order and payment information processed through our partners.',
-        'Social login data when you sign in with Google, Facebook, or TikTok.',
+        'Account details: name, email, phone number, delivery address, and profile photo if you add one.',
+        'Authentication data: email/password credentials and social login identifiers when you sign in with Google, Facebook, Apple, Instagram, or TikTok (display name and avatar only as provided by those providers).',
+        'Order, booking, and payment-related data needed to process purchases, deliveries, stays, and services (card details are processed by payment partners; we do not store full card numbers).',
+        'Device and usage data: device model, OS version, app version, IP address, language, crash logs, and in-app interactions.',
+        'Precise or approximate location when you grant permission, used for delivery address autofill, courier tracking, ride matching, and nearby listings.',
+        'Photos or documents you upload (for example KYC, property, or support attachments).',
+        'Communications with support, including messages and email.',
       ],
     },
     {
       id: 'use',
       title: 'How We Use Data',
       bullets: [
-        'Provide, operate, and improve Kudya services.',
-        'Process orders, deliveries, and customer support.',
-        'Personalize offers and secure the platform.',
-        'Comply with legal obligations and prevent fraud.',
+        'Create and manage your account and authenticate sign-in.',
+        'Process orders, deliveries, bookings, payments, refunds, and partner payouts.',
+        'Show maps, directions, estimated times, and location-based services you request.',
+        'Provide customer support and send transactional notifications (order status, security alerts).',
+        'Improve safety, prevent fraud and abuse, and secure the platform.',
+        'Analyse aggregated usage to improve product performance and reliability.',
+        'Comply with legal, tax, and regulatory obligations.',
       ],
     },
     {
       id: 'share',
-      title: 'Sharing',
+      title: 'How We Share Data',
       bullets: [
-        'With merchants, couriers, and payment providers to fulfill services.',
-        'When required by law or to protect safety and rights.',
-        'We do not sell personal data for third-party advertising.',
+        'Merchants, drivers, partners, and property hosts as needed to fulfil your order or booking.',
+        'Payment processors, SMS/email providers, map providers, and cloud hosting vendors that process data on our instructions.',
+        'Authorities when required by law or to protect users, partners, or Kudya.',
+        'We do not sell personal data to third parties for advertising.',
+      ],
+    },
+    {
+      id: 'permissions',
+      title: 'App Permissions',
+      bullets: [
+        'Location — optional; used for delivery, rides, and nearby content when enabled.',
+        'Camera / photos — optional; used when you upload images or documents.',
+        'Notifications — optional; used for order and account alerts.',
+        'You can revoke permissions in your device settings; some features may then be limited.',
+      ],
+    },
+    {
+      id: 'deletion',
+      title: 'Data Deletion & Account Closure',
+      paragraphs: [
+        'You may request deletion of your Kudya account and associated personal data at any time. In the mobile app or website, open your account settings and choose Deactivate / Delete account if available, or email privacy@kudya.store or support@kudya.store with the subject “Delete my Kudya account” and the email or phone number registered on the account.',
+        'We will verify your identity and delete or anonymise personal data within 30 days, except information we must retain for legal, security, fraud-prevention, accounting, or dispute-resolution purposes (for example completed order records required by law).',
+      ],
+      bullets: [
+        'Access or correction requests: email privacy@kudya.store.',
+        'Withdraw consent for optional processing (marketing or location) in-app or by contacting us.',
       ],
     },
     {
       id: 'rights',
       title: 'Your Rights',
       bullets: [
-        'Request access, correction, or deletion of your data.',
-        'Withdraw consent where processing is consent-based.',
-        'Contact us using the details at the bottom of this page.',
+        'Request access to the personal data we hold about you.',
+        'Request correction of inaccurate data.',
+        'Request deletion as described above.',
+        'Object to or restrict certain processing where applicable under local law.',
+        'Lodge a complaint with a competent data protection authority in your country.',
+      ],
+    },
+    {
+      id: 'children',
+      title: 'Children',
+      paragraphs: [
+        'Kudya is not directed to children under 13 (or the minimum age required in your country). We do not knowingly collect personal data from children. If you believe a child has provided data, contact privacy@kudya.store and we will delete it.',
       ],
     },
     {
       id: 'security',
       title: 'Security & Retention',
       paragraphs: [
-        'We use encryption, access controls, and monitoring to protect data. We retain information only as long as needed for the purposes described or as required by law.',
+        'We use encryption in transit (HTTPS/TLS), access controls, and monitoring to protect data. No method of transmission or storage is 100% secure. We retain personal data only as long as needed to provide services, resolve disputes, enforce agreements, and meet legal obligations, then delete or anonymise it.',
+      ],
+    },
+    {
+      id: 'changes',
+      title: 'Changes to This Policy',
+      paragraphs: [
+        'We may update this Privacy Policy from time to time. The “Last updated” date at the top will change when we do. Continued use of Kudya after an update means you acknowledge the revised policy. Material changes may also be communicated in-app or by email where appropriate.',
+      ],
+    },
+    {
+      id: 'contact',
+      title: 'Contact',
+      paragraphs: [
+        'Privacy requests: privacy@kudya.store',
+        'General support: support@kudya.store',
+        'Web: https://sd-kudya.vercel.app/PrivacyPolicy and https://sd-kudya.vercel.app/contact',
       ],
     },
   ],
@@ -285,14 +346,82 @@ const termsPt: LegalPageData = {
 const privacyPt: LegalPageData = {
   title: 'Política de Privacidade',
   intro:
-    'A sua privacidade importa. Esta política explica como a Kudya recolhe, utiliza e protege dados pessoais na África Austral.',
+    'A sua privacidade importa. Esta política explica como a Kudya recolhe, utiliza, partilha e protege dados pessoais nas apps e sites Kudya na África Austral.',
   lastUpdate: `Última atualização: ${lastUpdate}`,
   sections: [
-    { id: 'collect', title: 'Informações que Recolhemos', bullets: ['Dados de conta: nome, e-mail, telefone, morada.', 'Dados de uso: dispositivo, IP, localização (se permitida).', 'Informações de pedidos e pagamentos.', 'Dados de login social (Google, Facebook, TikTok).'] },
-    { id: 'use', title: 'Como Utilizamos os Dados', bullets: ['Operar e melhorar os serviços Kudya.', 'Processar pedidos, entregas e suporte.', 'Personalizar ofertas e proteger a plataforma.', 'Cumprir obrigações legais.'] },
-    { id: 'share', title: 'Partilha', bullets: ['Com comerciantes, entregadores e pagamentos para prestar o serviço.', 'Quando exigido por lei.', 'Não vendemos dados para publicidade de terceiros.'] },
-    { id: 'rights', title: 'Os Seus Direitos', bullets: ['Solicitar acesso, correção ou eliminação.', 'Retirar consentimento quando aplicável.', 'Contactar-nos pelos dados no rodapé.'] },
-    { id: 'security', title: 'Segurança', paragraphs: ['Utilizamos encriptação e controlos de acesso. Retemos dados apenas pelo tempo necessário.'] },
+    {
+      id: 'who',
+      title: 'Quem Somos',
+      paragraphs: [
+        'A Kudya opera entrega de comida, compras, serviços e imóveis. Contactos de privacidade: privacy@kudya.store ou support@kudya.store.',
+      ],
+    },
+    {
+      id: 'collect',
+      title: 'Informações que Recolhemos',
+      bullets: [
+        'Dados de conta: nome, e-mail, telefone, morada.',
+        'Dados de uso: dispositivo, IP, localização (se permitida).',
+        'Informações de pedidos e pagamentos (processados por parceiros).',
+        'Dados de login social (Google, Facebook, Apple, TikTok).',
+        'Fotos ou documentos que carregar.',
+      ],
+    },
+    {
+      id: 'use',
+      title: 'Como Utilizamos os Dados',
+      bullets: [
+        'Operar e melhorar os serviços Kudya.',
+        'Processar pedidos, entregas e suporte.',
+        'Segurança, prevenção de fraude e obrigações legais.',
+      ],
+    },
+    {
+      id: 'share',
+      title: 'Partilha',
+      bullets: [
+        'Com comerciantes, entregadores e pagamentos para prestar o serviço.',
+        'Quando exigido por lei.',
+        'Não vendemos dados para publicidade de terceiros.',
+      ],
+    },
+    {
+      id: 'deletion',
+      title: 'Eliminação de Dados e Conta',
+      paragraphs: [
+        'Pode pedir a eliminação da conta por e-mail para privacy@kudya.store ou support@kudya.store com o assunto “Eliminar a minha conta Kudya”. Tratamos o pedido em até 30 dias, salvo retenção legal obrigatória.',
+      ],
+    },
+    {
+      id: 'rights',
+      title: 'Os Seus Direitos',
+      bullets: [
+        'Solicitar acesso, correção ou eliminação.',
+        'Retirar consentimento quando aplicável.',
+        'Contactar privacy@kudya.store.',
+      ],
+    },
+    {
+      id: 'children',
+      title: 'Crianças',
+      paragraphs: [
+        'A Kudya não se destina a menores de 13 anos. Se um menor forneceu dados, contacte privacy@kudya.store.',
+      ],
+    },
+    {
+      id: 'security',
+      title: 'Segurança',
+      paragraphs: [
+        'Utilizamos encriptação e controlos de acesso. Retemos dados apenas pelo tempo necessário ou exigido por lei.',
+      ],
+    },
+    {
+      id: 'contact',
+      title: 'Contacto',
+      paragraphs: [
+        'privacy@kudya.store · support@kudya.store · https://sd-kudya.vercel.app/PrivacyPolicy',
+      ],
+    },
   ],
 };
 
@@ -347,14 +476,25 @@ const termsFr: LegalPageData = {
 
 const privacyFr: LegalPageData = {
   title: 'Politique de confidentialité',
-  intro: 'Comment Kudya collecte, utilise et protège vos données personnelles.',
+  intro:
+    'Comment Kudya collecte, utilise, partage et protège vos données personnelles sur les apps et sites Kudya.',
   lastUpdate: `Dernière mise à jour : ${lastUpdate}`,
   sections: [
-    { id: 'collect', title: 'Données collectées', bullets: ['Compte, usage, commandes, connexion sociale.'] },
+    { id: 'who', title: 'Qui nous sommes', paragraphs: ['Contact confidentialité : privacy@kudya.store ou support@kudya.store.'] },
+    { id: 'collect', title: 'Données collectées', bullets: ['Compte, usage, commandes, localisation (si autorisée), connexion sociale, fichiers téléversés.'] },
     { id: 'use', title: 'Utilisation', bullets: ['Services, commandes, sécurité, obligations légales.'] },
     { id: 'share', title: 'Partage', bullets: ['Partenaires de livraison et paiement.', 'Jamais vendu pour publicité tierce.'] },
+    {
+      id: 'deletion',
+      title: 'Suppression des données',
+      paragraphs: [
+        'Demandez la suppression de votre compte à privacy@kudya.store (objet « Delete my Kudya account »). Traitement sous 30 jours, sauf conservation légale.',
+      ],
+    },
     { id: 'rights', title: 'Vos droits', bullets: ['Accès, rectification, suppression sur demande.'] },
-    { id: 'security', title: 'Sécurité', paragraphs: ['Chiffrement et contrôles d\'accès.'] },
+    { id: 'children', title: 'Enfants', paragraphs: ['Service non destiné aux moins de 13 ans.'] },
+    { id: 'security', title: 'Sécurité', paragraphs: ["Chiffrement et contrôles d'accès."] },
+    { id: 'contact', title: 'Contact', paragraphs: ['privacy@kudya.store · https://sd-kudya.vercel.app/PrivacyPolicy'] },
   ],
 };
 
@@ -395,12 +535,25 @@ const termsEs: LegalPageData = {
 
 const privacyEs: LegalPageData = {
   title: 'Política de privacidad',
-  intro: 'Cómo Kudya recopila, usa y protege tus datos personales.',
+  intro: 'Cómo Kudya recopila, usa, comparte y protege tus datos personales en las apps y sitios de Kudya.',
   lastUpdate: `Última actualización: ${lastUpdate}`,
-  sections: privacyFr.sections.map((s, i) => ({
-    ...s,
-    title: ['Datos recopilados', 'Uso', 'Compartir', 'Tus derechos', 'Seguridad'][i],
-  })),
+  sections: [
+    { id: 'who', title: 'Quiénes somos', paragraphs: ['Contacto de privacidad: privacy@kudya.store o support@kudya.store.'] },
+    { id: 'collect', title: 'Datos recopilados', bullets: ['Cuenta, uso, pedidos, ubicación (si se permite), inicio social, archivos subidos.'] },
+    { id: 'use', title: 'Uso', bullets: ['Servicios, pedidos, seguridad y obligaciones legales.'] },
+    { id: 'share', title: 'Compartir', bullets: ['Comerciantes, repartidores y pagos.', 'No vendemos datos para publicidad de terceros.'] },
+    {
+      id: 'deletion',
+      title: 'Eliminación de datos',
+      paragraphs: [
+        'Solicita borrar tu cuenta en privacy@kudya.store (asunto «Delete my Kudya account»). Respondemos en 30 días, salvo retención legal.',
+      ],
+    },
+    { id: 'rights', title: 'Tus derechos', bullets: ['Acceso, corrección y eliminación bajo petición.'] },
+    { id: 'children', title: 'Niños', paragraphs: ['No dirigido a menores de 13 años.'] },
+    { id: 'security', title: 'Seguridad', paragraphs: ['Cifrado y controles de acceso.'] },
+    { id: 'contact', title: 'Contacto', paragraphs: ['privacy@kudya.store · https://sd-kudya.vercel.app/PrivacyPolicy'] },
+  ],
 };
 
 const faqEs: FaqPageData = {

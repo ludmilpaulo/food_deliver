@@ -54,11 +54,11 @@ const Navbar: React.FC<NavbarProps> = ({ initialLocale }) => {
 
   const navLinks = (
     <>
-      <NavLink href="/AllProducts" icon={<FiPackage size={20} className="text-blue-700" />} label={t("allProducts") || "All Products"} />
-      <NavLink href="/StoreTypes" icon={<MdStore size={20} className="text-yellow-500" />} label={t("Stores")} />
+      <NavLink href="/AllProducts" icon={<FiPackage size={20} className="text-blue-700" />} label={t("allProducts", "All Products")} />
+      <NavLink href="/StoreTypes" icon={<MdStore size={20} className="text-yellow-500" />} label={t("Stores", "Stores")} />
       <NavLink href="/services" icon={<MdMedicalServices size={20} className="text-pink-600" />} label={t("Services", "Services")} />
       <NavLink href="/properties" icon={<MdHome size={20} className="text-teal-600" />} label={t("Properties", "Properties")} />
-      <NavLink href="/CartPage" icon={<IoMdCart size={22} className="text-green-700" />} label={t("Cart")}>
+      <NavLink href="/CartPage" icon={<IoMdCart size={22} className="text-green-700" />} label={t("Cart", "Cart")}>
         {cartQuantity > 0 && (
           <span className="absolute -top-2 -right-3 bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center shadow font-bold animate-bounce">
             {cartQuantity}

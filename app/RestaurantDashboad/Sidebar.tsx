@@ -25,6 +25,7 @@ import CustomersList from "./CustomersList";
 import Report from "./Report";
 import DriverList from "./DriverList";
 import { useTranslation } from "@/hooks/useTranslation";
+import RestaurantMiniAnalytics from "@/components/restaurant/RestaurantMiniAnalytics";
 
 interface SidebarProps {
   fornecedor: FornecedorType | null;
@@ -273,6 +274,12 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
         </div>
       </div>
       <div className="flex-1 overflow-y-auto p-4 bg-gray-100">
+        {!showProducts &&
+          !showOrders &&
+          !showProfile &&
+          !showReport &&
+          !listOfCustomer &&
+          !listOfDriver && <RestaurantMiniAnalytics />}
         {showProducts && <Products />}
         {showOrders && <Order />}
         {showProfile && <Profile />} {/* Show Profile when showProfile is true */}

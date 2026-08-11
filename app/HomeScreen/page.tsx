@@ -27,10 +27,12 @@ const PAGE_SIZE = 9; // Stores per page
 const HomeScreen: React.FC = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const allStores = useAppSelector((state) => state.allStores.data);
+  const allStoresRaw = useAppSelector((state) => state.allStores.data);
   const storesLoading = useAppSelector((state) => state.allStores.loading);
+  const allStores = Array.isArray(allStoresRaw) ? allStoresRaw : [];
 
-  const { data: allProducts } = useAppSelector((state) => state.allProducts);
+  const { data: allProductsRaw } = useAppSelector((state) => state.allProducts);
+  const allProducts = Array.isArray(allProductsRaw) ? allProductsRaw : [];
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);

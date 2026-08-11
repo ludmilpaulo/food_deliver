@@ -15,6 +15,8 @@ export const ADMIN_PANEL_IDS: AdminPanelId[] = [
   'liveSupport',
   'payouts',
   'platformControl',
+  'propertyReview',
+  'propertyApplications',
   'pricing',
   'translations',
   'backupExport',

@@ -4,6 +4,8 @@ import dynamic from "next/dynamic";
 
 const SuperAppAdmin = dynamic(() => import("@/components/SuperAppAdmin"));
 const PlatformModulesAdmin = dynamic(() => import("@/components/admin/PlatformModulesAdmin"));
+const PropertyReviewAdmin = dynamic(() => import("@/components/admin/PropertyReviewAdmin"));
+const PropertyApplicationsAdmin = dynamic(() => import("@/components/admin/PropertyApplicationsAdmin"));
 const PricingAdmin = dynamic(() => import("@/components/admin/PricingAdmin"));
 const TranslationsAdmin = dynamic(() => import("@/components/admin/TranslationsAdmin"));
 const ProductList = dynamic(() => import("./store/ProductList"));
@@ -38,6 +40,8 @@ export type AdminPanelId =
   | "liveSupport"
   | "payouts"
   | "platformControl"
+  | "propertyReview"
+  | "propertyApplications"
   | "pricing"
   | "translations"
   | "backupExport";
@@ -48,6 +52,10 @@ export function AdminPanelContent({ activePanel }: { activePanel: AdminPanelId }
       return <SuperAppAdmin />;
     case "platformControl":
       return <PlatformModulesAdmin />;
+    case "propertyReview":
+      return <PropertyReviewAdmin />;
+    case "propertyApplications":
+      return <PropertyApplicationsAdmin />;
     case "pricing":
       return <PricingAdmin />;
     case "translations":

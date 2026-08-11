@@ -2,8 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "@/hooks/useTranslation";
-import { fetchHomeModules, resolveWebModuleRoute, FALLBACK_HOME_MODULES, type HomeModule } from "@/services/platformApi";
-import { isSuperAppModuleEnabled } from "@/lib/platformModules";
+import { fetchHomeModules, resolveWebModuleRoute, type HomeModule } from "@/services/platformApi";
 import type { SupportedLocale } from "@/configs/translations";
 
 function ModuleSkeleton() {
@@ -15,19 +14,22 @@ function ModuleSkeleton() {
 export default function SuperAppModules({ lang }: { lang?: SupportedLocale }) {
   const [modules, setModules] = useState<HomeModule[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { t, languageCode } = useTranslation();
   const currentLang = lang || languageCode;
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    setError(null);
     fetchHomeModules(currentLang, "web")
       .then((res) => {
-        if (!cancelled) setModules(res.length > 0 ? res : FALLBACK_HOME_MODULES.filter((m) => isSuperAppModuleEnabled(m.key)));
+        if (!cancelled) setModules(res);
       })
       .catch(() => {
         if (!cancelled) {
-          setModules(FALLBACK_HOME_MODULES.filter((m) => isSuperAppModuleEnabled(m.key)));
+          setModules([]);
+          setError(t("modulesLoadFailed", "Could not load services. Please try again."));
         }
       })
       .finally(() => {
@@ -36,7 +38,7 @@ export default function SuperAppModules({ lang }: { lang?: SupportedLocale }) {
     return () => {
       cancelled = true;
     };
-  }, [currentLang]);
+  }, [currentLang, t]);
 
   return (
     <section>
@@ -47,9 +49,17 @@ export default function SuperAppModules({ lang }: { lang?: SupportedLocale }) {
       <p className="brand-muted text-sm mb-6">
         {t("yourLifeOneApp", "Your life, one app")}
       </p>
+      {error && !loading && (
+        <p className="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">{error}</p>
+      )}
+      {!loading && modules.length === 0 && !error && (
+        <p className="mb-4 text-sm text-slate-500">
+          {t("noServicesAvailable", "No services are available right now.")}
+        </p>
+      )}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {loading
-          ? Array.from({ length: 10 }).map((_, index) => <ModuleSkeleton key={index} />)
+          ? Array.from({ length: 8 }).map((_, index) => <ModuleSkeleton key={index} />)
           : modules.map((mod) => {
               const gradientStart = mod.gradient?.[0] || mod.color || "#3B82F6";
               const gradientEnd = mod.gradient?.[1] || mod.color || "#1D4ED8";

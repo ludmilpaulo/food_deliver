@@ -18,9 +18,21 @@ export const fetchAllStores = createAsyncThunk<Store[]>(
   "allStores/fetchAll",
   async () => {
     const response = await fetch(`${baseAPI}/customer/customer/stores/`);
-    const data = await response.json();
-    // Only approved stores
-    return data.stores.filter((s: Store) => s.is_approved);
+    const data: unknown = await response.json();
+    if (!response.ok) {
+      const detail =
+        data && typeof data === "object" && typeof (data as { detail?: unknown }).detail === "string"
+          ? (data as { detail: string }).detail
+          : `Failed to load stores (${response.status})`;
+      throw new Error(detail);
+    }
+    const stores =
+      data && typeof data === "object" && Array.isArray((data as { stores?: unknown }).stores)
+        ? ((data as { stores: Store[] }).stores)
+        : Array.isArray(data)
+          ? (data as Store[])
+          : [];
+    return stores.filter((s) => s.is_approved);
   }
 );
 

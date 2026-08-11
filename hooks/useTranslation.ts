@@ -9,12 +9,42 @@ import {
   t as localT,
   LANGUAGE_CHANGE_EVENT,
 } from "@/configs/i18n";
-import type { SupportedLocale, TranslationKey } from "@/configs/translations";
+import translations, {
+  type SupportedLocale,
+  type TranslationKey,
+} from "@/configs/translations";
+import { marketplaceT } from "@/configs/marketplaceTranslations";
+import { homeT } from "@/configs/homeTranslations";
+import { propertyApplicationT } from "@/configs/propertyApplicationTranslations";
 import { fetchApiTranslations } from "@/services/platformApi";
 import { store } from "@/redux/store";
 import { languageApi } from "@/redux/slices/languageApi";
 
 const CACHE_KEY = "kudya_api_translations";
+
+function englishBaseline(key: string): string | undefined {
+  const typed = translations.en[key as TranslationKey];
+  if (typed) return typed;
+  return (
+    propertyApplicationT("en", key) ??
+    homeT("en", key) ??
+    marketplaceT("en", key)
+  );
+}
+
+function localForLocale(locale: SupportedLocale, key: string): string | undefined {
+  const app = propertyApplicationT(locale, key);
+  if (app) return app;
+  const home = homeT(locale, key);
+  if (home) return home;
+  const market = marketplaceT(locale, key);
+  if (market) return market;
+  const typed = localT(key as TranslationKey);
+  if (typed !== key) return typed;
+  const table = translations[locale] as Record<string, string> | undefined;
+  if (table?.[key]) return table[key];
+  return undefined;
+}
 
 export function useTranslation(initialLocale?: SupportedLocale) {
   const [languageCode, setLanguageCode] = useState<SupportedLocale>(
@@ -114,12 +144,40 @@ export function useTranslation(initialLocale?: SupportedLocale) {
   };
 
   const t = useCallback(
-    (key: string, fallback?: string) => {
-      if (apiTranslations[key]) return apiTranslations[key];
-      const localValue = localT(key as TranslationKey);
-      return localValue === key ? fallback ?? key : localValue;
+    (key: string, fallback?: string, params?: Record<string, string | number>) => {
+      const localValue = localForLocale(languageCode, key);
+      const apiValue = apiTranslations[key];
+      const enValue = englishBaseline(key);
+
+      let resolved: string;
+      if (apiValue) {
+        if (
+          languageCode !== "en" &&
+          localValue &&
+          enValue &&
+          apiValue === enValue &&
+          localValue !== enValue
+        ) {
+          resolved = localValue;
+        } else {
+          resolved = apiValue;
+        }
+      } else if (localValue) {
+        resolved = localValue;
+      } else {
+        resolved = fallback ?? key;
+      }
+
+      if (!params) return resolved;
+      return Object.entries(params).reduce(
+        (acc, [name, value]) =>
+          acc
+            .replace(new RegExp(`\\{${name}\\}`, "g"), String(value))
+            .replace(new RegExp(`\\{\\{${name}\\}\\}`, "g"), String(value)),
+        resolved,
+      );
     },
-    [apiTranslations],
+    [apiTranslations, languageCode],
   );
 
   return { t, languageCode, changeLanguage, apiTranslations };

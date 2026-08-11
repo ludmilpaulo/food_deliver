@@ -76,8 +76,11 @@ export const doctorApi = createApi({
   baseQuery: doctorBaseQuery,
   tagTypes: ["DoctorDashboard", "DoctorProfile", "DoctorServices", "DoctorAvailability", "DoctorSlots", "DoctorAppointments", "PublicDoctors", "DoctorVerification", "DoctorDocuments"],
   endpoints: (builder) => ({
-    getDoctorDashboard: builder.query<DoctorDashboardStats, void>({
-      query: () => "/me/dashboard/",
+    getDoctorDashboard: builder.query<DoctorDashboardStats, { days?: number } | void>({
+      query: (params) => {
+        const days = params && "days" in params ? params.days : undefined;
+        return days ? `/me/dashboard/?days=${days}` : "/me/dashboard/";
+      },
       transformResponse: (response: RawRecord) => mapDashboardStats(response),
       providesTags: ["DoctorDashboard", "DoctorProfile", "DoctorAppointments"],
     }),

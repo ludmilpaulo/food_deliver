@@ -7,6 +7,7 @@ export type PlatformModuleAdmin = {
   slug: string;
   description: string;
   icon: string;
+  icon_url?: string | null;
   route: string;
   gradient_start: string;
   gradient_end: string;
@@ -15,6 +16,7 @@ export type PlatformModuleAdmin = {
   is_active: boolean;
   available_on_web: boolean;
   available_on_mobile: boolean;
+  available_on_parceiro: boolean;
   requires_auth: boolean;
 };
 
@@ -32,6 +34,7 @@ export type BusinessCategoryAdmin = {
   is_active: boolean;
   available_on_web: boolean;
   available_on_mobile: boolean;
+  available_on_parceiro: boolean;
   sort_order: number;
 };
 
@@ -90,12 +93,17 @@ export type RideCategoryAdmin = {
 const ADMIN_BASE = "/api/platform/admin";
 
 export async function fetchAdminModules() {
-  const { data } = await api.get<PlatformModuleAdmin[]>(`${ADMIN_BASE}/modules/`);
+  const { data } = await api.get<PlatformModuleAdmin[]>(`${ADMIN_BASE}/services/`);
+  return data;
+}
+
+export async function createAdminModule(payload: Partial<PlatformModuleAdmin>) {
+  const { data } = await api.post<PlatformModuleAdmin>(`${ADMIN_BASE}/services/`, payload);
   return data;
 }
 
 export async function updateAdminModule(id: number, payload: Partial<PlatformModuleAdmin>) {
-  const { data } = await api.patch<PlatformModuleAdmin>(`${ADMIN_BASE}/modules/${id}/`, payload);
+  const { data } = await api.patch<PlatformModuleAdmin>(`${ADMIN_BASE}/services/${id}/`, payload);
   return data;
 }
 

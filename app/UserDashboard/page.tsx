@@ -1,17 +1,24 @@
 "use client";
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import DownloadInvoice from "./DownloadInvoice";
 import OrderHistory from "./OrderHistory";
 import UpdateProfile from "./UpdateProfile";
 import dynamic from "next/dynamic";
 import Sidebar from "./Sidebar";
 import Bookings from "./Bookings";
+import PropertyApplicationsPanel from "./PropertyApplicationsPanel";
+import DocumentsVaultPanel from "./DocumentsVaultPanel";
+import ActiveRentalsPanel from "./ActiveRentalsPanel";
+import StayBookingsPanel from "./StayBookingsPanel";
 import { useTranslation } from "@/hooks/useTranslation";
 import withAuth from "@/components/ProtectedPage";
 import { useAppDispatch } from "@/redux/store";
 import { logoutUser } from "@/redux/slices/authSlice";
 import api from "@/services/api";
+import { readAuthToken } from "@/lib/authToken";
+import type { PropertyServicesSummary } from "@/types/propertyApplication";
+import { fetchPropertyServices } from "@/services/propertyApplicationApi";
 
 const TrackOrders = dynamic(() => import("./TrackOrders"), { ssr: false });
 const TrackDelivery = dynamic(() => import("./TrackDelivery"), { ssr: false });
@@ -19,10 +26,34 @@ const TrackDelivery = dynamic(() => import("./TrackDelivery"), { ssr: false });
 const UserDashboard: React.FC = () => {
   const { t } = useTranslation();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
-  const [selectedMenu, setSelectedMenu] = useState<string>("trackOrders");
+  const [selectedMenu, setSelectedMenu] = useState<string>(
+    searchParams.get("menu") || "trackOrders",
+  );
   const [deactivateModal, setDeactivateModal] = useState(false);
   const [deactivating, setDeactivating] = useState(false);
+  const [services, setServices] = useState<PropertyServicesSummary | null>(null);
+
+  useEffect(() => {
+    const menu = searchParams.get("menu");
+    if (menu) setSelectedMenu(menu);
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!readAuthToken()) return;
+    let cancelled = false;
+    fetchPropertyServices()
+      .then((data) => {
+        if (!cancelled) setServices(data);
+      })
+      .catch(() => {
+        if (!cancelled) setServices(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleConfirmDeactivate = async () => {
     setDeactivating(true);
@@ -32,7 +63,12 @@ const UserDashboard: React.FC = () => {
       setDeactivateModal(false);
       router.replace("/LoginScreenUser");
     } catch {
-      alert(t("deactivateFailed", "Could not deactivate your account. Please try again or contact support."));
+      alert(
+        t(
+          "deactivateFailed",
+          "Could not deactivate your account. Please try again or contact support.",
+        ),
+      );
     } finally {
       setDeactivating(false);
     }
@@ -52,6 +88,19 @@ const UserDashboard: React.FC = () => {
         return <OrderHistory />;
       case "downloadInvoice":
         return <DownloadInvoice />;
+      case "properties":
+        return <PropertyApplicationsPanel />;
+      case "documents":
+        return <DocumentsVaultPanel />;
+      case "activeRentals":
+        return (
+          <ActiveRentalsPanel
+            rentals={services?.active_rentals}
+            loading={services === null}
+          />
+        );
+      case "upcomingStays":
+        return <StayBookingsPanel />;
       default:
         return <TrackOrders />;
     }
@@ -63,11 +112,12 @@ const UserDashboard: React.FC = () => {
         selectedMenu={selectedMenu}
         setSelectedMenu={setSelectedMenu}
         onDeactivate={() => setDeactivateModal(true)}
+        services={services}
       />
       <main className="flex-1 py-10 px-4 sm:px-10 md:px-16 transition-all min-h-screen bg-gradient-to-b from-yellow-50 via-blue-50/20 to-white/70 shadow-inner rounded-l-3xl">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-2xl md:text-3xl font-extrabold text-blue-900 mb-8 text-center drop-shadow-lg">
-            {t("welcomeDashboard", "Welcome to your Dashboard")}
+            {t("myKudya", "My Kudya")}
           </h1>
           <div className="bg-white/80 shadow-xl rounded-3xl p-6 min-h-[420px]">
             {renderComponent()}

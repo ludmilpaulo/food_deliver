@@ -1,21 +1,17 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { baseAPI } from "@/services/types";
 import { readAuthToken } from "@/lib/authToken";
 import { useTranslation } from "@/hooks/useTranslation";
+import { usePropertyTranslation } from "@/hooks/usePropertyTranslation";
 
 type Props = {
   propertyId: number;
   listingType: string;
   propertyTitle: string;
-};
-
-const LISTING_LABELS: Record<string, string> = {
-  rent_daily: "Rent per Day",
-  rent_monthly: "Rent per Month",
-  buy: "For Sale",
+  allowedLeaseMonths?: number[];
 };
 
 function enquiryTypeForListing(listingType: string): string {
@@ -23,19 +19,22 @@ function enquiryTypeForListing(listingType: string): string {
   return "rental_application";
 }
 
-function defaultMessage(listingType: string, title: string): string {
-  if (listingType === "buy") {
-    return `Hello, I am interested in purchasing "${title}". Please share next steps for viewing and making an offer.`;
-  }
-  if (listingType === "rent_monthly") {
-    return `Hello, I would like to apply to rent "${title}" on a monthly basis. Please let me know availability and required documents.`;
-  }
-  return `Hello, I would like to rent "${title}" and check available dates. Please confirm pricing and booking steps.`;
-}
+export default function PropertyEnquiryPanel({
+  propertyId,
+  listingType,
+  propertyTitle,
+  allowedLeaseMonths,
+}: Props) {
+  const { t, languageCode } = useTranslation();
+  const { listingTypeLabel, defaultEnquiryMessage } = usePropertyTranslation();
+  const [message, setMessage] = useState(() => defaultEnquiryMessage(listingType, propertyTitle));
+  const leaseMonths = Array.isArray(allowedLeaseMonths)
+    ? allowedLeaseMonths.filter((n) => Number.isFinite(n) && n > 0)
+    : [];
 
-export default function PropertyEnquiryPanel({ propertyId, listingType, propertyTitle }: Props) {
-  const { t } = useTranslation();
-  const [message, setMessage] = useState(() => defaultMessage(listingType, propertyTitle));
+  useEffect(() => {
+    setMessage(defaultEnquiryMessage(listingType, propertyTitle));
+  }, [defaultEnquiryMessage, languageCode, listingType, propertyTitle]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -116,8 +115,44 @@ export default function PropertyEnquiryPanel({ propertyId, listingType, property
           : t("interestedInRenting", "Interested in renting?")}
       </h2>
       <p className="mt-1 text-sm text-teal-700">
-        {LISTING_LABELS[listingType] ?? listingType} · {propertyTitle}
+        {listingTypeLabel(listingType)} · {propertyTitle}
       </p>
+
+      {listingType !== "buy" && leaseMonths.length > 0 && (
+        <div className="mt-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-teal-800/70">
+            {t("allowedLeaseMonths", "Available lease terms")}
+          </p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {leaseMonths.map((months) => (
+              <span
+                key={months}
+                className="rounded-lg bg-white px-2.5 py-1 text-xs font-semibold text-teal-800 ring-1 ring-teal-200"
+              >
+                {t("monthsLabel", "{n} months").replace("{n}", String(months))}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {listingType !== "buy" && (
+        <div className="mt-4">
+          <Link
+            href={
+              readAuthToken()
+                ? `/properties/${propertyId}/apply`
+                : `/LoginScreenUser?next=${encodeURIComponent(`/properties/${propertyId}/apply`)}`
+            }
+            className="inline-flex rounded-xl bg-teal-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal-800"
+          >
+            {t("applyToRent", "Apply to rent")}
+          </Link>
+          <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-teal-800/70">
+            {t("sendEnquiry", "Or send a message")}
+          </p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="mt-4 space-y-4">
         <label className="block text-sm">
@@ -147,7 +182,11 @@ export default function PropertyEnquiryPanel({ propertyId, listingType, property
             disabled={submitting}
             className="rounded-xl bg-teal-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-60"
           >
-            {submitting ? t("loading") : actionLabel}
+            {submitting
+              ? t("loading")
+              : listingType === "buy"
+                ? actionLabel
+                : t("sendEnquiry", "Send enquiry")}
           </button>
           {!readAuthToken() && (
             <Link

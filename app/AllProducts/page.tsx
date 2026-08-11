@@ -15,7 +15,8 @@ const PAGE_SIZE = 12;
 const BrowseProductsPage: React.FC = () => {
   const { t, languageCode } = useTranslation();
   const dispatch = useAppDispatch();
-  const { data: allProducts, loading } = useAppSelector((s) => s.allProducts);
+  const { data: allProductsRaw, loading } = useAppSelector((s) => s.allProducts);
+  const allProducts = Array.isArray(allProductsRaw) ? allProductsRaw : [];
 
   // UI State
   const [search, setSearch] = useState("");

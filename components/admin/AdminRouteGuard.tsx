@@ -101,15 +101,20 @@ export default function AdminRouteGuard({ children }: { children: React.ReactNod
 
   if (!authHydrated || !ready) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+      <div className="flex h-screen items-center justify-center bg-[#f4f6f9]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-11 w-11 animate-spin rounded-full border-[3px] border-slate-200 border-t-blue-600" />
+          <p className="text-sm font-medium text-slate-500">
+            {t("checkingAccess", "Checking admin access…")}
+          </p>
+        </div>
       </div>
     );
   }
 
   if (!allowed) {
     return (
-      <div className="p-8 text-center text-slate-600">
+      <div className="flex h-screen items-center justify-center bg-slate-50 p-8 text-center text-slate-600">
         {t("adminAccessDenied", "Platform admin access required.")}
       </div>
     );

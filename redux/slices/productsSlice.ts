@@ -5,6 +5,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import API from '@/services/api';
 import { fetchProductsByStore as fetchProductsByStoreV1 } from '@/features/marketplace/api/checkoutApi';
 import type { MarketplaceVertical } from '@/features/marketplace/lib/normalizeStores';
+import { unwrapListPayload } from '@/utils/unwrapListPayload';
 
 interface ProductsState {
   data: Product[];
@@ -28,7 +29,7 @@ export const fetchProductsByStore = createAsyncThunk<
     return (await fetchProductsByStoreV1(storeId, vertical)) as Product[];
   }
   const resp = await API.get(`/store/products/by_store/?store=${storeId}`);
-  return resp.data;
+  return unwrapListPayload<Product>(resp.data);
 });
 
 
@@ -44,11 +45,12 @@ const productsSlice = createSlice({
         state.vertical = action.meta.arg.vertical ?? null;
       })
       .addCase(fetchProductsByStore.fulfilled, (state, action) => {
-        state.data = action.payload;
+        state.data = Array.isArray(action.payload) ? action.payload : [];
         state.loading = false;
       })
       .addCase(fetchProductsByStore.rejected, (state, action) => {
         state.loading = false;
+        state.data = [];
         state.error = action.error.message || 'Failed to fetch products';
       });
   },

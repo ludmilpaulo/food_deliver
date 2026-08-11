@@ -1,10 +1,42 @@
+function normalizeToken(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+/**
+ * Read the JWT from localStorage.
+ * Accepts both JSON-stringified tokens (`"eyJ..."`) and raw JWTs (`eyJ...`).
+ * Never throws — malformed storage returns null.
+ */
 export function readAuthToken(): string | null {
-  if (typeof window === 'undefined') return null;
+  if (typeof window === "undefined") return null;
   try {
-    const raw = localStorage.getItem('auth_token');
+    const raw = localStorage.getItem("auth_token");
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as unknown;
-    return typeof parsed === 'string' && parsed.length > 0 ? parsed : null;
+    const trimmed = raw.trim();
+    if (!trimmed) return null;
+
+    // Preferred format: JSON.stringify(token)
+    if (trimmed.startsWith('"') || trimmed.startsWith("{") || trimmed.startsWith("[")) {
+      try {
+        return normalizeToken(JSON.parse(trimmed));
+      } catch {
+        // Fall through to raw / repair paths below.
+      }
+    }
+
+    // Legacy / mistaken writes: bare JWT without JSON quotes
+    if (/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(trimmed)) {
+      return trimmed;
+    }
+
+    // Last resort: try JSON.parse anyway (wrapped in catch)
+    try {
+      return normalizeToken(JSON.parse(trimmed));
+    } catch {
+      return null;
+    }
   } catch {
     return null;
   }
@@ -18,9 +50,9 @@ export type StoredAuthUser = {
 };
 
 export function readStoredAuthUser(): StoredAuthUser | null {
-  if (typeof window === 'undefined') return null;
+  if (typeof window === "undefined") return null;
   try {
-    const raw = localStorage.getItem('auth_user');
+    const raw = localStorage.getItem("auth_user");
     if (!raw) return null;
     return JSON.parse(raw) as StoredAuthUser;
   } catch {
@@ -29,19 +61,19 @@ export function readStoredAuthUser(): StoredAuthUser | null {
 }
 
 export function writeAuthToken(token: string): void {
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
   try {
-    localStorage.setItem('auth_token', JSON.stringify(token));
+    localStorage.setItem("auth_token", JSON.stringify(token));
   } catch {
     // ignore storage failures
   }
 }
 
 export function clearAuthToken(): void {
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
   try {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('auth_user');
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("auth_user");
   } catch {
     // ignore storage failures
   }

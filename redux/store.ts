@@ -13,6 +13,7 @@ import allProductsReducer from "./slices/allProductsSlice";
 import relatedProductsReducer from "./slices/relatedProductsSlice";
 import servicesReducer from "./slices/servicesSlice";
 import { doctorApi, appointmentsApi, adminDoctorApi } from "./slices/doctorApi";
+import { propertyApi } from "./slices/propertyApi";
 import { adminDriverApi } from "./slices/driverAdminApi";
 import { healthcareApi } from "./slices/healthcareApi";
 import { notificationApi } from "./slices/notificationApi";
@@ -37,6 +38,7 @@ export const store = configureStore({
     services: servicesReducer,
     [aboutApi.reducerPath]: aboutApi.reducer,
     [doctorApi.reducerPath]: doctorApi.reducer,
+    [propertyApi.reducerPath]: propertyApi.reducer,
     [healthcareApi.reducerPath]: healthcareApi.reducer,
     [appointmentsApi.reducerPath]: appointmentsApi.reducer,
     [adminDoctorApi.reducerPath]: adminDoctorApi.reducer,
@@ -51,6 +53,7 @@ export const store = configureStore({
     getDefaultMiddleware()
       .concat(aboutApi.middleware)
       .concat(doctorApi.middleware)
+      .concat(propertyApi.middleware)
       .concat(healthcareApi.middleware)
       .concat(appointmentsApi.middleware)
       .concat(adminDoctorApi.middleware)

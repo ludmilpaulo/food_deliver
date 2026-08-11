@@ -51,6 +51,11 @@ export default function DynamicBusinessDashboardPage() {
         }
         if (expected === "doctor") {
           router.replace("/dashboard/doctor");
+          return;
+        }
+        if (expected === "property") {
+          router.replace("/dashboard/property");
+          return;
         }
       } catch {
         if (!cancelled) {

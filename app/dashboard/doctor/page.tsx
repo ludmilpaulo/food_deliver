@@ -10,6 +10,8 @@ import DoctorServicesPanel from "@/components/doctor/DoctorServicesPanel";
 import DoctorAvailabilityPanel from "@/components/doctor/DoctorAvailabilityPanel";
 import DoctorAppointmentsPanel from "@/components/doctor/DoctorAppointmentsPanel";
 import DoctorVerificationRequired from "@/components/doctor/DoctorVerificationRequired";
+import DoctorAnalyticsCharts from "@/components/doctor/DoctorAnalyticsCharts";
+import type { AnalyticsDays } from "@/components/analytics/AnalyticsDaysFilter";
 import { useDoctorTranslation } from "@/hooks/useDoctorTranslation";
 import { verificationStatusLabel } from "@/configs/doctorTranslations";
 import {
@@ -23,8 +25,9 @@ export default function DoctorDashboardPage() {
   const router = useRouter();
   const { dt, languageCode } = useDoctorTranslation();
   const [activeTab, setActiveTab] = useState<DoctorDashboardTab>("overview");
+  const [days, setDays] = useState<AnalyticsDays>(7);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const { data: stats, isLoading, isError } = useGetDoctorDashboardQuery(undefined, {
+  const { data: stats, isLoading, isError } = useGetDoctorDashboardQuery({ days }, {
     pollingInterval: 60000,
   });
   const { data: verification, isLoading: verificationLoading } = useGetDoctorVerificationStatusQuery();
@@ -123,6 +126,7 @@ export default function DoctorDashboardPage() {
         {activeTab === "overview" && (
           <>
             <DoctorStatsGrid stats={stats} currencyFormatter={currencyFormatter} />
+            <DoctorAnalyticsCharts analytics={stats.analytics} days={days} onDaysChange={setDays} />
             <section className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <h2 className="text-lg font-bold text-slate-900">{dt("recentActivity")}</h2>

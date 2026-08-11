@@ -129,28 +129,36 @@ const TrackOrders: React.FC = () => {
     }
   }, [user?.token]);
 
-  // Calculate distances
-  const calculateDistanceAndTime = useCallback(() => {
-    if (userLocation) {
-      const newDistances = { ...distances };
-      orders.forEach((order) => {
-        const driverLocation = orderLocations[order.id]?.driver_location;
-        if (driverLocation) {
-          const parsedLocation = parseLocation(driverLocation);
-          const result = haversineDistance(userLocation, parsedLocation);
-          newDistances[order.id] = {
-            distance: `${result.distance.toFixed(2)} km`,
-            duration: `${Math.ceil(result.duration)} mins`,
-          };
-        }
-      });
-      setDistances(newDistances);
-    }
-  }, [userLocation, orders, orderLocations, distances]);
-
+  // Calculate distances — do not depend on `distances` (that caused an infinite setState loop).
   useEffect(() => {
-    calculateDistanceAndTime();
-  }, [userLocation, orders, orderLocations, calculateDistanceAndTime]);
+    if (!userLocation) return;
+    const newDistances: Record<number, DistanceInfo> = {};
+    orders.forEach((order) => {
+      const driverLocation = orderLocations[order.id]?.driver_location;
+      if (!driverLocation) return;
+      const parsedLocation = parseLocation(driverLocation);
+      const result = haversineDistance(userLocation, parsedLocation);
+      newDistances[order.id] = {
+        distance: `${result.distance.toFixed(2)} km`,
+        duration: `${Math.ceil(result.duration)} mins`,
+      };
+    });
+    setDistances((prev) => {
+      const prevKeys = Object.keys(prev);
+      const nextKeys = Object.keys(newDistances);
+      if (
+        prevKeys.length === nextKeys.length &&
+        nextKeys.every(
+          (key) =>
+            prev[Number(key)]?.distance === newDistances[Number(key)]?.distance &&
+            prev[Number(key)]?.duration === newDistances[Number(key)]?.duration,
+        )
+      ) {
+        return prev;
+      }
+      return newDistances;
+    });
+  }, [userLocation, orders, orderLocations]);
 
   // Fetch chat messages for an order
   const fetchChatMessages = useCallback((order: TrackOrder) => {

@@ -1,8 +1,7 @@
 import { baseAPI } from "./types";
 import type { SupportedLocale } from "@/configs/translations";
-import { isSuperAppModuleEnabled } from "@/lib/platformModules";
 
-export type ClientPlatform = "web" | "mobile";
+export type ClientPlatform = "web" | "mobile" | "parceiro" | "customer";
 
 export type HomeModule = {
   id: number;
@@ -17,6 +16,7 @@ export type HomeModule = {
   isActive: boolean;
   availableOnWeb: boolean;
   availableOnMobile: boolean;
+  availableOnParceiro?: boolean;
   sortOrder: number;
 };
 
@@ -25,9 +25,12 @@ type RawHomeModule = Partial<HomeModule> & {
   key?: string;
   title?: string;
   subtitle?: string;
+  short_description?: string;
   gradient_start?: string;
   gradient_end?: string;
   order?: number;
+  display_order?: number;
+  route?: string;
 };
 
 export type BusinessCategory = {
@@ -43,6 +46,7 @@ export type BusinessCategory = {
   isActive: boolean;
   availableOnWeb: boolean;
   availableOnMobile: boolean;
+  availableOnParceiro?: boolean;
   sortOrder: number;
 };
 
@@ -66,6 +70,7 @@ export type BusinessProfile = {
   isActive: boolean;
 };
 
+/** Client-side route wiring for known keys — not a service catalog. */
 const WEB_MODULE_ROUTES_BY_KEY: Record<string, string> = {
   food: "/food",
   groceries: "/groceries",
@@ -100,19 +105,6 @@ const LEGACY_MODULE_ROUTES: Record<string, string> = {
   ComingSoon: "/PartnerDashboard",
   Business: "/PartnerDashboard",
 };
-
-export const FALLBACK_HOME_MODULES: HomeModule[] = [
-  { id: 1, key: "food", name: "Food", slug: "food", description: "Restaurants & meals", icon: "utensils", color: "#F59E0B", gradient: ["#F59E0B", "#D97706"], route: "/food", isActive: true, availableOnWeb: true, availableOnMobile: true, sortOrder: 10 },
-  { id: 2, key: "groceries", name: "Groceries", slug: "groceries", description: "Shops near you", icon: "shopping-basket", color: "#10B981", gradient: ["#10B981", "#059669"], route: "/groceries", isActive: true, availableOnWeb: true, availableOnMobile: true, sortOrder: 20 },
-  { id: 3, key: "property", name: "Property", slug: "property", description: "Rent or buy", icon: "home", color: "#8B5CF6", gradient: ["#8B5CF6", "#6D28D9"], route: "/properties", isActive: true, availableOnWeb: true, availableOnMobile: true, sortOrder: 30 },
-  { id: 4, key: "accommodation", name: "Stay", slug: "stay", description: "Book accommodation", icon: "bed", color: "#0EA5E9", gradient: ["#0EA5E9", "#0369A1"], route: "/stay", isActive: true, availableOnWeb: true, availableOnMobile: true, sortOrder: 40 },
-  { id: 5, key: "services", name: "Services", slug: "services", description: "Local professionals", icon: "briefcase", color: "#2563EB", gradient: ["#2563EB", "#1D4ED8"], route: "/services", isActive: true, availableOnWeb: true, availableOnMobile: true, sortOrder: 50 },
-  { id: 6, key: "doctors", name: "Doctors", slug: "doctors", description: "Book consultations", icon: "stethoscope", color: "#DC2626", gradient: ["#DC2626", "#B91C1C"], route: "/Doctors", isActive: true, availableOnWeb: true, availableOnMobile: true, sortOrder: 60 },
-  { id: 7, key: "car_rental", name: "Car Rental", slug: "car-rental", description: "Rent a vehicle", icon: "car-side", color: "#0F766E", gradient: ["#0F766E", "#115E59"], route: "/car-rental", isActive: true, availableOnWeb: true, availableOnMobile: true, sortOrder: 70 },
-  { id: 8, key: "package", name: "Send Package", slug: "package", description: "Courier delivery", icon: "package", color: "#7C3AED", gradient: ["#7C3AED", "#6D28D9"], route: "/send-package", isActive: true, availableOnWeb: true, availableOnMobile: true, sortOrder: 80 },
-  { id: 9, key: "wallet", name: "Wallet", slug: "wallet", description: "Pay & manage money", icon: "wallet", color: "#475569", gradient: ["#475569", "#334155"], route: "/wallet", isActive: true, availableOnWeb: true, availableOnMobile: true, sortOrder: 90 },
-  { id: 10, key: "business", name: "Business", slug: "business", description: "Corporate accounts", icon: "building", color: "#1E293B", gradient: ["#1E293B", "#0F172A"], route: "/business", isActive: true, availableOnWeb: true, availableOnMobile: true, sortOrder: 100 },
-];
 
 export function resolveWebModuleRoute(route: string | undefined, key?: string): string {
   const moduleKey = (key || "").toLowerCase();
@@ -165,52 +157,62 @@ function mapHomeModule(item: RawHomeModule, index: number): HomeModule {
     key,
     name: item.name || item.title || "",
     slug: item.slug || key || "",
-    description: item.description || item.subtitle || "",
+    description: item.description || item.subtitle || item.short_description || "",
     icon: item.icon || "grid",
     color: item.color || gradientStart,
     gradient: [gradientStart, gradientEnd],
-      route: resolveWebModuleRoute(item.route, key || item.slug),
+    route: resolveWebModuleRoute(item.route, key || item.slug),
     isActive: item.isActive ?? true,
-    availableOnWeb: item.availableOnWeb ?? key !== "rides",
+    availableOnWeb: item.availableOnWeb ?? true,
     availableOnMobile: item.availableOnMobile ?? true,
-    sortOrder: item.sortOrder ?? item.order ?? index,
+    availableOnParceiro: item.availableOnParceiro ?? true,
+    sortOrder: item.sortOrder ?? item.display_order ?? item.order ?? index,
   };
 }
 
-function filterHomeModules(modules: HomeModule[], platform: ClientPlatform): HomeModule[] {
-  return modules
-    .filter((item) => {
-      if (!isSuperAppModuleEnabled(item.key)) return false;
-      if (platform === "web" && (item.availableOnWeb === false || item.key === "rides")) {
-        return false;
-      }
-      if (platform === "mobile" && item.availableOnMobile === false) {
-        return false;
-      }
-      return item.isActive;
-    })
-    .sort((a, b) => a.sortOrder - b.sortOrder);
+function normalizePlatformParam(platform: ClientPlatform): string {
+  if (platform === "customer") return "mobile";
+  return platform;
 }
 
+/** Prefer /api/platform/services/; fall back to legacy home-modules. */
 export async function fetchHomeModules(
   lang: SupportedLocale,
   platform: ClientPlatform = "web",
 ): Promise<HomeModule[]> {
-  const params = new URLSearchParams({ lang, platform });
-  try {
-    const response = await fetch(`${baseAPI}/api/platform/home-modules/?${params.toString()}`, {
-      headers: withLanguageHeaders(lang),
-    });
-    if (!response.ok) {
-      throw new Error("Failed to load home modules");
+  const params = new URLSearchParams({ lang, platform: normalizePlatformParam(platform) });
+  const endpoints = [
+    `${baseAPI}/api/platform/services/?${params.toString()}`,
+    `${baseAPI}/api/platform/home-modules/?${params.toString()}`,
+  ];
+
+  for (const url of endpoints) {
+    try {
+      const response = await fetch(url, { headers: withLanguageHeaders(lang) });
+      if (!response.ok) continue;
+      const body = (await response.json()) as RawHomeModule[] | { results?: RawHomeModule[] };
+      const rows = Array.isArray(body) ? body : body.results || [];
+      return rows.map(mapHomeModule).sort((a, b) => a.sortOrder - b.sortOrder);
+    } catch {
+      // try next endpoint
     }
-    const data = (await response.json()) as RawHomeModule[];
-    const modules = filterHomeModules(data.map(mapHomeModule), platform);
-    if (modules.length > 0) return modules;
-  } catch {
-    // fall through to defaults
   }
-  return filterHomeModules(FALLBACK_HOME_MODULES, platform);
+  return [];
+}
+
+export async function fetchPlatformService(
+  slug: string,
+  lang: SupportedLocale,
+  platform: ClientPlatform = "web",
+): Promise<HomeModule | null> {
+  const params = new URLSearchParams({ lang, platform: normalizePlatformParam(platform) });
+  const response = await fetch(
+    `${baseAPI}/api/platform/services/${encodeURIComponent(slug)}/?${params.toString()}`,
+    { headers: withLanguageHeaders(lang) },
+  );
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error("Failed to load platform service");
+  return mapHomeModule((await response.json()) as RawHomeModule, 0);
 }
 
 type RawBusinessCategory = Partial<BusinessCategory> & {
@@ -219,6 +221,7 @@ type RawBusinessCategory = Partial<BusinessCategory> & {
   is_active?: boolean;
   available_on_web?: boolean;
   available_on_mobile?: boolean;
+  available_on_parceiro?: boolean;
   sort_order?: number;
 };
 
@@ -238,6 +241,7 @@ function normalizeBusinessCategory(raw: RawBusinessCategory, index: number): Bus
     isActive: raw.isActive ?? raw.is_active ?? true,
     availableOnWeb: raw.availableOnWeb ?? raw.available_on_web ?? true,
     availableOnMobile: raw.availableOnMobile ?? raw.available_on_mobile ?? true,
+    availableOnParceiro: raw.availableOnParceiro ?? raw.available_on_parceiro ?? true,
     sortOrder: raw.sortOrder ?? raw.sort_order ?? index,
   };
 }
@@ -246,7 +250,7 @@ export async function fetchBusinessCategories(
   lang: SupportedLocale,
   platform: ClientPlatform = "web",
 ): Promise<BusinessCategory[]> {
-  const params = new URLSearchParams({ platform });
+  const params = new URLSearchParams({ platform: normalizePlatformParam(platform) });
   const response = await fetch(`${baseAPI}/api/platform/business-categories/?${params.toString()}`, {
     headers: withLanguageHeaders(lang),
   });

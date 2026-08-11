@@ -34,7 +34,10 @@ const nextConfig = {
   compress: true,
   turbopack: {},
   webpack: (config, { isServer }) => {
-    if (!isServer && config.plugins) {
+    // Only register a service worker in production builds. Generating one
+    // during `next dev` can cache stale/HTML chunks and surface as
+    // Runtime SyntaxError: "Invalid or unexpected token".
+    if (!isServer && isProd && config.plugins) {
       config.plugins = config.plugins.filter((p) => !(p instanceof GenerateSW));
       config.plugins.push(
         new GenerateSW({

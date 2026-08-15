@@ -100,7 +100,7 @@ export const getServiceAvailability = async (
   return data;
 };
 
-export const createBooking = async (payload: CreateBookingPayload) => {
+export const createBooking = async (payload: CreateBookingPayload): Promise<ServiceBooking> => {
   const { data } = await api.post(`${baseAPI}/services/bookings/`, payload);
   return data;
 };

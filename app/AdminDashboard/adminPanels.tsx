@@ -25,6 +25,7 @@ const LiveSupportAdmin = dynamic(() => import("@/components/admin/LiveSupportAdm
 const Payouts = dynamic(() => import("./Payouts"));
 const DatabaseActions = dynamic(() => import("./DatabaseActions"));
 const BackupExport = dynamic(() => import("@/components/BackupExport"));
+const PaymentsAdmin = dynamic(() => import("@/components/admin/PaymentsAdmin"));
 
 export type AdminPanelId =
   | "superApp"
@@ -46,7 +47,8 @@ export type AdminPanelId =
   | "pricing"
   | "verticalOps"
   | "translations"
-  | "backupExport";
+  | "backupExport"
+  | "payments";
 
 export function AdminPanelContent({ activePanel }: { activePanel: AdminPanelId }) {
   switch (activePanel) {
@@ -89,6 +91,8 @@ export function AdminPanelContent({ activePanel }: { activePanel: AdminPanelId }
       return <Payouts />;
     case "backupExport":
       return <BackupExport />;
+    case "payments":
+      return <PaymentsAdmin />;
     default:
       return <SuperAppAdmin />;
   }

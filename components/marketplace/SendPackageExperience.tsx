@@ -11,6 +11,12 @@ import {
 } from '@/redux/slices/marketplaceApi';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/redux/store';
+import PaymentDetails from '@/app/Checkout/PaymentDetails';
+import {
+  useCreatePaymentMutation,
+  useUploadPaymentProofMutation,
+} from '@/redux/slices/paymentsApi';
+import { followUpPayment } from '@/lib/followUpPayment';
 
 const PACKAGE_TYPES = ['small', 'medium', 'large', 'fragile', 'document', 'envelope'] as const;
 const URGENCY_OPTIONS = ['standard', 'express', 'same_day'] as const;
@@ -33,6 +39,11 @@ export default function SendPackageExperience() {
   const [urgency, setUrgency] = useState<(typeof URGENCY_OPTIONS)[number]>('standard');
   const [notes, setNotes] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState('');
+  const [paymentPhone, setPaymentPhone] = useState('');
+  const [proofFile, setProofFile] = useState<File | null>(null);
+  const [createPayment] = useCreatePaymentMutation();
+  const [uploadProof] = useUploadPaymentProofMutation();
 
   const resolveAddresses = async (): Promise<{ pickup: LatLng; dropoff: LatLng } | null> => {
     const [pickupHits, dropoffHits] = await Promise.all([
@@ -93,7 +104,7 @@ export default function SendPackageExperience() {
     try {
       const coords = pickup && dropoff ? { pickup, dropoff } : await resolveAddresses();
       if (!coords) return;
-      await requestPackage({
+      const parcel = await requestPackage({
         pickup_address: coords.pickup.label,
         pickup_lat: coords.pickup.lat,
         pickup_lng: coords.pickup.lng,
@@ -106,6 +117,22 @@ export default function SendPackageExperience() {
         recipient_phone: recipientPhone,
         package_notes: notes,
       }).unwrap();
+      const parcelId = typeof parcel.id === 'number' ? parcel.id : Number(parcel.id);
+      const amount =
+        typeof parcel.price === 'number' || typeof parcel.price === 'string'
+          ? parcel.price
+          : estimate?.estimated_price;
+      await followUpPayment({
+        createPayment,
+        uploadProof,
+        amount: amount ?? 0,
+        method: paymentMethod,
+        phone: paymentPhone,
+        proofFile,
+        serviceType: 'package',
+        objectId: Number.isFinite(parcelId) ? parcelId : undefined,
+        currency: typeof parcel.currency === 'string' ? parcel.currency : estimate?.currency,
+      });
     } catch {
       setError(t('bookingFailed', 'Could not complete request'));
     }
@@ -178,6 +205,14 @@ export default function SendPackageExperience() {
           placeholder={t('packageNotes', 'Package description')}
           className="w-full rounded-xl border border-slate-200 px-4 py-3"
           rows={3}
+        />
+        <PaymentDetails
+          paymentMethod={paymentMethod}
+          setPaymentMethod={setPaymentMethod}
+          phone={paymentPhone}
+          setPhone={setPaymentPhone}
+          proofFile={proofFile}
+          setProofFile={setProofFile}
         />
 
         {estimate ? (

@@ -21,6 +21,7 @@ export const ADMIN_PANEL_IDS: AdminPanelId[] = [
   'verticalOps',
   'translations',
   'backupExport',
+  'payments',
 ];
 
 export function isAdminPanelId(value: string | null | undefined): value is AdminPanelId {

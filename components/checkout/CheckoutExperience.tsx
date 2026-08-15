@@ -13,11 +13,20 @@ import AddressInput from '@/app/Checkout/AddressInput';
 import PaymentDetails from '@/app/Checkout/PaymentDetails';
 import { validateCouponRequest } from '@/services/checkoutService';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useCreatePaymentMutation, useUploadPaymentProofMutation } from '@/redux/slices/paymentsApi';
+import type { PaymentInitializeResponse } from '@/types/payments';
 
 type StoreGroup = {
   storeId: number;
   items: CartItem[];
   subtotal: number;
+};
+
+type CheckoutResult = {
+  status?: string;
+  error?: string;
+  errors?: Array<{ error: string }>;
+  created_orders?: number[];
 };
 
 type MultipleOrderPayload = {
@@ -63,7 +72,9 @@ export default function CheckoutExperience() {
 
   const [useCurrentLocation, setUseCurrentLocation] = useState(true);
   const [userAddress, setUserAddress] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('Entrega');
+  const [paymentMethod, setPaymentMethod] = useState('');
+  const [paymentPhone, setPaymentPhone] = useState('');
+  const [proofFile, setProofFile] = useState<File | null>(null);
   const [deliveryNotes, setDeliveryNotes] = useState('');
   const [couponCode, setCouponCode] = useState('');
   const [couponDiscount, setCouponDiscount] = useState(0);
@@ -71,6 +82,8 @@ export default function CheckoutExperience() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [quotedFees, setQuotedFees] = useState<Record<number, number>>({});
+  const [createPayment] = useCreatePaymentMutation();
+  const [uploadProof] = useUploadPaymentProofMutation();
 
   const storeGroups = useMemo(() => groupItemsByStore(items), [items]);
   const subtotal = useMemo(
@@ -182,8 +195,46 @@ export default function CheckoutExperience() {
         },
         body: JSON.stringify(payload),
       });
-      const data = (await response.json()) as { status?: string; error?: string; errors?: Array<{ error: string }> };
+      const data = (await response.json()) as CheckoutResult;
       if (data.status === 'success' || data.status === 'partial_success') {
+        const orderIds = data.created_orders ?? [];
+        if (paymentMethod && paymentMethod !== 'cash' && orderIds.length > 0) {
+          try {
+            let redirectUrl: string | null = null;
+            let notice: string | null = null;
+            for (let index = 0; index < orderIds.length; index += 1) {
+              const group = storeGroups[index];
+              const amount = group
+                ? group.subtotal + (quotedFees[group.storeId] ?? 0)
+                : total;
+              const pay: PaymentInitializeResponse = await createPayment({
+                amount,
+                method: paymentMethod,
+                phone: paymentPhone || undefined,
+                service_type: 'order',
+                object_id: orderIds[index],
+              }).unwrap();
+              if (proofFile && pay.requires_action === 'upload_proof') {
+                await uploadProof({ paymentId: pay.payment_id, file: proofFile }).unwrap();
+              }
+              if (pay.authorization_url) redirectUrl = pay.authorization_url;
+              if (pay.customer_message) notice = pay.customer_message;
+            }
+            dispatch(clearAllCart());
+            if (redirectUrl) {
+              window.location.assign(redirectUrl);
+              return;
+            }
+            router.push('/orders');
+            if (notice) setError(notice);
+            return;
+          } catch {
+            dispatch(clearAllCart());
+            setError(t('paymentFollowUpFailed', 'Order placed. Complete payment from your orders if prompted.'));
+            router.push('/orders');
+            return;
+          }
+        }
         dispatch(clearAllCart());
         router.push('/orders');
         return;
@@ -238,7 +289,14 @@ export default function CheckoutExperience() {
             userAddress={userAddress}
             setUserAddress={setUserAddress}
           />
-          <PaymentDetails paymentMethod={paymentMethod} setPaymentMethod={setPaymentMethod} />
+          <PaymentDetails
+            paymentMethod={paymentMethod}
+            setPaymentMethod={setPaymentMethod}
+            phone={paymentPhone}
+            setPhone={setPaymentPhone}
+            proofFile={proofFile}
+            setProofFile={setProofFile}
+          />
           <label className="mb-2 block text-gray-700">{t('deliveryNotes', 'Delivery notes')}</label>
           <textarea
             className="mb-4 w-full rounded border border-gray-300 p-2"

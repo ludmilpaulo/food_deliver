@@ -10,6 +10,7 @@ import type {
   RentalVehicle,
   WalletSummary,
   WalletTransaction,
+  WalletTopUpResponse,
 } from '@/types/marketplace';
 
 type RawRecord = Record<string, unknown>;
@@ -85,7 +86,10 @@ export const marketplaceApi = createApi({
       query: () => '/api/wallet/history/',
       providesTags: ['Wallet'],
     }),
-    topUpWallet: builder.mutation<WalletTransaction, { amount: number; currency: string }>({
+    topUpWallet: builder.mutation<
+      WalletTopUpResponse,
+      { amount: number; currency: string; country?: string; method?: string; phone?: string }
+    >({
       query: (body) => ({
         url: '/api/wallet/top_up/',
         method: 'POST',

@@ -16,6 +16,11 @@ function PartnerDashboard() {
   const [balance, setBalance] = useState<{ available_balance: number; currency: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [title, setTitle] = useState("");
+  const [price, setPrice] = useState("100");
+  const [duration, setDuration] = useState("60");
+  const [categoryId, setCategoryId] = useState<number | "">("");
+  const [description, setDescription] = useState("");
   const parceiroId = user?.user_id;
 
   useEffect(() => {
@@ -23,12 +28,14 @@ function PartnerDashboard() {
       try {
         setLoading(true);
         setError(null);
-        const [cats, bal] = await Promise.all([
-          fetchServiceCategories(),
-          getAvailableBalance().catch(() => null),
-        ]);
+        const cats = await fetchServiceCategories();
         setCategories(cats);
-        if (bal) setBalance(bal);
+        if (cats[0]) setCategoryId(cats[0].id);
+        try {
+          setBalance(await getAvailableBalance());
+        } catch {
+          setBalance(null);
+        }
         if (parceiroId) {
           const my = await fetchMyServices();
           setServices(my);
@@ -52,18 +59,20 @@ function PartnerDashboard() {
   };
 
   const handleCreateService = async () => {
-    if (!parceiroId || categories.length === 0) return;
+    if (!parceiroId || !categoryId || !title.trim()) return;
     const created = await createService({
-      category: categories[0].id,
-      title: "New Service",
-      description: "New service",
-      price: 1000,
-      currency: "AOA",
-      duration_minutes: 90,
+      category: Number(categoryId),
+      title: title.trim(),
+      description: description.trim() || title.trim(),
+      price: Number(price),
+      currency: "ZAR",
+      duration_minutes: Number(duration) || 60,
       delivery_type: "in_person",
       is_active: true,
     });
     setServices((s) => [created, ...s]);
+    setTitle("");
+    setDescription("");
   };
 
   const handleAddAvailability = async () => {
@@ -109,7 +118,22 @@ function PartnerDashboard() {
         <section className="bg-white/90 rounded-2xl p-5 shadow mb-6">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold">{t("myServices", "My Services")}</h2>
-            <button onClick={handleCreateService} className="px-3 py-2 bg-blue-600 text-white rounded">
+          </div>
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+            <select
+              value={categoryId}
+              onChange={(e) => setCategoryId(e.target.value ? Number(e.target.value) : "")}
+              className="rounded-lg border px-3 py-2"
+            >
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("title", "Title")} className="rounded-lg border px-3 py-2" />
+            <input value={price} onChange={(e) => setPrice(e.target.value)} placeholder={t("price", "Price")} className="rounded-lg border px-3 py-2" />
+            <input value={duration} onChange={(e) => setDuration(e.target.value)} placeholder={t("durationMinutes", "Duration (minutes)")} className="rounded-lg border px-3 py-2" />
+            <input value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t("description", "Description")} className="rounded-lg border px-3 py-2 md:col-span-2" />
+            <button onClick={handleCreateService} className="px-3 py-2 bg-blue-600 text-white rounded md:col-span-2">
               {t("add", "Add")}
             </button>
           </div>
@@ -160,9 +184,11 @@ function PartnerDashboard() {
           <h2 className="text-xl font-semibold">{t("payouts", "Payouts")}</h2>
           <div className="mt-3">
             <div className="text-sm text-gray-700">
-              {t("available", "Available")}: {balance?.available_balance ?? 0} {balance?.currency ?? 'AOA'}
+              {balance
+                ? `${t("available", "Available")}: ${balance.available_balance} ${balance.currency}`
+                : t("earningsUnavailable", "Wallet earnings could not be loaded.")}
             </div>
-            <button className="mt-2 px-3 py-2 bg-green-600 text-white rounded" onClick={handleRequestPayout}>
+            <button className="mt-2 px-3 py-2 bg-green-600 text-white rounded" onClick={handleRequestPayout} disabled={!balance}>
               {t("requestPayout", "Request Payout")}
             </button>
           </div>

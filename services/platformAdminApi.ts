@@ -67,11 +67,14 @@ export type CommissionRuleAdmin = {
   id: number;
   service_type: string;
   provider_type: string;
+  transaction_type?: string;
   fee_type: string;
   value: string;
+  fixed_fee?: string;
   currency: string;
   country: number | null;
   city: number | null;
+  effective_from?: string | null;
   is_active: boolean;
 };
 
@@ -208,4 +211,119 @@ export function invalidateTranslationCache(lang?: string) {
       // ignore
     }
   });
+}
+
+const PAYMENTS_ADMIN = "/api/payments/admin";
+
+export async function fetchPaymentCountryConfigs() {
+  const { data } = await api.get(`${PAYMENTS_ADMIN}/country-configs/`);
+  return unwrapAdminList<import("@/types/payments").CountryPaymentConfigAdmin>(data);
+}
+
+export async function createPaymentCountryConfig(
+  payload: Partial<import("@/types/payments").CountryPaymentConfigAdmin>,
+) {
+  const { data } = await api.post<import("@/types/payments").CountryPaymentConfigAdmin>(
+    `${PAYMENTS_ADMIN}/country-configs/`,
+    payload,
+  );
+  return data;
+}
+
+export async function updatePaymentCountryConfig(
+  id: number,
+  payload: Partial<import("@/types/payments").CountryPaymentConfigAdmin>,
+) {
+  const { data } = await api.patch<import("@/types/payments").CountryPaymentConfigAdmin>(
+    `${PAYMENTS_ADMIN}/country-configs/${id}/`,
+    payload,
+  );
+  return data;
+}
+
+export async function fetchPaymentBankAccounts() {
+  const { data } = await api.get(`${PAYMENTS_ADMIN}/bank-accounts/`);
+  return unwrapAdminList<import("@/types/payments").BankAccount>(data);
+}
+
+export async function createPaymentBankAccount(payload: Partial<import("@/types/payments").BankAccount>) {
+  const { data } = await api.post<import("@/types/payments").BankAccount>(
+    `${PAYMENTS_ADMIN}/bank-accounts/`,
+    payload,
+  );
+  return data;
+}
+
+export async function updatePaymentBankAccount(
+  id: number,
+  payload: Partial<import("@/types/payments").BankAccount>,
+) {
+  const { data } = await api.patch<import("@/types/payments").BankAccount>(
+    `${PAYMENTS_ADMIN}/bank-accounts/${id}/`,
+    payload,
+  );
+  return data;
+}
+
+export async function fetchPaymentProviders() {
+  const { data } = await api.get(`${PAYMENTS_ADMIN}/providers/`);
+  return unwrapAdminList<import("@/types/payments").PaymentProviderAdmin>(data);
+}
+
+export async function savePaymentProvider(
+  id: number | null,
+  payload: Record<string, unknown>,
+) {
+  if (id) {
+    const { data } = await api.patch<import("@/types/payments").PaymentProviderAdmin>(
+      `${PAYMENTS_ADMIN}/providers/${id}/`,
+      payload,
+    );
+    return data;
+  }
+  const { data } = await api.post<import("@/types/payments").PaymentProviderAdmin>(
+    `${PAYMENTS_ADMIN}/providers/`,
+    payload,
+  );
+  return data;
+}
+
+export async function fetchPaymentOverview(params?: Record<string, string>) {
+  const { data } = await api.get<import("@/types/payments").PaymentOverview>(
+    `${PAYMENTS_ADMIN}/transactions/overview/`,
+    { params },
+  );
+  return data;
+}
+
+export async function fetchPaymentVerificationQueue() {
+  const { data } = await api.get(`${PAYMENTS_ADMIN}/transactions/verification_queue/`);
+  return unwrapAdminList<import("@/types/payments").PaymentAdminRow>(data);
+}
+
+export async function approvePaymentProof(id: number) {
+  const { data } = await api.post<import("@/types/payments").PaymentAdminRow>(
+    `${PAYMENTS_ADMIN}/transactions/${id}/approve/`,
+  );
+  return data;
+}
+
+export async function rejectPaymentProof(id: number, reason: string) {
+  const { data } = await api.post<import("@/types/payments").PaymentAdminRow>(
+    `${PAYMENTS_ADMIN}/transactions/${id}/reject/`,
+    { reason },
+  );
+  return data;
+}
+
+export async function fetchPaymentAudit() {
+  const { data } = await api.get<import("@/types/payments").PaymentAuditEvent[]>(
+    `${PAYMENTS_ADMIN}/audit/`,
+  );
+  return Array.isArray(data) ? data : [];
+}
+
+function unwrapAdminList<T>(data: T[] | { results?: T[] }): T[] {
+  if (Array.isArray(data)) return data;
+  return data.results ?? [];
 }

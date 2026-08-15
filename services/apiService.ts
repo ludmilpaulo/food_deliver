@@ -72,8 +72,12 @@ export const fetchOrders = async (_userId: number): Promise<OrderTypes[]> => {
   return fetchPartnerOrders();
 };
 
-export const updateOrderStatus = async (_userId: number, orderId: number): Promise<void> => {
-  await advancePartnerOrderStatus(orderId);
+export const updateOrderStatus = async (
+  _userId: number,
+  orderId: number,
+  nextStatus?: number | string,
+): Promise<void> => {
+  await advancePartnerOrderStatus(orderId, nextStatus);
 };
 
 export const getstore = async (_userId: number): Promise<StoreType> => {

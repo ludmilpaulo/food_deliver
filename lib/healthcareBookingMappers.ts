@@ -1,5 +1,4 @@
 import type {
-  BookingPaymentOption,
   DoctorAvailableSlot,
   DoctorBookingSettings,
   HealthcareAppointment,
@@ -49,25 +48,10 @@ export function mapHealthcareSlot(raw: RawRecord): DoctorAvailableSlot {
   };
 }
 
-const PAYMENT_OPTIONS: BookingPaymentOption[] = [
-  'pay_now',
-  'pay_at_clinic',
-  'wallet',
-  'mobile_money',
-  'card',
-];
-
-function isPaymentOption(value: string): value is BookingPaymentOption {
-  return PAYMENT_OPTIONS.includes(value as BookingPaymentOption);
-}
-
 export function mapBookingSettings(raw: RawRecord): DoctorBookingSettings {
   const methods = Array.isArray(raw.payment_methods)
-    ? raw.payment_methods.filter(
-        (item): item is BookingPaymentOption =>
-          typeof item === 'string' && isPaymentOption(item),
-      )
-    : (['pay_at_clinic'] as BookingPaymentOption[]);
+    ? raw.payment_methods.filter((item): item is string => typeof item === 'string' && item.length > 0)
+    : [];
 
   return {
     doctorId: asNumber(raw.doctor_id),

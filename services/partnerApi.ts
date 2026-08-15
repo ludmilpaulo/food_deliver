@@ -121,8 +121,13 @@ export const requestPayout = async (payload: Partial<Payout>) => {
 };
 
 export const getAvailableBalance = async (): Promise<{ available_balance: number; currency: string }> => {
-  const { data } = await api.get(`${baseAPI}/services/payouts/available_balance/`);
-  return data;
+  const { data } = await api.get<{ available_balance: string | number; currency: string }>(
+    `${baseAPI}/api/wallet/earnings/`,
+  );
+  return {
+    available_balance: Number(data.available_balance),
+    currency: data.currency,
+  };
 };
 
 

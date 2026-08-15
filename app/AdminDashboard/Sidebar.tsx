@@ -68,6 +68,7 @@ const PANEL_ICONS: Record<AdminPanelId, React.ReactNode> = {
   verticalOps: <MdHotel className="text-[1.05rem]" />,
   translations: <MdTranslate className="text-[1.05rem]" />,
   backupExport: <MdSettingsBackupRestore className="text-[1.05rem]" />,
+  payments: <MdPayments className="text-[1.05rem]" />,
 };
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, activePanel, onSelectPanel }) => {

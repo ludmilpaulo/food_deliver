@@ -7,6 +7,12 @@ import { useSelector } from 'react-redux';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useBookRentalMutation, useGetRentalVehiclesQuery } from '@/redux/slices/marketplaceApi';
 import type { RootState } from '@/redux/store';
+import PaymentDetails from '@/app/Checkout/PaymentDetails';
+import {
+  useCreatePaymentMutation,
+  useUploadPaymentProofMutation,
+} from '@/redux/slices/paymentsApi';
+import { followUpPayment } from '@/lib/followUpPayment';
 
 export default function CarRentalDetailPage() {
   const params = useParams<{ vehicleId: string }>();
@@ -21,6 +27,11 @@ export default function CarRentalDetailPage() {
   const [pickup, setPickup] = useState('');
   const [dropoff, setDropoff] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState('');
+  const [paymentPhone, setPaymentPhone] = useState('');
+  const [proofFile, setProofFile] = useState<File | null>(null);
+  const [createPayment] = useCreatePaymentMutation();
+  const [uploadProof] = useUploadPaymentProofMutation();
 
   const handleBook = async (event: FormEvent) => {
     event.preventDefault();
@@ -30,13 +41,30 @@ export default function CarRentalDetailPage() {
     }
     setError(null);
     try {
-      await bookRental({
+      const booking = await bookRental({
         vehicle: vehicleId,
         start_date: startDate,
         end_date: endDate,
         pickup_location: pickup,
         return_location: dropoff || pickup,
       }).unwrap();
+      const bookingId = typeof booking.id === 'number' ? booking.id : Number(booking.id);
+      const amount =
+        typeof booking.total_amount === 'number' || typeof booking.total_amount === 'string'
+          ? booking.total_amount
+          : vehicle?.daily_price ?? 0;
+      const currency = typeof booking.currency === 'string' ? booking.currency : vehicle?.currency;
+      await followUpPayment({
+        createPayment,
+        uploadProof,
+        amount,
+        method: paymentMethod,
+        phone: paymentPhone,
+        proofFile,
+        serviceType: 'car_rental',
+        objectId: Number.isFinite(bookingId) ? bookingId : undefined,
+        currency,
+      });
     } catch {
       setError(t('bookingFailed', 'Could not complete request'));
     }
@@ -99,6 +127,14 @@ export default function CarRentalDetailPage() {
           onChange={(event) => setDropoff(event.target.value)}
           placeholder={t('returnLocation', 'Return location')}
           className="w-full rounded-xl border border-slate-200 px-4 py-3"
+        />
+        <PaymentDetails
+          paymentMethod={paymentMethod}
+          setPaymentMethod={setPaymentMethod}
+          phone={paymentPhone}
+          setPhone={setPaymentPhone}
+          proofFile={proofFile}
+          setProofFile={setProofFile}
         />
         {error ? <p className="text-sm text-red-600">{error}</p> : null}
         {isSuccess ? (

@@ -12,6 +12,12 @@ import StayAvailabilityCalendar, {
   type AvailabilityDay,
   type DayStatus,
 } from "@/components/properties/StayAvailabilityCalendar";
+import PaymentDetails from "@/app/Checkout/PaymentDetails";
+import {
+  useCreatePaymentMutation,
+  useUploadPaymentProofMutation,
+} from "@/redux/slices/paymentsApi";
+import { followUpPayment, isImmediateCaptureMethod } from "@/lib/followUpPayment";
 
 type StaySettingsSummary = {
   price_per_night?: string;
@@ -90,6 +96,11 @@ export default function StayBookingPanel({
   const [quoteError, setQuoteError] = useState<string | null>(null);
   const [reserving, setReserving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState('');
+  const [paymentPhone, setPaymentPhone] = useState('');
+  const [proofFile, setProofFile] = useState<File | null>(null);
+  const [createPayment] = useCreatePaymentMutation();
+  const [uploadProof] = useUploadPaymentProofMutation();
 
   const maxGuests = staySettings?.max_guests ?? 16;
   const maxAdults = Math.min(maxGuests, 16);
@@ -248,7 +259,7 @@ export default function StayBookingPanel({
           adults,
           children,
           infants,
-          confirm: true,
+          confirm: !isImmediateCaptureMethod(paymentMethod),
         }),
       });
       const data: unknown = await res.json().catch(() => ({}));
@@ -260,6 +271,18 @@ export default function StayBookingPanel({
         throw new Error(detail);
       }
       const booking = data as BookingResult;
+      const { redirected } = await followUpPayment({
+        createPayment,
+        uploadProof,
+        amount: quote?.total ?? "0",
+        method: paymentMethod,
+        phone: paymentPhone,
+        proofFile,
+        serviceType: "stay",
+        objectId: booking.id,
+        currency: quote?.currency,
+      });
+      if (redirected) return;
       router.push(`/properties/bookings/${booking.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : t("bookingFailed", "Could not complete your booking."));
@@ -399,6 +422,15 @@ export default function StayBookingPanel({
           ) : null}
         </div>
       )}
+
+      <PaymentDetails
+        paymentMethod={paymentMethod}
+        setPaymentMethod={setPaymentMethod}
+        phone={paymentPhone}
+        setPhone={setPaymentPhone}
+        proofFile={proofFile}
+        setProofFile={setProofFile}
+      />
 
       {error && (
         <p className="text-sm text-rose-700">

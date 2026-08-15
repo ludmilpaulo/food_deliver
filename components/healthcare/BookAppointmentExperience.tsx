@@ -27,11 +27,16 @@ import {
   useGetHealthcareDoctorQuery,
 } from '@/redux/slices/healthcareApi';
 import { persistBookingSession } from '@/redux/slices/authSlice';
+import {
+  useCreatePaymentMutation,
+  useUploadPaymentProofMutation,
+} from '@/redux/slices/paymentsApi';
+import PaymentDetails from '@/app/Checkout/PaymentDetails';
+import { followUpPayment } from '@/lib/followUpPayment';
 import type { RootState } from '@/redux/store';
 import { useAppDispatch } from '@/redux/store';
 import type { HealthcareTranslationKey } from '@/configs/healthcareTranslations';
 import type {
-  BookingPaymentOption,
   BookingStep,
   DoctorConsultationType,
   GuardianRelationship,
@@ -135,7 +140,9 @@ export default function BookAppointmentExperience({ doctorId }: Props) {
   const [date, setDate] = useState('');
   const [selectedSlotId, setSelectedSlotId] = useState<number | null>(null);
   const [reason, setReason] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<BookingPaymentOption>('pay_at_clinic');
+  const [paymentMethod, setPaymentMethod] = useState('');
+  const [paymentPhone, setPaymentPhone] = useState('');
+  const [proofFile, setProofFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [supportChatOpen, setSupportChatOpen] = useState(false);
 
@@ -180,6 +187,8 @@ export default function BookAppointmentExperience({ doctorId }: Props) {
   );
 
   const [bookAppointment, { isLoading: booking }] = useCreateHealthcareAppointmentMutation();
+  const [createPayment] = useCreatePaymentMutation();
+  const [uploadProof] = useUploadPaymentProofMutation();
 
   const availableSlots = useMemo(
     () => slots.filter((slot) => slot.isAvailable && !slot.isBooked && !slot.isBlocked),
@@ -190,8 +199,6 @@ export default function BookAppointmentExperience({ doctorId }: Props) {
 
   const quickDates = useMemo(() => buildQuickDateOptions(7), []);
   const availableDaySet = useMemo(() => new Set(availableDays), [availableDays]);
-
-  const paymentMethods = bookingSettings?.paymentMethods ?? ['pay_at_clinic'];
   const platformFee = bookingSettings?.platformFee ?? 0;
   const consultationFee = bookingSettings?.consultationFee ?? summary?.consultationFee ?? 0;
   const currency = bookingSettings?.currency ?? summary?.currency ?? 'AOA';
@@ -220,12 +227,6 @@ export default function BookAppointmentExperience({ doctorId }: Props) {
       phone_number: prev.phone_number || authUser.phone || '',
     }));
   }, [authUser]);
-
-  useEffect(() => {
-    if (paymentMethods.length && !paymentMethods.includes(paymentMethod)) {
-      setPaymentMethod(paymentMethods[0]);
-    }
-  }, [paymentMethod, paymentMethods]);
 
   const activeStep: BookingStep = useMemo(() => {
     if (!consultationType) return 'consultation';
@@ -327,6 +328,18 @@ export default function BookAppointmentExperience({ doctorId }: Props) {
           }),
         );
       }
+      const { redirected } = await followUpPayment({
+        createPayment,
+        uploadProof,
+        amount: totalFee,
+        method: paymentMethod,
+        phone: paymentPhone,
+        proofFile,
+        serviceType: 'doctor',
+        objectId: appointment.id,
+        currency,
+      });
+      if (redirected) return;
       router.push(`/health/appointments/${appointment.id}/confirmed`);
     } catch (err) {
       setError(extractBookingError(err) ?? ht('bookingFailed'));
@@ -645,21 +658,15 @@ export default function BookAppointmentExperience({ doctorId }: Props) {
 
             <section className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
               <h2 className="text-lg font-bold text-slate-900">{ht('paymentMethod')}</h2>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {paymentMethods.map((method) => (
-                  <button
-                    key={method}
-                    type="button"
-                    onClick={() => setPaymentMethod(method)}
-                    className={`rounded-xl border px-4 py-2 text-sm font-semibold ${
-                      paymentMethod === method
-                        ? 'border-sky-600 bg-sky-50 text-sky-700'
-                        : 'border-slate-200 text-slate-700'
-                    }`}
-                  >
-                    {ht(method)}
-                  </button>
-                ))}
+              <div className="mt-4">
+                <PaymentDetails
+                  paymentMethod={paymentMethod}
+                  setPaymentMethod={setPaymentMethod}
+                  phone={paymentPhone}
+                  setPhone={setPaymentPhone}
+                  proofFile={proofFile}
+                  setProofFile={setProofFile}
+                />
               </div>
             </section>
 

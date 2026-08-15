@@ -47,8 +47,11 @@ export async function fetchPartnerOrders() {
   return Array.isArray(data) ? data : data.results ?? [];
 }
 
-export async function advancePartnerOrderStatus(orderId: number) {
-  const { data } = await api.patch(`${API_V1_PREFIX}/partner/orders/${orderId}/status/`);
+export async function advancePartnerOrderStatus(orderId: number, nextStatus?: number | string) {
+  const { data } = await api.patch(
+    `${API_V1_PREFIX}/partner/orders/${orderId}/status/`,
+    nextStatus === undefined ? {} : { status: nextStatus },
+  );
   return data;
 }
 

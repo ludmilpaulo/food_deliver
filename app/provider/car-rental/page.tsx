@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import { useTranslation } from '@/hooks/useTranslation';
 import {
   useCreateRentalVehicleMutation,
+  useGetCountriesQuery,
   useGetMyRentalVehiclesQuery,
   useGetPartnerRentalBookingsQuery,
 } from '@/redux/slices/marketplaceApi';
@@ -16,6 +17,7 @@ function PartnerCarRentalPage() {
   const token = useSelector((state: RootState) => state.auth.token);
   const { data: vehicles = [], isLoading, refetch } = useGetMyRentalVehiclesQuery(undefined, { skip: !token });
   const { data: bookings = [] } = useGetPartnerRentalBookingsQuery(undefined, { skip: !token });
+  const { data: countries = [] } = useGetCountriesQuery();
   const [createVehicle, { isLoading: creating }] = useCreateRentalVehicleMutation();
   const [make, setMake] = useState('');
   const [model, setModel] = useState('');
@@ -43,7 +45,7 @@ function PartnerCarRentalPage() {
       setPlate('');
       refetch();
     } catch {
-      setError(t('saveFailed', 'Could not save vehicle. Country id is required.'));
+      setError(t('saveFailed', 'Could not save vehicle. Select a country and try again.'));
     }
   };
 
@@ -60,7 +62,12 @@ function PartnerCarRentalPage() {
         <input required value={year} onChange={(e) => setYear(e.target.value)} placeholder="Year" className="rounded-xl border px-3 py-2" />
         <input required value={plate} onChange={(e) => setPlate(e.target.value)} placeholder="Plate" className="rounded-xl border px-3 py-2" />
         <input required value={dailyPrice} onChange={(e) => setDailyPrice(e.target.value)} placeholder="Daily price" className="rounded-xl border px-3 py-2" />
-        <input required value={countryId} onChange={(e) => setCountryId(e.target.value)} placeholder="Country ID" className="rounded-xl border px-3 py-2" />
+        <select required value={countryId} onChange={(e) => setCountryId(e.target.value)} className="rounded-xl border px-3 py-2">
+          <option value="">{t('country', 'Country')}</option>
+          {countries.map((c) => (
+            <option key={c.id} value={c.id}>{c.name}</option>
+          ))}
+        </select>
         {error ? <p className="sm:col-span-2 text-sm text-red-600">{error}</p> : null}
         <button type="submit" disabled={creating} className="rounded-xl bg-teal-700 px-4 py-2 font-semibold text-white">
           {t('add', 'Add')}

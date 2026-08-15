@@ -29,19 +29,21 @@ const Order: React.FC = () => {
     }
   }, [user?.user_id]);
 
- const handleStatus = async (orderId: number) => {
+ const handleStatus = async (orderId: number, nextStatus: number) => {
     const user_id = user?.user_id;
     if (!user_id) {
       alert(t("userIdMissing", "User ID not provided."));
       return;
     }
 
-    if (window.confirm(t("confirmCallDriver", "Are you sure you want to call the driver?"))) {
+    const confirmMessage =
+      nextStatus === 5
+        ? t("confirmRejectOrder", "Reject this order?")
+        : t("confirmMarkReady", "Mark this order ready and call a driver?");
+    if (window.confirm(confirmMessage)) {
       try {
-        console.log("sending")
-        await updateOrderStatus(user_id, orderId);
-        alert(t("driverCalledSuccess", "Driver called successfully!"));
-        fetchOrderData(); // Opcionalmente, você pode atualizar os pedidos
+        await updateOrderStatus(user_id, orderId, nextStatus);
+        fetchOrderData();
       } catch (error) {
         console.error("Erro ao atualizar o status do pedido:", error);
         alert(t("orderStatusUpdateFailed", "Failed to update order status. Please try again."));
@@ -110,12 +112,20 @@ const Order: React.FC = () => {
                         <td className="px-4 py-2 border">{order.status}</td>
                         <td className="px-4 py-2 border">
                           {order.status_code === 1 && (
-                            <button
-                              onClick={() => handleStatus(order.id)}
-                              className="px-4 py-2 ml-4 text-white bg-blue-500 rounded hover:bg-blue-600"
-                            >
-                              {t("callDriver", "Call Driver")}
-                            </button>
+                            <div className="flex flex-col gap-2">
+                              <button
+                                onClick={() => handleStatus(order.id, 2)}
+                                className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
+                              >
+                                {t("markReady", "Ready / Call driver")}
+                              </button>
+                              <button
+                                onClick={() => handleStatus(order.id, 5)}
+                                className="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700"
+                              >
+                                {t("reject", "Reject")}
+                              </button>
+                            </div>
                           )}
                         </td>
                       </tr>

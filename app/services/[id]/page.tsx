@@ -6,6 +6,12 @@ import Image from "next/image";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAppSelector } from "@/redux/store";
 import { getCurrentUser } from "@/services/authService";
+import PaymentDetails from "@/app/Checkout/PaymentDetails";
+import {
+  useCreatePaymentMutation,
+  useUploadPaymentProofMutation,
+} from "@/redux/slices/paymentsApi";
+import { followUpPayment } from "@/lib/followUpPayment";
 
 export default function ServiceDetailPage() {
   const params = useParams();
@@ -25,6 +31,11 @@ export default function ServiceDetailPage() {
   const [note, setNote] = useState("");
   const [bookingLoading, setBookingLoading] = useState(false);
   const [bookingMessage, setBookingMessage] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [paymentPhone, setPaymentPhone] = useState("");
+  const [proofFile, setProofFile] = useState<File | null>(null);
+  const [createPayment] = useCreatePaymentMutation();
+  const [uploadProof] = useUploadPaymentProofMutation();
 
   const formatPrice = (value: unknown): string => {
     const numeric = typeof value === "number" ? value : Number(value);
@@ -90,14 +101,25 @@ export default function ServiceDetailPage() {
     setBookingLoading(true);
     setBookingMessage(null);
     try {
-      await createBooking({
+      const booking = await createBooking({
         service: service.id,
         customer: customerId,
         booking_date: selectedDate,
         booking_time: selectedTime,
         duration_minutes: service.duration_minutes,
         customer_notes: note,
-        payment_method: "card",
+        payment_method: paymentMethod || "cash",
+      });
+      await followUpPayment({
+        createPayment,
+        uploadProof,
+        amount: booking.price ?? service.price,
+        method: paymentMethod,
+        phone: paymentPhone,
+        proofFile,
+        serviceType: "service",
+        objectId: booking.id,
+        currency: booking.currency ?? service.currency,
       });
       setBookingMessage(t("bookingCreated", "Booking created!"));
     } catch (e: unknown) {
@@ -166,6 +188,15 @@ export default function ServiceDetailPage() {
               onChange={(e) => setNote(e.target.value)}
             />
           </div>
+
+          <PaymentDetails
+            paymentMethod={paymentMethod}
+            setPaymentMethod={setPaymentMethod}
+            phone={paymentPhone}
+            setPhone={setPaymentPhone}
+            proofFile={proofFile}
+            setProofFile={setProofFile}
+          />
 
           <button
             className="mt-4 bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50"

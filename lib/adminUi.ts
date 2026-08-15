@@ -173,6 +173,14 @@ export const ADMIN_NAV_ITEMS: AdminNavItemMeta[] = [
     descDefault: "Fees, commissions, and pricing rules",
   },
   {
+    key: "payments",
+    group: "platform",
+    labelKey: "paymentConfiguration",
+    labelDefault: "Payments",
+    descKey: "paymentsAdminDesc",
+    descDefault: "Country methods, EcoCash, bank/EFT, and verification",
+  },
+  {
     key: "verticalOps",
     group: "operations",
     labelKey: "verticalOps",

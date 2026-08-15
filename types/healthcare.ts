@@ -131,12 +131,7 @@ export type PatientDetailsPayload = {
   relationship_to_patient?: GuardianRelationship;
 };
 
-export type BookingPaymentOption =
-  | 'pay_now'
-  | 'pay_at_clinic'
-  | 'wallet'
-  | 'mobile_money'
-  | 'card';
+export type BookingPaymentOption = string;
 
 export type DoctorBookingSettings = {
   doctorId: number;

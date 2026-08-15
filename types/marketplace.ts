@@ -32,6 +32,19 @@ export type WalletTransaction = {
   created_at: string;
 };
 
+export type WalletTopUpResponse = {
+  payment_id: number;
+  authorization_url: string | null;
+  provider: string;
+  provider_reference: string;
+  public_key: string | null;
+  status: string;
+  amount: string;
+  currency: string;
+  customer_message?: string | null;
+  requires_action?: string | null;
+};
+
 export type RentalVehicle = {
   id: number;
   make: string;

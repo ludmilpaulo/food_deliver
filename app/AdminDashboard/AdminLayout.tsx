@@ -94,6 +94,14 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                 <p className="hidden truncate text-sm text-slate-500 lg:block">
                   {t(meta.descKey, meta.descDefault)}
                 </p>
+                <a
+                  href={process.env.NEXT_PUBLIC_INTERNAL_OPS_URL || "http://localhost:3010"}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hidden text-xs font-medium text-emerald-700 underline-offset-2 hover:underline xl:inline"
+                >
+                  {t("internalOpsLink", "Internal Operations →")}
+                </a>
               </div>
             </div>
 

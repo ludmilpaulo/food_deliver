@@ -70,13 +70,17 @@ export default function CheckoutExperience() {
   const [couponMessage, setCouponMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [quotedFees, setQuotedFees] = useState<Record<number, number>>({});
 
   const storeGroups = useMemo(() => groupItemsByStore(items), [items]);
   const subtotal = useMemo(
     () => items.reduce((sum, item) => sum + item.price * item.quantity, 0),
     [items],
   );
-  const deliveryFee = storeGroups.length * 100;
+  const deliveryFee = useMemo(
+    () => storeGroups.reduce((sum, group) => sum + (quotedFees[group.storeId] ?? 0), 0),
+    [storeGroups, quotedFees],
+  );
   const total = Math.max(subtotal + deliveryFee - couponDiscount, 0);
 
   useEffect(() => {
@@ -85,6 +89,33 @@ export default function CheckoutExperience() {
       router.replace('/LoginScreenUser?next=/Checkout');
     }
   }, [authHydrated, user, token, router]);
+
+  useEffect(() => {
+    if (!storeGroups.length) return;
+    let cancelled = false;
+    const loadQuotes = async () => {
+      const next: Record<number, number> = {};
+      await Promise.all(
+        storeGroups.map(async (group) => {
+          try {
+            const response = await fetch(
+              `${baseAPI}/api/v1/marketplace/checkout/quote/?store_id=${group.storeId}`,
+            );
+            if (!response.ok) return;
+            const data = (await response.json()) as { delivery_fee?: string };
+            next[group.storeId] = Number(data.delivery_fee) || 0;
+          } catch {
+            next[group.storeId] = 0;
+          }
+        }),
+      );
+      if (!cancelled) setQuotedFees(next);
+    };
+    void loadQuotes();
+    return () => {
+      cancelled = true;
+    };
+  }, [storeGroups]);
 
   useEffect(() => {
     if (!authHydrated) return;
@@ -132,7 +163,7 @@ export default function CheckoutExperience() {
         address: useCurrentLocation ? '' : userAddress.trim(),
         location: '',
         use_current_location: useCurrentLocation,
-        delivery_fee: '100',
+        delivery_fee: String(quotedFees[group.storeId] ?? 0),
         payment_method: paymentMethod,
         delivery_notes: deliveryNotes,
         order_details: group.items.map((item) => ({

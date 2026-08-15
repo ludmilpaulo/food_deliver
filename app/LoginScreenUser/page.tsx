@@ -8,12 +8,13 @@ import { useAppDispatch, useAppSelector } from "@/redux/store";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import logo from "@/assets/azul.png";
-import { loginUser, selectAuth, type LoginResult } from "@/redux/slices/authSlice";
+import { loginUser, selectAuth, setAuthFromSocial, type LoginResult } from "@/redux/slices/authSlice";
 import { resolvePostLoginRoute } from "@/utils/postLoginRoute";
 import ForgotPasswordModal from "./ForgotPasswordModal";
 import { SupportedLocale, supportedLocales } from "@/configs/translations";
 import { analytics } from "@/utils/mixpanel";
 import { useTranslation } from "@/hooks/useTranslation";
+import SocialLoginButtons from "@/components/auth/SocialLoginButtons";
 import {
   DEV_TEST_ADMIN_LOGIN,
   DEV_TEST_CUSTOMER_LOGIN,
@@ -111,6 +112,16 @@ const LoginScreenUser: React.FC = () => {
         alert(t("loginFailed"));
       }
     }
+  };
+
+  const handleSocialSuccess = (result: LoginResult) => {
+    dispatch(setAuthFromSocial(result));
+    const destination = resolvePostLoginRoute(result, nextPath);
+    analytics.trackLogin(result.user_id.toString(), {
+      user_type: result.created ? "social_signup" : "social_login",
+      platform: "web",
+    });
+    window.location.assign(destination);
   };
 
   return (
@@ -224,6 +235,7 @@ const LoginScreenUser: React.FC = () => {
             >
               {t("login")}
             </button>
+            <SocialLoginButtons onSuccess={handleSocialSuccess} disabled={loading} />
           </form>
         </motion.div>
       </div>

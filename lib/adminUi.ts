@@ -173,6 +173,14 @@ export const ADMIN_NAV_ITEMS: AdminNavItemMeta[] = [
     descDefault: "Fees, commissions, and pricing rules",
   },
   {
+    key: "verticalOps",
+    group: "operations",
+    labelKey: "verticalOps",
+    labelDefault: "Stay / rental / packages",
+    descKey: "verticalOpsDesc",
+    descDefault: "Staff queues for stay bookings, car rentals, and packages",
+  },
+  {
     key: "translations",
     group: "platform",
     labelKey: "translationsAdmin",

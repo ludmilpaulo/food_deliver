@@ -60,7 +60,9 @@ export function resolveProviderPortalTarget(category: string): string {
     '/provider/grocery': '/RestaurantDashboad',
     '/provider/store': '/RestaurantDashboad',
     '/provider/services': '/PartnerDashboard',
-    '/provider/business': '/PartnerDashboard',
+    '/provider/stay': '/dashboard/property',
+    '/provider/properties': '/dashboard/property',
+    '/provider/business': '/business',
   };
   return targets[route] ?? route;
 }

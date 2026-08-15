@@ -1,41 +1,20 @@
 'use client';
 
 import Link from 'next/link';
-import { FormEvent, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from '@/hooks/useTranslation';
 import LocationFilterBar from '@/components/location/LocationFilterBar';
 import { useLocationFilter } from '@/contexts/LocationContext';
 import type { RootState } from '@/redux/store';
-import {
-  useGetWalletHistoryQuery,
-  useGetWalletQuery,
-  useTopUpWalletMutation,
-} from '@/redux/slices/marketplaceApi';
+import { useGetWalletHistoryQuery, useGetWalletQuery } from '@/redux/slices/marketplaceApi';
 
 export default function WalletExperience() {
   const { t } = useTranslation();
   const token = useSelector((state: RootState) => state.auth.token);
   const { country } = useLocationFilter();
   const currency = country?.currency ?? 'AOA';
-  const { data: wallet, isLoading, refetch } = useGetWalletQuery(currency, { skip: !token });
+  const { data: wallet, isLoading } = useGetWalletQuery(currency, { skip: !token });
   const { data: transactions = [] } = useGetWalletHistoryQuery(undefined, { skip: !token });
-  const [topUpWallet, { isLoading: toppingUp }] = useTopUpWalletMutation();
-  const [amount, setAmount] = useState('1000');
-  const [message, setMessage] = useState<string | null>(null);
-
-  const handleTopUp = async (event: FormEvent) => {
-    event.preventDefault();
-    if (!token) return;
-    setMessage(null);
-    try {
-      await topUpWallet({ amount: Number(amount), currency }).unwrap();
-      setMessage(t('topUpSuccess', 'Wallet topped up successfully.'));
-      refetch();
-    } catch {
-      setMessage(t('topUpFailed', 'Could not top up wallet.'));
-    }
-  };
 
   if (!token) {
     return (
@@ -64,26 +43,12 @@ export default function WalletExperience() {
         </p>
       </div>
 
-      <form onSubmit={handleTopUp} className="mt-6 flex flex-wrap items-end gap-3 rounded-2xl border border-slate-100 bg-white p-5">
-        <label className="flex flex-col gap-1 text-sm text-slate-600">
-          {t('topUpAmount', 'Top-up amount')}
-          <input
-            type="number"
-            min="1"
-            value={amount}
-            onChange={(event) => setAmount(event.target.value)}
-            className="rounded-xl border border-slate-200 px-4 py-2"
-          />
-        </label>
-        <button
-          type="submit"
-          disabled={toppingUp}
-          className="rounded-xl bg-slate-900 px-4 py-2 font-semibold text-white"
-        >
-          {t('topUp', 'Top up')}
-        </button>
-      </form>
-      {message ? <p className="mt-3 text-sm text-emerald-700">{message}</p> : null}
+      <p className="mt-2 text-sm text-slate-500">
+        {t(
+          'walletTopUpUnavailable',
+          'Wallet top-up is temporarily unavailable until a payment provider is connected. Balance and history below are from the server.',
+        )}
+      </p>
 
       <section className="mt-8">
         <h2 className="text-lg font-semibold text-slate-900">{t('transactions', 'Transactions')}</h2>

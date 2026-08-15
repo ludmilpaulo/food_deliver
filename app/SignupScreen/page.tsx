@@ -13,7 +13,9 @@ import { useAppDispatch } from "@/redux/store";
 import { analytics } from "@/utils/mixpanel"; 
 import { useTranslation } from "@/hooks/useTranslation";
 import { fetchBusinessCategories, type BusinessCategory } from "@/services/platformApi";
-import { type LoginResult, loginUser } from "@/redux/slices/authSlice";
+import { type LoginResult, loginUser, setAuthFromSocial } from "@/redux/slices/authSlice";
+import SocialLoginButtons from "@/components/auth/SocialLoginButtons";
+import { resolvePostLoginRoute } from "@/utils/postLoginRoute";
 // LANGUAGE SELECT SUPPORT
 const LANGUAGE_LABELS: Record<SupportedLocale, string> = {
   en: "English",
@@ -355,6 +357,19 @@ const SignupScreen = () => {
               >
                 {t("signup")}
               </button>
+              {role === "client" ? (
+                <SocialLoginButtons
+                  disabled={loading}
+                  onSuccess={(result) => {
+                    dispatch(setAuthFromSocial(result));
+                    analytics.trackSignup(result.user_id.toString(), {
+                      user_type: "social",
+                      platform: "web",
+                    });
+                    window.location.assign(resolvePostLoginRoute(result));
+                  }}
+                />
+              ) : null}
             </form>
           )}
         </motion.div>

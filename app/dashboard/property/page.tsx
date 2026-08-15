@@ -17,6 +17,7 @@ import PropertyAnalyticsCharts from "@/components/property/PropertyAnalyticsChar
 import PropertyAddWizard from "@/components/property/PropertyAddWizard";
 import PartnerApplicationReview from "@/components/property/PartnerApplicationReview";
 import type { AnalyticsDays } from "@/components/analytics/AnalyticsDaysFilter";
+import withPartnerAuth from "@/components/PartnerRouteGuard";
 import {
   getListingUiStatus,
   listingPurpose,
@@ -71,7 +72,7 @@ function StatusBadge({
   );
 }
 
-export default function PropertyDashboardPage() {
+function PropertyDashboardPage() {
   const router = useRouter();
   const {
     pt,
@@ -291,7 +292,6 @@ export default function PropertyDashboardPage() {
     if (availabilityListingId != null) {
       void loadAvailability(availabilityListingId);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when listing selection changes
   }, [activeTab, availabilityListingId, stayListings]);
 
   const statusLabel = (status: PropertyUiStatus) => {
@@ -1302,3 +1302,5 @@ export default function PropertyDashboardPage() {
     </main>
   );
 }
+
+export default withPartnerAuth(PropertyDashboardPage);

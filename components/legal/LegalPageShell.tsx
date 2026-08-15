@@ -110,7 +110,7 @@ export default function LegalPageShell({ kind }: Props) {
     };
   }, [isFaq, faqContent, lang]);
 
-  const { data: aboutUsEntries = [], isLoading } = useGetAboutUsQuery();
+  const { data: aboutUsEntries = [] } = useGetAboutUsQuery();
   const countryName = countryMap[getUserCountryCode()];
   const aboutUsData = useMemo(() => {
     if (!aboutUsEntries || !Array.isArray(aboutUsEntries)) return null;
@@ -309,9 +309,7 @@ export default function LegalPageShell({ kind }: Props) {
               https://sd-kudya.vercel.app/PrivacyPolicy
             </a>
           </div>
-          {isLoading ? (
-            <p className="text-sm text-slate-500">{t("loading")}</p>
-          ) : aboutUsData ? (
+          {aboutUsData ? (
             <div className="space-y-2 text-slate-700 border-t border-blue-50 pt-4">
               <p className="font-semibold text-blue-900">{aboutUsData.title}</p>
               <p>{aboutUsData.address}</p>

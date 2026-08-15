@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { SupportedLocale, supportedLocales } from '@/configs/translations';
 
-export const SITE_URL = 'https://kudya.online';
+export const SITE_URL = 'https://sd-kudya.vercel.app';
 export const SITE_NAME = 'Kudya';
 export const DEFAULT_OG_IMAGE = 'https://www.kudya.shop/media/logo/azul.png';
 

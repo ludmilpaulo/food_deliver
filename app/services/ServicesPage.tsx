@@ -2,7 +2,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/store";
 import { fetchServices } from "@/redux/slices/servicesSlice";
-import type { ServiceListItem } from "@/services/serviceApi";
+import type { ServiceListItem, ServiceBooking } from "@/services/serviceApi";
+import { getMyBookings } from "@/services/serviceApi";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -13,13 +14,26 @@ export default function ServicesPage() {
   const { t } = useTranslation();
   const { data, loading, error } = useAppSelector((s) => s.services);
 
+  const { user } = useAppSelector((s) => s.auth);
+
   const [search, setSearch] = useState("");
   const [requestedOnce, setRequestedOnce] = useState(false);
+  const [bookings, setBookings] = useState<ServiceBooking[]>([]);
 
   useEffect(() => {
     setRequestedOnce(true);
     dispatch(fetchServices(undefined));
   }, [dispatch]);
+
+  useEffect(() => {
+    if (!user?.token) {
+      setBookings([]);
+      return;
+    }
+    getMyBookings()
+      .then(setBookings)
+      .catch(() => setBookings([]));
+  }, [user?.token]);
 
   const formatPrice = (value: unknown): string => {
     const numeric = typeof value === "number" ? value : Number(value);
@@ -41,6 +55,20 @@ export default function ServicesPage() {
     <main className="min-h-screen bg-gradient-to-br from-yellow-300 via-yellow-400 to-blue-500 py-10">
       <div className="max-w-6xl mx-auto px-4">
         <h1 className="text-3xl font-bold text-white mb-4">{t("Services", "Services")}</h1>
+
+        {bookings.length > 0 ? (
+          <div className="mb-6 rounded-2xl bg-white/90 p-4">
+            <h2 className="font-semibold text-slate-900">{t("myBookings", "My bookings")}</h2>
+            <ul className="mt-3 space-y-2">
+              {bookings.slice(0, 8).map((booking) => (
+                <li key={booking.id} className="text-sm text-slate-700">
+                  {booking.service_title || booking.booking_number || `#${booking.id}`} · {booking.status} ·{" "}
+                  {booking.booking_date}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
 
         <div className="flex items-center bg-white/90 rounded-full px-4 py-3 shadow mb-6">
           <input

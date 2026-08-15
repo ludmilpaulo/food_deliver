@@ -8,6 +8,7 @@ export type PartnerService = {
   parceiro: number;
   category: number;
   title: string;
+  description?: string;
   price: number;
   currency: string;
   duration_minutes: number;
@@ -20,11 +21,24 @@ export const fetchServiceCategories = async (): Promise<ServiceCategory[]> => {
   return data;
 };
 
-export const fetchMyServices = async (parceiroId: number): Promise<PartnerService[]> => {
-  const { data } = await api.get(`${baseAPI}/services/services/`, {
-    params: { parceiro: parceiroId },
-  });
-  return data;
+function unwrapList<T>(data: unknown): T[] {
+  if (Array.isArray(data)) return data as T[];
+  if (data && typeof data === 'object' && 'results' in data) {
+    const results = (data as { results?: T[] }).results;
+    return Array.isArray(results) ? results : [];
+  }
+  return [];
+}
+
+export const fetchMyServices = async (parceiroId?: number): Promise<PartnerService[]> => {
+  if (parceiroId) {
+    const { data } = await api.get(`${baseAPI}/services/services/`, {
+      params: { parceiro: parceiroId },
+    });
+    return unwrapList<PartnerService>(data);
+  }
+  const { data } = await api.get(`${baseAPI}/services/services/mine/`);
+  return unwrapList<PartnerService>(data);
 };
 
 export const createService = async (payload: Partial<PartnerService>) => {

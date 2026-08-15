@@ -4,12 +4,12 @@ import Link from 'next/link';
 import { useTranslation } from '@/hooks/useTranslation';
 import LocationFilterBar from '@/components/location/LocationFilterBar';
 import { useLocationFilter } from '@/contexts/LocationContext';
-import { useGetAccommodationListingsQuery } from '@/redux/slices/marketplaceApi';
+import { useGetStayPropertiesQuery } from '@/redux/slices/marketplaceApi';
 
 export default function StayExperience() {
   const { t } = useTranslation();
   const { country, city } = useLocationFilter();
-  const { data: listings = [], isLoading, isError, refetch } = useGetAccommodationListingsQuery({
+  const { data: listings = [], isLoading, isError, refetch } = useGetStayPropertiesQuery({
     country: country?.id,
     city: city?.id ?? undefined,
   });
@@ -46,22 +46,29 @@ export default function StayExperience() {
       ) : null}
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {listings.map((listing) => (
-          <Link
-            key={listing.id}
-            href={`/stay/${listing.id}`}
-            className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition hover:border-sky-200"
-          >
-            <h2 className="text-lg font-semibold text-slate-900">{listing.title}</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              {[listing.city_name, listing.country_name].filter(Boolean).join(', ')}
-            </p>
-            <p className="mt-3 text-sm text-slate-600 line-clamp-2">{listing.description}</p>
-            <p className="mt-4 text-xl font-bold text-sky-700">
-              {listing.price_per_night} {listing.currency}/{t('night', 'night')}
-            </p>
-          </Link>
-        ))}
+        {listings.map((listing) => {
+          const id = Number(listing.id);
+          const title = String(listing.title ?? '');
+          const price = String(listing.price ?? listing.price_per_night ?? '');
+          const currency = String(listing.currency ?? '');
+          const cityName =
+            typeof listing.city === 'object' && listing.city && 'name' in listing.city
+              ? String((listing.city as { name?: string }).name ?? '')
+              : String(listing.city_name ?? listing.city ?? '');
+          return (
+            <Link
+              key={id}
+              href={`/properties/${id}`}
+              className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition hover:border-sky-200"
+            >
+              <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
+              <p className="mt-1 text-sm text-slate-500">{cityName}</p>
+              <p className="mt-4 text-xl font-bold text-sky-700">
+                {price} {currency}/{t('night', 'night')}
+              </p>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

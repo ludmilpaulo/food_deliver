@@ -8,7 +8,7 @@ import { fetchFornecedorData, updateLocation } from "@/services/apiService";
 import { FornecedorType } from "@/services/types";
 import { MdMenu } from "react-icons/md";
 import { HelpCircle } from "lucide-react";
-import withAuth from "@/components/ProtectedPage";
+import withPartnerAuth from "@/components/PartnerRouteGuard";
 import HelpGuideModal from "@/components/HelpGuideModal";
 import { useTranslation } from "@/hooks/useTranslation";
 
@@ -207,4 +207,4 @@ const StoreDashboard: React.FC = () => {
   );
 };
 
-export default withAuth(StoreDashboard);
+export default withPartnerAuth(StoreDashboard);

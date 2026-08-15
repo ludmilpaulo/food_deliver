@@ -60,7 +60,7 @@ const marketplaceBaseQuery = fetchBaseQuery({
 export const marketplaceApi = createApi({
   reducerPath: 'marketplaceApi',
   baseQuery: marketplaceBaseQuery,
-  tagTypes: ['Countries', 'Cities', 'Wallet', 'Rentals', 'Stays', 'Courier'],
+  tagTypes: ['Countries', 'Cities', 'Wallet', 'Rentals', 'Stays', 'Courier', 'PartnerRentals'],
   endpoints: (builder) => ({
     getCountries: builder.query<Country[], void>({
       query: () => '/api/countries/',
@@ -110,6 +110,52 @@ export const marketplaceApi = createApi({
       transformResponse: (response: RawRecord[] | { results?: RawRecord[] }) =>
         unwrapList(response) as AccommodationListing[],
       providesTags: ['Stays'],
+    }),
+    getStayProperties: builder.query<RawRecord[], { country?: number; city?: number }>({
+      query: ({ country, city }) => {
+        const params: Record<string, string | number> = { purpose: 'stay' };
+        if (country) params.country = country;
+        if (city) params.city = city;
+        return { url: '/api/properties/search/', params };
+      },
+      transformResponse: (response: RawRecord[] | { results?: RawRecord[] }) => unwrapList(response),
+      providesTags: ['Stays'],
+    }),
+    bookRental: builder.mutation<
+      RawRecord,
+      {
+        vehicle: number;
+        start_date: string;
+        end_date: string;
+        pickup_location: string;
+        return_location: string;
+      }
+    >({
+      query: (body) => ({
+        url: '/api/rentals/bookings/book/',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Rentals'],
+    }),
+    getMyRentalVehicles: builder.query<RentalVehicle[], void>({
+      query: () => '/api/rentals/me/vehicles/',
+      transformResponse: (response: RawRecord[] | { results?: RawRecord[] }) =>
+        unwrapList(response) as RentalVehicle[],
+      providesTags: ['PartnerRentals'],
+    }),
+    createRentalVehicle: builder.mutation<RentalVehicle, RawRecord>({
+      query: (body) => ({
+        url: '/api/rentals/me/vehicles/',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['PartnerRentals'],
+    }),
+    getPartnerRentalBookings: builder.query<RawRecord[], void>({
+      query: () => '/api/rentals/me/vehicles/bookings/',
+      transformResponse: (response: RawRecord[] | { results?: RawRecord[] }) => unwrapList(response),
+      providesTags: ['PartnerRentals'],
     }),
     estimatePackage: builder.mutation<
       PackageEstimate,
@@ -162,6 +208,11 @@ export const {
   useTopUpWalletMutation,
   useGetRentalVehiclesQuery,
   useGetAccommodationListingsQuery,
+  useGetStayPropertiesQuery,
+  useBookRentalMutation,
+  useGetMyRentalVehiclesQuery,
+  useCreateRentalVehicleMutation,
+  useGetPartnerRentalBookingsQuery,
   useEstimatePackageMutation,
   useRequestPackageMutation,
 } = marketplaceApi;

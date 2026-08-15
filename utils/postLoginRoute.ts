@@ -39,11 +39,12 @@ export function resolvePostLoginRoute(
   result: LoginResult,
   next?: string | null,
 ): string {
+  let destination = getPostLoginRoute(result);
   if (next && next.startsWith("/") && !next.startsWith("//")) {
-    if (next.toLowerCase() === "/checkout") {
-      return "/Checkout";
-    }
-    return next;
+    destination = next.toLowerCase() === "/checkout" ? "/Checkout" : next;
   }
-  return getPostLoginRoute(result);
+  if (result.needs_profile) {
+    return `/CompleteProfile?next=${encodeURIComponent(destination)}`;
+  }
+  return destination;
 }

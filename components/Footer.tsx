@@ -27,7 +27,7 @@ const currentYear = new Date().getFullYear();
 
 const Footer: React.FC = () => {
   const { t } = useTranslation();
-  const { data: aboutUsEntries = [], isLoading, isError } = useGetAboutUsQuery();
+  const { data: aboutUsEntries = [] } = useGetAboutUsQuery();
   const userCountryCode =
     typeof window !== "undefined" ? getUserCountryCode() : "ZA";
   const countryName = countryMap[userCountryCode];
@@ -44,24 +44,11 @@ const Footer: React.FC = () => {
   const gradient =
     "bg-gradient-to-br from-yellow-400 via-blue-50 to-blue-800";
 
-  if (isLoading) {
-    return (
-      <footer className={gradient + " text-white"}>
-        <div className="container mx-auto px-4 py-8 text-center">
-          <p className="font-semibold animate-pulse">{t("loading")}</p>
-        </div>
-      </footer>
-    );
-  }
-  if (isError || !aboutUsData) {
-    return (
-      <footer className={gradient + " text-white"}>
-        <div className="container mx-auto px-4 py-8 text-center">
-          <p className="font-semibold text-red-100">{t("error")}</p>
-        </div>
-      </footer>
-    );
-  }
+  // Always render a real footer (never "Loading…") so store policy crawlers
+  // see static contact details even before About Us API resolves.
+  const contactEmail = aboutUsData?.email || "privacy@kudya.store";
+  const contactPhone = aboutUsData?.phone || "";
+  const contactAddress = aboutUsData?.address || "Southern Africa";
 
   const legalLinks = [
     { href: "/FAQ", label: t("faq") },
@@ -151,22 +138,34 @@ const Footer: React.FC = () => {
               <p className="flex items-center justify-center md:justify-start gap-2">
                 <FaEnvelope className="w-5 h-5 text-blue-700 shrink-0" aria-hidden />
                 <span className="font-bold text-black">
-                  {aboutUsData.email ? (
-                    <Link href={`mailto:${aboutUsData.email}`} className="hover:text-blue-900 underline transition">{aboutUsData.email}</Link>
-                  ) : "--"}
+                  <Link href={`mailto:${contactEmail}`} className="hover:text-blue-900 underline transition">
+                    {contactEmail}
+                  </Link>
                 </span>
               </p>
-              <p className="flex items-center justify-center md:justify-start gap-2">
-                <FaPhone className="w-5 h-5 text-blue-700 shrink-0" aria-hidden />
-                <span className="font-bold text-black">
-                  {aboutUsData.phone ? (
-                    <Link href={`tel:${aboutUsData.phone}`} className="hover:text-blue-900 underline transition">{aboutUsData.phone}</Link>
-                  ) : "--"}
-                </span>
-              </p>
+              {!aboutUsData?.email && (
+                <p className="flex items-center justify-center md:justify-start gap-2">
+                  <FaEnvelope className="w-5 h-5 text-blue-700 shrink-0" aria-hidden />
+                  <span className="font-bold text-black">
+                    <Link href="mailto:support@kudya.store" className="hover:text-blue-900 underline transition">
+                      support@kudya.store
+                    </Link>
+                  </span>
+                </p>
+              )}
+              {contactPhone ? (
+                <p className="flex items-center justify-center md:justify-start gap-2">
+                  <FaPhone className="w-5 h-5 text-blue-700 shrink-0" aria-hidden />
+                  <span className="font-bold text-black">
+                    <Link href={`tel:${contactPhone}`} className="hover:text-blue-900 underline transition">
+                      {contactPhone}
+                    </Link>
+                  </span>
+                </p>
+              ) : null}
               <p className="flex items-center justify-center md:justify-start gap-2">
                 <FaMapMarkerAlt className="w-5 h-5 text-blue-700 shrink-0" aria-hidden />
-                <span className="font-bold text-black">{aboutUsData.address || "--"}</span>
+                <span className="font-bold text-black">{contactAddress}</span>
               </p>
             </div>
             <motion.div
@@ -175,11 +174,11 @@ const Footer: React.FC = () => {
               transition={{ duration: 1 }}
               className="flex space-x-3 mt-3 justify-center md:justify-start"
             >
-              {aboutUsData.facebook && <SocialIcon url={aboutUsData.facebook} />}
-              {aboutUsData.linkedin && <SocialIcon url={aboutUsData.linkedin} />}
-              {aboutUsData.twitter && <SocialIcon url={aboutUsData.twitter} />}
-              {aboutUsData.instagram && <SocialIcon url={aboutUsData.instagram} />}
-              {aboutUsData.whatsapp && (
+              {aboutUsData?.facebook && <SocialIcon url={aboutUsData.facebook} />}
+              {aboutUsData?.linkedin && <SocialIcon url={aboutUsData.linkedin} />}
+              {aboutUsData?.twitter && <SocialIcon url={aboutUsData.twitter} />}
+              {aboutUsData?.instagram && <SocialIcon url={aboutUsData.instagram} />}
+              {aboutUsData?.whatsapp && (
                 <SocialIcon
                   url={`https://wa.me/${aboutUsData.whatsapp.replace(/\D/g, "")}`}
                   network="whatsapp"

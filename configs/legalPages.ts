@@ -48,7 +48,7 @@ const termsEn: LegalPageData = {
       title: 'Accounts & Eligibility',
       bullets: [
         'You must be at least 18 years old or have parental consent.',
-        'You may register with email/password or sign in with Google, Facebook, or TikTok.',
+        'You may register with email/password or sign in with Apple, Google, Facebook, or TikTok.',
         'You are responsible for activity under your account and for keeping credentials secure.',
         'Provide accurate information and keep your profile up to date.',
       ],
@@ -65,9 +65,10 @@ const termsEn: LegalPageData = {
     },
     {
       id: 'social',
-      title: 'Social Login (Including TikTok)',
+      title: 'Social Login (Apple, Google, TikTok, and others)',
       paragraphs: [
         'If you choose "Continue with TikTok", Kudya uses TikTok Login Kit only to authenticate you and create or link your account. We receive your TikTok open identifier, display name, and avatar for your Kudya profile. We do not post to TikTok or access your TikTok videos.',
+        'If you choose "Continue with Apple", Kudya uses Sign in with Apple to authenticate you. We receive Apple’s stable user identifier and, when you choose to share it, your name and email (which may be an Apple Private Relay address). Email is never treated as the only identity key.',
       ],
     },
     {

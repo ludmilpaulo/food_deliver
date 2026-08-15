@@ -37,6 +37,8 @@ export type LoginResult = {
   is_customer: boolean;
   is_driver: boolean;
   message: string;
+  created?: boolean;
+  needs_profile?: boolean;
   business_profile?: BusinessProfile;
 };
 
@@ -178,6 +180,44 @@ const authSlice = createSlice({
         // ignore storage failures
       }
     },
+    setAuthFromSocial(state, action: PayloadAction<LoginResult>) {
+      const access = action.payload.access || action.payload.token;
+      state.loading = false;
+      state.error = null;
+      if (!access) {
+        state.error = "Login failed";
+        return;
+      }
+      state.token = access;
+      state.refreshToken = action.payload.refresh ?? null;
+      try {
+        localStorage.setItem("auth_token", JSON.stringify(access));
+        localStorage.setItem(
+          "auth_user",
+          JSON.stringify({
+            user_id: action.payload.user_id,
+            username: action.payload.username,
+            role: action.payload.role,
+            is_platform_admin: action.payload.is_platform_admin,
+          }),
+        );
+      } catch {
+        // ignore storage failures
+      }
+      state.user = {
+        user_id: action.payload.user_id,
+        username: action.payload.username,
+        token: access,
+        role: action.payload.role,
+        is_platform_admin: action.payload.is_platform_admin,
+        is_customer: action.payload.is_customer,
+        is_driver: action.payload.is_driver,
+        business_profile: action.payload.business_profile,
+      };
+      state.user_id = action.payload.user_id;
+      state.username = action.payload.username;
+      state.message = action.payload.message || "Login com sucesso";
+    },
     persistBookingSession(
       state,
       action: PayloadAction<{ accessToken: string; refreshToken?: string; username?: string }>,
@@ -266,7 +306,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { logoutUser, clearAuthMessage, hydrateAuthFromStorage, persistBookingSession, syncAuthProfile } = authSlice.actions;
+export const { logoutUser, clearAuthMessage, hydrateAuthFromStorage, persistBookingSession, syncAuthProfile, setAuthFromSocial } = authSlice.actions;
 
 // User only
 export const selectUser = (state: { auth: AuthState }) => state.auth.user;

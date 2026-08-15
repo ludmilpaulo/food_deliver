@@ -7,6 +7,7 @@ const PlatformModulesAdmin = dynamic(() => import("@/components/admin/PlatformMo
 const PropertyReviewAdmin = dynamic(() => import("@/components/admin/PropertyReviewAdmin"));
 const PropertyApplicationsAdmin = dynamic(() => import("@/components/admin/PropertyApplicationsAdmin"));
 const PricingAdmin = dynamic(() => import("@/components/admin/PricingAdmin"));
+const VerticalOpsAdmin = dynamic(() => import("@/components/admin/VerticalOpsAdmin"));
 const TranslationsAdmin = dynamic(() => import("@/components/admin/TranslationsAdmin"));
 const ProductList = dynamic(() => import("./store/ProductList"));
 const Orders = dynamic(() => import("./Orders"));
@@ -43,6 +44,7 @@ export type AdminPanelId =
   | "propertyReview"
   | "propertyApplications"
   | "pricing"
+  | "verticalOps"
   | "translations"
   | "backupExport";
 
@@ -58,6 +60,8 @@ export function AdminPanelContent({ activePanel }: { activePanel: AdminPanelId }
       return <PropertyApplicationsAdmin />;
     case "pricing":
       return <PricingAdmin />;
+    case "verticalOps":
+      return <VerticalOpsAdmin />;
     case "translations":
       return <TranslationsAdmin />;
     case "menus":

@@ -18,6 +18,7 @@ export const ADMIN_PANEL_IDS: AdminPanelId[] = [
   'propertyReview',
   'propertyApplications',
   'pricing',
+  'verticalOps',
   'translations',
   'backupExport',
 ];

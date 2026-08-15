@@ -4,6 +4,7 @@ import { FormEvent, useState } from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/hooks/useTranslation';
 import LocationFilterBar from '@/components/location/LocationFilterBar';
+import { forwardGeocode } from '@/lib/locationsApi';
 import {
   useEstimatePackageMutation,
   useRequestPackageMutation,
@@ -14,6 +15,8 @@ import type { RootState } from '@/redux/store';
 const PACKAGE_TYPES = ['small', 'medium', 'large', 'fragile', 'document', 'envelope'] as const;
 const URGENCY_OPTIONS = ['standard', 'express', 'same_day'] as const;
 
+type LatLng = { lat: number; lng: number; label: string };
+
 export default function SendPackageExperience() {
   const { t } = useTranslation();
   const token = useSelector((state: RootState) => state.auth.token);
@@ -22,6 +25,8 @@ export default function SendPackageExperience() {
 
   const [pickupAddress, setPickupAddress] = useState('');
   const [dropoffAddress, setDropoffAddress] = useState('');
+  const [pickup, setPickup] = useState<LatLng | null>(null);
+  const [dropoff, setDropoff] = useState<LatLng | null>(null);
   const [recipientName, setRecipientName] = useState('');
   const [recipientPhone, setRecipientPhone] = useState('');
   const [packageType, setPackageType] = useState<(typeof PACKAGE_TYPES)[number]>('small');
@@ -29,15 +34,47 @@ export default function SendPackageExperience() {
   const [notes, setNotes] = useState('');
   const [error, setError] = useState<string | null>(null);
 
+  const resolveAddresses = async (): Promise<{ pickup: LatLng; dropoff: LatLng } | null> => {
+    const [pickupHits, dropoffHits] = await Promise.all([
+      forwardGeocode(pickupAddress.trim()),
+      forwardGeocode(dropoffAddress.trim()),
+    ]);
+    const pickupHit = pickupHits[0];
+    const dropoffHit = dropoffHits[0];
+    if (!pickupHit || !dropoffHit) {
+      setError(t('geocodeFailed', 'Could not find those addresses. Enter a more specific pickup and drop-off.'));
+      return null;
+    }
+    const nextPickup = {
+      lat: pickupHit.latitude,
+      lng: pickupHit.longitude,
+      label: pickupHit.formatted_address || pickupAddress,
+    };
+    const nextDropoff = {
+      lat: dropoffHit.latitude,
+      lng: dropoffHit.longitude,
+      label: dropoffHit.formatted_address || dropoffAddress,
+    };
+    if (nextPickup.lat === nextDropoff.lat && nextPickup.lng === nextDropoff.lng) {
+      setError(t('distinctDropoffRequired', 'Pickup and drop-off must be different locations.'));
+      return null;
+    }
+    setPickup(nextPickup);
+    setDropoff(nextDropoff);
+    return { pickup: nextPickup, dropoff: nextDropoff };
+  };
+
   const handleEstimate = async (event: FormEvent) => {
     event.preventDefault();
     setError(null);
     try {
+      const coords = await resolveAddresses();
+      if (!coords) return;
       await estimatePackage({
-        pickup_lat: -8.8383,
-        pickup_lng: 13.2344,
-        dropoff_lat: -8.85,
-        dropoff_lng: 13.25,
+        pickup_lat: coords.pickup.lat,
+        pickup_lng: coords.pickup.lng,
+        dropoff_lat: coords.dropoff.lat,
+        dropoff_lng: coords.dropoff.lng,
         package_type: packageType,
         urgency,
       }).unwrap();
@@ -54,13 +91,15 @@ export default function SendPackageExperience() {
     }
     setError(null);
     try {
+      const coords = pickup && dropoff ? { pickup, dropoff } : await resolveAddresses();
+      if (!coords) return;
       await requestPackage({
-        pickup_address: pickupAddress,
-        pickup_lat: -8.8383,
-        pickup_lng: 13.2344,
-        dropoff_address: dropoffAddress,
-        dropoff_lat: -8.85,
-        dropoff_lng: 13.25,
+        pickup_address: coords.pickup.label,
+        pickup_lat: coords.pickup.lat,
+        pickup_lng: coords.pickup.lng,
+        dropoff_address: coords.dropoff.label,
+        dropoff_lat: coords.dropoff.lat,
+        dropoff_lng: coords.dropoff.lng,
         package_type: packageType,
         urgency,
         recipient_name: recipientName,

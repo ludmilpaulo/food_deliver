@@ -1,9 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useAppSelector } from "@/redux/store";
-import { fetchServiceCategories, fetchMyServices, createService, updateService, fetchAvailability, createAvailability, fetchBlackouts, createBlackout, getAvailableBalance, requestPayout, type Availability, type Blackout, type PartnerService, type ServiceCategory } from "@/services/partnerApi";
+import { fetchServiceCategories, fetchMyServices, createService, fetchAvailability, createAvailability, fetchBlackouts, createBlackout, getAvailableBalance, requestPayout, type Availability, type Blackout, type PartnerService, type ServiceCategory } from "@/services/partnerApi";
 import { useTranslation } from "@/hooks/useTranslation";
-import withAuth from "@/components/ProtectedPage";
+import withPartnerAuth from "@/components/PartnerRouteGuard";
 
 function PartnerDashboard() {
   const { t } = useTranslation();
@@ -30,7 +30,7 @@ function PartnerDashboard() {
         setCategories(cats);
         if (bal) setBalance(bal);
         if (parceiroId) {
-          const my = await fetchMyServices(parceiroId);
+          const my = await fetchMyServices();
           setServices(my);
         }
       } catch {
@@ -54,9 +54,9 @@ function PartnerDashboard() {
   const handleCreateService = async () => {
     if (!parceiroId || categories.length === 0) return;
     const created = await createService({
-      parceiro: parceiroId,
       category: categories[0].id,
       title: "New Service",
+      description: "New service",
       price: 1000,
       currency: "AOA",
       duration_minutes: 90,
@@ -172,4 +172,4 @@ function PartnerDashboard() {
   );
 }
 
-export default withAuth(PartnerDashboard);
+export default withPartnerAuth(PartnerDashboard);

@@ -181,6 +181,14 @@ export const ADMIN_NAV_ITEMS: AdminNavItemMeta[] = [
     descDefault: "Country methods, EcoCash, bank/EFT, and verification",
   },
   {
+    key: "financial",
+    group: "platform",
+    labelKey: "financialOverview",
+    labelDefault: "Financial wallet",
+    descKey: "financialAdminDesc",
+    descDefault: "Wallet overview, reconciliation, settlement, and risk",
+  },
+  {
     key: "verticalOps",
     group: "operations",
     labelKey: "verticalOps",

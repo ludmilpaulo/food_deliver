@@ -17,6 +17,7 @@ import {
   MdBadge,
   MdSupportAgent,
   MdPayments,
+  MdAccountBalanceWallet,
   MdTune,
   MdAttachMoney,
   MdTranslate,
@@ -69,6 +70,7 @@ const PANEL_ICONS: Record<AdminPanelId, React.ReactNode> = {
   translations: <MdTranslate className="text-[1.05rem]" />,
   backupExport: <MdSettingsBackupRestore className="text-[1.05rem]" />,
   payments: <MdPayments className="text-[1.05rem]" />,
+  financial: <MdAccountBalanceWallet className="text-[1.05rem]" />,
 };
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, activePanel, onSelectPanel }) => {

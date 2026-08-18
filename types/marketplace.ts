@@ -18,6 +18,7 @@ export type WalletSummary = {
   id: number;
   available_balance: string;
   pending_balance: string;
+  reserved_balance?: string;
   currency: string;
 };
 

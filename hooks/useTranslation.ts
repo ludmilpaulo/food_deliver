@@ -16,6 +16,7 @@ import translations, {
 import { marketplaceT } from "@/configs/marketplaceTranslations";
 import { homeT } from "@/configs/homeTranslations";
 import { propertyApplicationT } from "@/configs/propertyApplicationTranslations";
+import { financialT } from "@/configs/financialTranslations";
 import { fetchApiTranslations } from "@/services/platformApi";
 import { store } from "@/redux/store";
 import { languageApi } from "@/redux/slices/languageApi";
@@ -33,6 +34,8 @@ function englishBaseline(key: string): string | undefined {
 }
 
 function localForLocale(locale: SupportedLocale, key: string): string | undefined {
+  const financial = financialT(locale, key);
+  if (financial) return financial;
   const app = propertyApplicationT(locale, key);
   if (app) return app;
   const home = homeT(locale, key);

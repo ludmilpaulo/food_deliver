@@ -23,6 +23,7 @@ import { adminVehicleApi } from "./slices/adminVehicleApi";
 import { marketplaceApi } from "./slices/marketplaceApi";
 import { ridesApi } from "./slices/ridesApi";
 import { paymentsApi } from "./slices/paymentsApi";
+import { financialApi } from "./slices/financialApi";
 
 
 export const store = configureStore({
@@ -52,6 +53,7 @@ export const store = configureStore({
     [marketplaceApi.reducerPath]: marketplaceApi.reducer,
     [ridesApi.reducerPath]: ridesApi.reducer,
     [paymentsApi.reducerPath]: paymentsApi.reducer,
+    [financialApi.reducerPath]: financialApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
@@ -68,7 +70,8 @@ export const store = configureStore({
       .concat(adminDriversOperationsApi.middleware)
       .concat(marketplaceApi.middleware)
       .concat(ridesApi.middleware)
-      .concat(paymentsApi.middleware),
+      .concat(paymentsApi.middleware)
+      .concat(financialApi.middleware),
 });
 
 // Keep the cart in localStorage so it survives reloads and login redirects.

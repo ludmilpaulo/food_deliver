@@ -24,6 +24,28 @@ describe("post-login routing", () => {
     expect(getPostLoginRoute({ ...restaurant, is_customer: true })).toBe("/RestaurantDashboad");
   });
 
+  it("sends grocery partners to the shared store dashboard", () => {
+    expect(
+      getPostLoginRoute({
+        token: "t",
+        user_id: 4,
+        username: "grocery@kudya.shop",
+        role: "grocery_store_owner",
+        is_customer: false,
+        is_driver: false,
+        message: "ok",
+        business_profile: {
+          id: 2,
+          businessName: "Kudya Grocery",
+          category: "grocery",
+          dashboardRoute: "/dashboard/grocery",
+          isApproved: true,
+          isActive: true,
+        },
+      }),
+    ).toBe("/RestaurantDashboad");
+  });
+
   it("sends customers home and admins to the admin console", () => {
     expect(
       getPostLoginRoute({

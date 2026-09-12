@@ -149,9 +149,9 @@ export default function StoresPage({ forcedVertical }: { forcedVertical?: Market
                   router.push(`/products?${query.toString()}`);
                 }}
               >
-                {store.images ? (
+                {(store.images || store.logo) ? (
                   <Image
-                    src={store.images}
+                    src={(store.images || store.logo) as string}
                     alt={store.name}
                     width={90}
                     height={90}

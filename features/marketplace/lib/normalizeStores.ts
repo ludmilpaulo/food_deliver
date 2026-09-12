@@ -8,26 +8,34 @@ export function normalizeV1Stores(data: unknown): Store[] {
     ? data
     : (data as { results?: RawStore[] })?.results ?? [];
 
-  return rows.map((raw) => ({
-    id: Number(raw.id),
-    name: String(raw.name ?? ''),
-    phone: String(raw.phone ?? ''),
-    address: String(raw.address ?? ''),
-    logo: typeof raw.logo === 'string' ? raw.logo : null,
-    latitude: typeof raw.latitude === 'number' ? raw.latitude : null,
-    longitude: typeof raw.longitude === 'number' ? raw.longitude : null,
-    banner: Boolean(raw.banner ?? raw.barnner),
-    barnner: Boolean(raw.barnner ?? raw.banner),
-    is_approved: Boolean(raw.is_approved ?? true),
-    store_type: typeof raw.store_type === 'number' ? raw.store_type : null,
-    category:
-      raw.category && typeof raw.category === 'object'
-        ? (raw.category as Store['category'])
-        : null,
-    opening_hours: Array.isArray(raw.opening_hours)
-      ? (raw.opening_hours as Store['opening_hours'])
-      : [],
-  }));
+  return rows.map((raw) => {
+    const logo = typeof raw.logo === 'string' ? raw.logo : null;
+    const nestedType =
+      raw.store_type && typeof raw.store_type === 'object'
+        ? Number((raw.store_type as { id?: number }).id)
+        : null;
+    return {
+      id: Number(raw.id),
+      name: String(raw.name ?? ''),
+      phone: String(raw.phone ?? ''),
+      address: String(raw.address ?? ''),
+      logo,
+      images: logo,
+      latitude: typeof raw.latitude === 'number' ? raw.latitude : null,
+      longitude: typeof raw.longitude === 'number' ? raw.longitude : null,
+      banner: Boolean(raw.banner ?? raw.barnner),
+      barnner: Boolean(raw.barnner ?? raw.banner),
+      is_approved: Boolean(raw.is_approved ?? true),
+      store_type: typeof raw.store_type === 'number' ? raw.store_type : nestedType,
+      category:
+        raw.category && typeof raw.category === 'object'
+          ? (raw.category as Store['category'])
+          : null,
+      opening_hours: Array.isArray(raw.opening_hours)
+        ? (raw.opening_hours as Store['opening_hours'])
+        : [],
+    };
+  });
 }
 
 export type MarketplaceVertical = 'food' | 'groceries';

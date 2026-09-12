@@ -47,6 +47,16 @@ export type StoredAuthUser = {
   username?: string;
   role?: string;
   is_platform_admin?: boolean;
+  is_customer?: boolean;
+  is_driver?: boolean;
+  business_profile?: {
+    id: number;
+    businessName: string;
+    category: string;
+    dashboardRoute: string;
+    isApproved: boolean;
+    isActive: boolean;
+  };
 };
 
 export function readStoredAuthUser(): StoredAuthUser | null {
@@ -57,6 +67,15 @@ export function readStoredAuthUser(): StoredAuthUser | null {
     return JSON.parse(raw) as StoredAuthUser;
   } catch {
     return null;
+  }
+}
+
+export function writeStoredAuthUser(user: StoredAuthUser): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem("auth_user", JSON.stringify(user));
+  } catch {
+    // ignore storage failures
   }
 }
 

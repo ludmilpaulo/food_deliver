@@ -22,14 +22,14 @@ export function getPostLoginRoute(result: LoginResult): string {
   if (isPlatformAdminUser(result)) {
     return "/AdminDashboard";
   }
+  if (result.business_profile) {
+    return resolveProviderPortalTarget(result.business_profile.category);
+  }
   if (result.is_driver) {
     return "/provider/courier";
   }
   if (result.is_customer) {
     return "/HomeScreen";
-  }
-  if (result.business_profile) {
-    return resolveProviderPortalTarget(result.business_profile.category);
   }
   return "/provider/onboarding";
 }

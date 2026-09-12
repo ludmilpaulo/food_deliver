@@ -2,6 +2,7 @@
 
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { loginUserService } from "../../services/authService"; // adjust as needed
+import { readStoredAuthUser, writeStoredAuthUser } from "../../lib/authToken";
 
 export type BusinessProfile = {
   id: number;
@@ -88,6 +89,23 @@ export const loginUser = createAsyncThunk<
   }
 });
 
+function persistLoginSession(result: LoginResult, access: string): void {
+  try {
+    localStorage.setItem("auth_token", JSON.stringify(access));
+    writeStoredAuthUser({
+      user_id: result.user_id,
+      username: result.username,
+      role: result.role,
+      is_platform_admin: result.is_platform_admin,
+      is_customer: result.is_customer,
+      is_driver: result.is_driver,
+      business_profile: result.business_profile,
+    });
+  } catch {
+    // ignore storage failures
+  }
+}
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -118,27 +136,20 @@ const authSlice = createSlice({
           const token = JSON.parse(tokenRaw) as string | null;
           if (token) {
             state.token = token;
-            const userRaw = localStorage.getItem('auth_user');
-            if (userRaw) {
-              const stored = JSON.parse(userRaw) as {
-                user_id?: number;
-                username?: string;
-                role?: string;
-                is_platform_admin?: boolean;
+            const stored = readStoredAuthUser();
+            if (stored?.user_id && stored.username) {
+              state.user_id = stored.user_id;
+              state.username = stored.username;
+              state.user = {
+                user_id: stored.user_id,
+                username: stored.username,
+                token,
+                role: stored.role,
+                is_platform_admin: stored.is_platform_admin,
+                is_customer: stored.is_customer ?? false,
+                is_driver: stored.is_driver ?? false,
+                business_profile: stored.business_profile,
               };
-              if (stored.user_id && stored.username) {
-                state.user_id = stored.user_id;
-                state.username = stored.username;
-                state.user = {
-                  user_id: stored.user_id,
-                  username: stored.username,
-                  token,
-                  role: stored.role,
-                  is_platform_admin: stored.is_platform_admin,
-                  is_customer: true,
-                  is_driver: false,
-                };
-              }
             }
           }
         }
@@ -167,15 +178,20 @@ const authSlice = createSlice({
         token: token ?? '',
         role,
         is_platform_admin,
-        is_customer: state.user?.is_customer ?? true,
+        is_customer: state.user?.is_customer ?? false,
         is_driver: state.user?.is_driver ?? false,
         business_profile: state.user?.business_profile,
       };
       try {
-        localStorage.setItem(
-          'auth_user',
-          JSON.stringify({ user_id, username, role, is_platform_admin }),
-        );
+        writeStoredAuthUser({
+          user_id,
+          username,
+          role,
+          is_platform_admin,
+          is_customer: state.user?.is_customer ?? false,
+          is_driver: state.user?.is_driver ?? false,
+          business_profile: state.user?.business_profile,
+        });
       } catch {
         // ignore storage failures
       }
@@ -190,20 +206,7 @@ const authSlice = createSlice({
       }
       state.token = access;
       state.refreshToken = action.payload.refresh ?? null;
-      try {
-        localStorage.setItem("auth_token", JSON.stringify(access));
-        localStorage.setItem(
-          "auth_user",
-          JSON.stringify({
-            user_id: action.payload.user_id,
-            username: action.payload.username,
-            role: action.payload.role,
-            is_platform_admin: action.payload.is_platform_admin,
-          }),
-        );
-      } catch {
-        // ignore storage failures
-      }
+      persistLoginSession(action.payload, access);
       state.user = {
         user_id: action.payload.user_id,
         username: action.payload.username,
@@ -270,18 +273,7 @@ const authSlice = createSlice({
         if (action.payload && access) {
           state.token = access;
           state.refreshToken = action.payload.refresh ?? null;
-          try { localStorage.setItem("auth_token", JSON.stringify(access)); } catch {}
-          try {
-            localStorage.setItem(
-              "auth_user",
-              JSON.stringify({
-                user_id: action.payload.user_id,
-                username: action.payload.username,
-                role: action.payload.role,
-                is_platform_admin: action.payload.is_platform_admin,
-              }),
-            );
-          } catch {}
+          persistLoginSession(action.payload, access);
           state.user = {
             user_id: action.payload.user_id,
             username: action.payload.username,

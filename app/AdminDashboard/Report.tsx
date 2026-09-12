@@ -7,6 +7,14 @@ import {
   type AdminMarketplaceReport,
 } from '@/features/admin/api/adminOrdersApi';
 import { fetchAnalyticsDashboard } from '@/features/analytics/api/analyticsApi';
+import AnalyticsTimeframeFilter from '@/components/analytics/AnalyticsTimeframeFilter';
+import {
+  barChartTooltipOptions,
+  pieChartSeries,
+  pieChartTooltipOptions,
+  reportAxisLabels,
+  type ReportTimeframe,
+} from '@/utils/reportCharts';
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
@@ -34,21 +42,32 @@ const Report: React.FC = () => {
   const [platform, setPlatform] = useState<PlatformStats | null>(null);
   const [analytics, setAnalytics] = useState<AnalyticsStats | null>(null);
   const [marketplace, setMarketplace] = useState<AdminMarketplaceReport | null>(null);
+  const [timeframe, setTimeframe] = useState<ReportTimeframe>('week');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      setError(null);
+    const loadOverview = async () => {
       try {
-        const [dashboard, analyticsData, marketplaceData] = await Promise.all([
+        const [dashboard, analyticsData] = await Promise.all([
           fetchAdminDashboardV1(),
           fetchAnalyticsDashboard(),
-          fetchAdminMarketplaceReport('week'),
         ]);
         setPlatform(dashboard);
         setAnalytics(analyticsData);
+      } catch {
+        setError(t('failedToFetchData', 'Failed to fetch data'));
+      }
+    };
+    void loadOverview();
+  }, [t]);
+
+  useEffect(() => {
+    const loadReport = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const marketplaceData = await fetchAdminMarketplaceReport(timeframe);
         setMarketplace(marketplaceData);
       } catch {
         setError(t('failedToFetchData', 'Failed to fetch data'));
@@ -56,10 +75,16 @@ const Report: React.FC = () => {
         setLoading(false);
       }
     };
-    load();
-  }, [t]);
+    void loadReport();
+  }, [t, timeframe]);
 
-  if (loading) {
+  const timeframeLabel = (value: ReportTimeframe) => {
+    if (value === 'day') return t('reportDay', 'Day');
+    if (value === 'month') return t('reportMonth', 'Month');
+    return t('reportWeek', 'Week');
+  };
+
+  if (loading && !marketplace) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="w-16 h-16 border-t-4 border-b-4 border-blue-500 rounded-full animate-spin" />
@@ -67,7 +92,7 @@ const Report: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (error && !marketplace) {
     return <div className="p-6 text-red-600">{error}</div>;
   }
 
@@ -88,13 +113,28 @@ const Report: React.FC = () => {
   ];
 
   const statusEntries = Object.entries(marketplace?.by_status ?? {});
+  const axisLabels = reportAxisLabels(
+    marketplace?.labels,
+    timeframe,
+    marketplace?.revenue?.length ?? 0,
+  );
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-2">{t('platformReports', 'Platform reports')}</h1>
-      <p className="text-slate-500 mb-6 text-sm">
-        {t('adminAnalyticsHint', 'Combined marketplace, mobility, and analytics overview')}
-      </p>
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">{t('platformReports', 'Platform reports')}</h1>
+          <p className="text-slate-500 text-sm">
+            {t('adminAnalyticsHint', 'Combined marketplace, mobility, and analytics overview')}
+          </p>
+        </div>
+        <AnalyticsTimeframeFilter
+          value={timeframe}
+          onChange={setTimeframe}
+          labelFor={timeframeLabel}
+        />
+      </div>
+      {error ? <p className="mb-4 text-sm text-red-600">{error}</p> : null}
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {summaryCards.map((card) => (
@@ -121,12 +161,7 @@ const Report: React.FC = () => {
           </div>
           <div className="p-4">
             <Chart
-              options={{
-                chart: { id: 'admin-revenue-chart' },
-                xaxis: {
-                  categories: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                },
-              }}
+              options={barChartTooltipOptions(axisLabels, 'admin-revenue-chart')}
               series={[{ name: t('revenue', 'Revenue'), data: marketplace?.revenue ?? [] }]}
               type="bar"
               height={280}
@@ -140,12 +175,7 @@ const Report: React.FC = () => {
           </div>
           <div className="p-4">
             <Chart
-              options={{
-                chart: { id: 'admin-orders-chart' },
-                xaxis: {
-                  categories: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                },
-              }}
+              options={barChartTooltipOptions(axisLabels, 'admin-orders-chart')}
               series={[{ name: t('orders', 'Orders'), data: marketplace?.orders ?? [] }]}
               type="bar"
               height={280}
@@ -160,8 +190,8 @@ const Report: React.FC = () => {
           <div className="p-4">
             {marketplace?.stores?.labels?.length ? (
               <Chart
-                options={{ labels: marketplace.stores.labels }}
-                series={marketplace.stores.data}
+                options={pieChartTooltipOptions(marketplace.stores.labels)}
+                series={pieChartSeries(marketplace.stores.data)}
                 type="pie"
                 height={280}
               />

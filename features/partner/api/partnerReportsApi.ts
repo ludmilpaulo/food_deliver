@@ -2,6 +2,7 @@ import v1Client from '@/shared/lib/api/v1Client';
 
 export type PartnerReportData = {
   days?: number;
+  timeframe?: string;
   labels?: string[];
   revenue: number[];
   orders: number[];

@@ -16,6 +16,8 @@ export type AdminOrder = {
 };
 
 export type AdminMarketplaceReport = {
+  timeframe?: string;
+  labels?: string[];
   revenue: number[];
   orders: number[];
   by_status: Record<string, number>;

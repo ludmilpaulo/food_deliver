@@ -19,6 +19,10 @@ import {
 
 type Tab = 'balance' | 'send' | 'withdraw' | 'remittance' | 'services';
 
+function createIdempotencyKey(prefix: string): string {
+  return `${prefix}-${globalThis.crypto.randomUUID()}`;
+}
+
 export default function WalletExperience() {
   const { t } = useTranslation();
   const token = useSelector((state: RootState) => state.auth.token);
@@ -91,7 +95,7 @@ export default function WalletExperience() {
         currency,
         recipient_phone: recipientPhone,
         pin: pin || undefined,
-        idempotency_key: `transfer-${Date.now()}`,
+        idempotency_key: createIdempotencyKey('transfer'),
       }).unwrap();
       setMessage(t('transferSuccess'));
       refetch();
@@ -121,7 +125,7 @@ export default function WalletExperience() {
         method: selectedMethod,
         payout_details: details,
         pin,
-        idempotency_key: `withdraw-${Date.now()}`,
+        idempotency_key: createIdempotencyKey('withdraw'),
       }).unwrap();
       setMessage(t('withdrawalPending'));
       refetch();

@@ -12,6 +12,11 @@ import withPartnerAuth from "@/components/PartnerRouteGuard";
 import HelpGuideModal from "@/components/HelpGuideModal";
 import { useTranslation } from "@/hooks/useTranslation";
 
+const Sidebar = dynamic(() => import("./Sidebar"), {
+  ssr: false,
+  loading: () => <p>Loading…</p>,
+});
+
 const StoreDashboard: React.FC = () => {
   const { t } = useTranslation();
   const user = useSelector(selectUser);
@@ -20,10 +25,6 @@ const StoreDashboard: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
-  const Sidebar = dynamic(() => import("./Sidebar"), {
-    ssr: false,
-    loading: () => <p>{t("loading")}</p>,
-  });
   const locationIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const locationDeniedRef = useRef(false);
 
@@ -156,7 +157,11 @@ const StoreDashboard: React.FC = () => {
   }, [user?.user_id]);
 
   const handleSidebarToggle = () => {
-    setIsSidebarOpen(!isSidebarOpen);
+    setIsSidebarOpen((open) => !open);
+  };
+
+  const closeMobileSidebar = () => {
+    setIsSidebarOpen(false);
   };
 
   return (
@@ -194,7 +199,12 @@ const StoreDashboard: React.FC = () => {
               <MdMenu />
             </button>
           </div>
-          <Sidebar fornecedor={fornecedor} isOpen={isSidebarOpen} onToggle={handleSidebarToggle} />
+          <Sidebar
+            fornecedor={fornecedor}
+            isOpen={isSidebarOpen}
+            onToggle={handleSidebarToggle}
+            onClose={closeMobileSidebar}
+          />
         </>
       )}
       <HelpGuideModal

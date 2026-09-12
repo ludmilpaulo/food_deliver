@@ -32,9 +32,10 @@ interface SidebarProps {
   onNavClick?: (navItem: string) => void; // Callback function to notify the parent about a menu click
   isOpen: boolean;
   onToggle: () => void;
+  onClose?: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onToggle }) => {
+const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onToggle, onClose }) => {
   const { t } = useTranslation();
   const [showProducts, setShowProducts] = useState(false);
   const [showOrders, setShowOrders] = useState(false);
@@ -134,7 +135,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
                     setListOfDriver(false);
                     setShowServices(false);
                     setShowReport(false); 
-                    onToggle();
+                    onClose?.();
                   }}
                 >
                   <div className="flex items-center space-x-3">
@@ -155,7 +156,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
                     setShowServices(false);
                     setShowReport(false); 
                     onNavClick && onNavClick(t("orders", "Orders"));
-                    onToggle();
+                    onClose?.();
                   }}
                 >
                   <div className="flex items-center space-x-3">
@@ -176,7 +177,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
                     setListOfDriver(false);
                     setShowServices(false);
                     setShowReport(true);
-                    onToggle();
+                    onClose?.();
                   }}
                 >
                   <div className="flex items-center space-x-3">
@@ -197,7 +198,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
                     setListOfDriver(false);
                     setListOfCustomer(true);
                     setShowServices(false);
-                    onToggle();
+                    onClose?.();
                   }}
                 >
                   <div className="flex items-center space-x-3">
@@ -218,7 +219,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
                     setListOfCustomer(false);
                     setListOfDriver(true);
                     setShowServices(false);
-                    onToggle();
+                    onClose?.();
                   }}
                 >
                   <div className="flex items-center space-x-3">
@@ -238,7 +239,7 @@ const Sidebar: React.FC<SidebarProps> = ({ fornecedor, onNavClick, isOpen, onTog
                     setListOfCustomer(false);
                     setListOfDriver(false);
                     onNavClick && onNavClick(t("account", "Account"));
-                    onToggle();
+                    onClose?.();
                   }}
                 >
                   <div className="flex items-center space-x-3">

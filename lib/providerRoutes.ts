@@ -57,7 +57,7 @@ export function resolveProviderPortalTarget(category: string): string {
   const route = resolveProviderWebRoute(category);
   const targets: Record<string, string> = {
     '/provider/restaurant': '/RestaurantDashboad',
-    '/provider/grocery': '/RestaurantDashboad',
+    '/provider/grocery': '/GroceryDashboad',
     '/provider/store': '/RestaurantDashboad',
     '/provider/services': '/PartnerDashboard',
     '/provider/stay': '/dashboard/property',

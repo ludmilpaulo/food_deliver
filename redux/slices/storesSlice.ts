@@ -39,6 +39,14 @@ export const fetchStoresByVertical = createAsyncThunk<Store[], MarketplaceVertic
   }
 );
 
+export const fetchAllStoresList = createAsyncThunk<Store[]>(
+  'stores/fetchAllList',
+  async () => {
+    const response = await API.get('/store/stores/');
+    return normalizeV1Stores(response.data);
+  }
+);
+
 const storesSlice = createSlice({
   name: 'stores',
   initialState,
@@ -68,6 +76,20 @@ const storesSlice = createSlice({
         state.vertical = action.meta.arg;
       })
       .addCase(fetchStoresByVertical.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to fetch stores';
+      })
+      .addCase(fetchAllStoresList.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.vertical = null;
+      })
+      .addCase(fetchAllStoresList.fulfilled, (state, action) => {
+        state.data = action.payload;
+        state.loading = false;
+        state.vertical = null;
+      })
+      .addCase(fetchAllStoresList.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch stores';
       });

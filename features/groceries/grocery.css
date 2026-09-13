@@ -1,0 +1,127 @@
+.grocery-shell {
+  --grocery-primary: #0b8f45;
+  --grocery-primary-dark: #056b34;
+  --grocery-soft: #eaf7ee;
+  --grocery-bg: #f8faf9;
+  --grocery-text: #111827;
+  --grocery-muted: #6b7280;
+  --grocery-border: #e5e7eb;
+  background: var(--grocery-bg);
+  color: var(--grocery-text);
+  min-height: 100vh;
+}
+
+.grocery-shell button:focus-visible,
+.grocery-shell a:focus-visible,
+.grocery-shell input:focus-visible {
+  outline: 2px solid var(--grocery-primary);
+  outline-offset: 2px;
+}
+
+.grocery-brand {
+  color: var(--grocery-primary);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.grocery-hide-scrollbar {
+  scrollbar-width: none;
+}
+
+.grocery-hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.grocery-bottom-nav {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 40;
+  border-top: 1px solid var(--grocery-border);
+  background: #fff;
+}
+
+.grocery-bottom-nav ul {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+@media (min-width: 768px) {
+  .grocery-bottom-nav {
+    display: none;
+  }
+}
+
+.grocery-product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .grocery-product-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .grocery-product-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+.grocery-category-row,
+.grocery-deals-row,
+.grocery-benefits-row {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .grocery-category-row {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    overflow: visible;
+  }
+
+  .grocery-benefits-row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    overflow: visible;
+  }
+}
+
+.grocery-promo-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .grocery-promo-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.grocery-add-btn {
+  display: flex;
+  min-height: 44px;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  background: var(--grocery-primary);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.grocery-add-btn:hover {
+  background: var(--grocery-primary-dark);
+}
+
+.grocery-add-btn:disabled {
+  cursor: not-allowed;
+  background: #9ca3af;
+}

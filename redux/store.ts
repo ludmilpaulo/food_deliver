@@ -21,9 +21,11 @@ import { languageApi } from "./slices/languageApi";
 import { adminDriversOperationsApi } from "./slices/adminDriversOperationsApi";
 import { adminVehicleApi } from "./slices/adminVehicleApi";
 import { marketplaceApi } from "./slices/marketplaceApi";
+import { groceryPartnerApi } from "./slices/groceryPartnerApi";
 import { ridesApi } from "./slices/ridesApi";
 import { paymentsApi } from "./slices/paymentsApi";
 import { financialApi } from "./slices/financialApi";
+import { groceriesApi } from "./slices/groceriesApi";
 
 
 export const store = configureStore({
@@ -51,9 +53,11 @@ export const store = configureStore({
     [adminVehicleApi.reducerPath]: adminVehicleApi.reducer,
     [adminDriversOperationsApi.reducerPath]: adminDriversOperationsApi.reducer,
     [marketplaceApi.reducerPath]: marketplaceApi.reducer,
+    [groceryPartnerApi.reducerPath]: groceryPartnerApi.reducer,
     [ridesApi.reducerPath]: ridesApi.reducer,
     [paymentsApi.reducerPath]: paymentsApi.reducer,
     [financialApi.reducerPath]: financialApi.reducer,
+    [groceriesApi.reducerPath]: groceriesApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
@@ -69,9 +73,11 @@ export const store = configureStore({
       .concat(adminVehicleApi.middleware)
       .concat(adminDriversOperationsApi.middleware)
       .concat(marketplaceApi.middleware)
+      .concat(groceryPartnerApi.middleware)
       .concat(ridesApi.middleware)
       .concat(paymentsApi.middleware)
-      .concat(financialApi.middleware),
+      .concat(financialApi.middleware)
+      .concat(groceriesApi.middleware),
 });
 
 // Keep the cart in localStorage so it survives reloads and login redirects.

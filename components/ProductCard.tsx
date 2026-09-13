@@ -62,15 +62,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, regionCode, language
   let stockLabel = "";
   let stockBadgeColor = "";
   let disableAddToCart = false;
-  if (product.stock <= 0) {
+  const available = product.stock_quantity ?? product.stock;
+  const unit = product.selling_unit || product.unit || "item";
+  const step = unit === "kg" || unit === "litre" ? 0.5 : 1;
+  if (available <= 0 || product.is_purchasable === false) {
     stockLabel = t("outOfStock") || "Out of Stock";
     stockBadgeColor = "#EF4444";
     disableAddToCart = true;
-  } else if (product.stock === 1) {
+  } else if (available <= 1) {
     stockLabel = t("lastOne") || "Last One!";
     stockBadgeColor = "#F59E42";
     disableAddToCart = false;
-  } else if (product.stock < 10) {
+  } else if (product.inventory_status === "low_stock" || available < 10) {
     stockLabel = t("lowStock") || "Low Stock";
     stockBadgeColor = "#FCD34D";
     disableAddToCart = false;
@@ -100,7 +103,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, regionCode, language
         store: product.store ?? 0,
         size: selectedSize,
         color: selectedColor,
-        quantity: 1,
+        quantity: step,
+        selling_unit: unit,
       })
     );
     setTimeout(() => {
@@ -111,11 +115,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, regionCode, language
 
   function adjustQuantity(amount: number) {
     if (!matchingCartItem) return;
-    if (amount === -1 && matchingCartItem.quantity <= 1) return;
+    if (amount < 0 && matchingCartItem.quantity <= step) {
+      dispatch(removeItem({ id: product.id, size: matchingCartItem.size, color: matchingCartItem.color }));
+      return;
+    }
     dispatch(
       addItem({
         ...matchingCartItem,
-        quantity: amount === 1 ? 1 : -1, // Will be handled by slice
+        selling_unit: unit,
+        quantity: amount > 0 ? step : -step,
       })
     );
   }
@@ -173,7 +181,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, regionCode, language
             </span>
           )}
           <span className="text-blue-700 font-semibold text-base">
-            {formatCurrency(price, currencyCode, language)}
+            {product.price_display || `${formatCurrency(price, currencyCode, language)}${unit !== "item" ? ` / ${unit}` : ""}`}
           </span>
         </div>
         {/* Cart controls */}

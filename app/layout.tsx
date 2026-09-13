@@ -3,8 +3,7 @@ import { cookies } from 'next/headers';
 import './globals.css';
 
 import StoreProvider from '@/redux/StoreProvider';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import AppChrome from '@/components/AppChrome';
 import ClientRoot from './ClientRoot';
 import JsonLd from '@/components/JsonLd';
 import { LocationProvider } from '@/contexts/LocationContext';
@@ -40,9 +39,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <StoreProvider>
           <LocationProvider>
             <ClientRoot>
-              <Navbar initialLocale={locale} />
-              {children}
-              <Footer />
+              <AppChrome locale={locale}>
+                {children}
+              </AppChrome>
             </ClientRoot>
           </LocationProvider>
         </StoreProvider>

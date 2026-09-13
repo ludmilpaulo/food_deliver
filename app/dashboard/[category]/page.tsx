@@ -41,7 +41,7 @@ export default function DynamicBusinessDashboardPage() {
         const requested = params.category;
         const expected = businessProfile.dashboardRoute.split("/").pop();
         const portalTarget = resolveProviderPortalTarget(businessProfile.category);
-        if (portalTarget.startsWith('/RestaurantDashboad') || portalTarget.startsWith('/PartnerDashboard')) {
+        if (portalTarget.startsWith('/RestaurantDashboad') || portalTarget.startsWith('/GroceryDashboad') || portalTarget.startsWith('/PartnerDashboard')) {
           router.replace(portalTarget);
           return;
         }

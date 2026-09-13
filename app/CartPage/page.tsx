@@ -52,6 +52,7 @@ const CartPage: React.FC = () => {
 
   // Remove only one unit
   const handleQuantityChange = (item: CartItem, diff: 1 | -1) => {
+    const step = item.selling_unit === "kg" || item.selling_unit === "litre" ? 0.5 : 1;
     if (diff === 1) {
       dispatch(
         addItem({
@@ -62,7 +63,8 @@ const CartPage: React.FC = () => {
           size: item.size || "",
           color: item.color || "",
           store: item.store,
-          quantity: 1,
+          selling_unit: item.selling_unit,
+          quantity: step,
         })
       );
     } else {
@@ -184,7 +186,9 @@ const CartPage: React.FC = () => {
                     >
                       -
                     </button>
-                    <span className="mx-2 text-lg font-semibold">{item.quantity}</span>
+                    <span className="mx-2 text-lg font-semibold">
+                      {item.quantity} {item.selling_unit && item.selling_unit !== "item" ? item.selling_unit : ""}
+                    </span>
                     <button
                       className="bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center text-xl font-bold hover:bg-blue-100 transition"
                       onClick={() => handleQuantityChange(item, 1)}

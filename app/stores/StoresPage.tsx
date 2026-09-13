@@ -2,7 +2,7 @@
 import React, { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/store";
-import { fetchStoresByType, fetchStoresByVertical } from "@/redux/slices/storesSlice";
+import { fetchAllStoresList, fetchStoresByType, fetchStoresByVertical } from "@/redux/slices/storesSlice";
 import type { MarketplaceVertical } from "@/features/marketplace/lib/normalizeStores";
 
 import { motion } from "framer-motion";
@@ -72,7 +72,11 @@ export default function StoresPage({ forcedVertical }: { forcedVertical?: Market
       dispatch(fetchStoresByVertical(vertical));
       return;
     }
-    if (storeTypeId) dispatch(fetchStoresByType(storeTypeId));
+    if (storeTypeId) {
+      dispatch(fetchStoresByType(storeTypeId));
+      return;
+    }
+    dispatch(fetchAllStoresList());
   }, [storeTypeId, vertical, dispatch]);
 
   // Add distances to stores

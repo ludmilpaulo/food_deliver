@@ -74,9 +74,19 @@ export interface Product {
   colors?: string[];
   sizes?: string[];
   store: number;
-  price_with_markup: number;
-  original_price: number; // if you send this
-  store_name?: string;    // if you send this
+  price_with_markup?: number;
+  original_price?: number;
+  store_name?: string;
+  selling_unit?: string;
+  stock_unit?: string;
+  weight?: number | null;
+  weight_unit?: string;
+  is_purchasable?: boolean;
+  inventory_status?: string;
+  price_display?: string;
+  stock_quantity?: number;
+  brand?: string;
+  unit?: string;
 }
 
   
@@ -238,6 +248,6 @@ export interface CartItem {
   size: string;
   color: string;
   quantity: number;
-  store: number;  
-     // storeId
+  store: number;
+  selling_unit?: string;
 }

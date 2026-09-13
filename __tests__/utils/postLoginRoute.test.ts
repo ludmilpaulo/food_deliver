@@ -24,7 +24,7 @@ describe("post-login routing", () => {
     expect(getPostLoginRoute({ ...restaurant, is_customer: true })).toBe("/RestaurantDashboad");
   });
 
-  it("sends grocery partners to the shared store dashboard", () => {
+  it("sends grocery partners to the grocery dashboard", () => {
     expect(
       getPostLoginRoute({
         token: "t",
@@ -43,7 +43,7 @@ describe("post-login routing", () => {
           isActive: true,
         },
       }),
-    ).toBe("/RestaurantDashboad");
+    ).toBe("/GroceryDashboad");
   });
 
   it("sends customers home and admins to the admin console", () => {

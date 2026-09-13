@@ -27,4 +27,13 @@ describe('grocery store normalization', () => {
   it('points groceries at the v1 grocery catalog', () => {
     expect(verticalApiPath('groceries')).toBe('/api/v1/groceries/stores/');
   });
+
+  it('unwraps paginated results from the catalog APIs', () => {
+    const stores = normalizeV1Stores({
+      results: [{ id: 1, name: 'Kudya Restaurant', store_type: { id: 1 } }],
+    });
+    expect(stores).toHaveLength(1);
+    expect(stores[0].id).toBe(1);
+    expect(stores[0].store_type).toBe(1);
+  });
 });

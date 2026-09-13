@@ -55,7 +55,7 @@ const basketSlice = createSlice({
           (item.color || "") === (color || "")
       );
       if (existingItem) {
-        existingItem.quantity += action.payload.quantity || 1;
+        existingItem.quantity = Number((existingItem.quantity + (action.payload.quantity || 1)).toFixed(3));
       } else {
         state.items.push({
           ...action.payload,
@@ -64,6 +64,24 @@ const basketSlice = createSlice({
           quantity: action.payload.quantity || 1,
         });
       }
+    },
+    setItemQuantity: (
+      state,
+      action: PayloadAction<{ id: number; quantity: number; size?: string; color?: string }>
+    ) => {
+      const { id, quantity, size = "", color = "" } = action.payload;
+      const existingItem = state.items.find(
+        (item) =>
+          item.id === id &&
+          (item.size || "") === size &&
+          (item.color || "") === color
+      );
+      if (!existingItem) return;
+      if (quantity <= 0) {
+        state.items = state.items.filter((item) => item !== existingItem);
+        return;
+      }
+      existingItem.quantity = Number(quantity.toFixed(3));
     },
     removeItem: (
       state,
@@ -77,8 +95,11 @@ const basketSlice = createSlice({
           (item.color || "") === color
       );
       if (index !== -1) {
-        if (state.items[index].quantity > 1) {
-          state.items[index].quantity -= 1;
+        if (state.items[index].quantity > 0.5) {
+          state.items[index].quantity = Number((state.items[index].quantity - (state.items[index].selling_unit === "kg" || state.items[index].selling_unit === "litre" ? 0.5 : 1)).toFixed(3));
+          if (state.items[index].quantity <= 0) {
+            state.items.splice(index, 1);
+          }
         } else {
           state.items.splice(index, 1);
         }
@@ -112,6 +133,7 @@ export const {
   hydrateBasket,
   addItem,
   removeItem,
+  setItemQuantity,
   removeLine, // <--- export new reducer
   clearCart,
   clearAllCart,

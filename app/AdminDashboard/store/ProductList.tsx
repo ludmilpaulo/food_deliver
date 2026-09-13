@@ -34,12 +34,19 @@ const ProductList: React.FC = () => {
   const filteredproducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesstore = selectedstore === '' || product.store_name === selectedstore;
-    const matchesPrice = product.price_with_markup >= priceRange[0] && product.price_with_markup <= priceRange[1];
+    const markupPrice = product.price_with_markup ?? product.price ?? 0;
+    const matchesPrice = markupPrice >= priceRange[0] && markupPrice <= priceRange[1];
 
     return matchesSearch && matchesstore && matchesPrice;
   });
 
-  const uniquestores = Array.from(new Set(products.map(product => product.store_name)));
+  const uniquestores = Array.from(
+    new Set(
+      products
+        .map((product) => product.store_name)
+        .filter((name): name is string => Boolean(name)),
+    ),
+  );
 
   console.log('Filtered products:', filteredproducts); // Debugging log
 
@@ -122,10 +129,10 @@ const ProductList: React.FC = () => {
                       <p className="text-gray-500">{product.description}</p>
                       <p className="text-gray-700">{t("store", "Store")}: {product.store_name}</p>
                       <p className="text-gray-700">
-                        {t("originalPrice", "Original Price")}: {product.original_price.toFixed(2)} Kz
+                        {t("originalPrice", "Original Price")}: {(product.original_price ?? product.price ?? 0).toFixed(2)} Kz
                       </p>
                       <p className="text-gray-900 font-bold">
-                        {t("priceWithMarkup", "Price with Markup")}: {product.price_with_markup.toFixed(2)} Kz
+                        {t("priceWithMarkup", "Price with Markup")}: {(product.price_with_markup ?? product.price ?? 0).toFixed(2)} Kz
                       </p>
                     </div>
                   </div>

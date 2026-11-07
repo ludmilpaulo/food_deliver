@@ -101,13 +101,20 @@ type Property = {
   location?: PropertyLocation;
   stay_settings_summary?: StaySettingsSummary | null;
   allowed_lease_months?: number[];
+  country_policy?: {
+    launch_status?: string;
+    transactions_enabled?: boolean;
+    legal_notice?: string;
+    currency?: string;
+    allowed_lease_months?: number[];
+  } | null;
 };
 
 function PropertyDetailContent() {
   const params = useParams();
   const id = params?.id;
   const { region: regionCode } = useUserRegion();
-  const { t } = useTranslation();
+  const { t, languageCode } = useTranslation();
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
@@ -130,7 +137,10 @@ function PropertyDetailContent() {
 
     const load = async () => {
       setLoading(true);
-      const headers: HeadersInit = { Accept: "application/json" };
+      const headers: HeadersInit = {
+        Accept: "application/json",
+        "Accept-Language": languageCode,
+      };
       const token = readAuthToken();
       if (token) headers.Authorization = `Bearer ${token}`;
 
@@ -140,7 +150,7 @@ function PropertyDetailContent() {
         if (res.status === 401 && token) {
           clearAuthToken();
           res = await fetch(`${baseAPI}/properties/${id}/`, {
-            headers: { Accept: "application/json" },
+            headers: { Accept: "application/json", "Accept-Language": languageCode },
           });
         }
         if (!res.ok) {
@@ -160,7 +170,7 @@ function PropertyDetailContent() {
     return () => {
       cancelled = true;
     };
-  }, [id]);
+  }, [id, languageCode]);
 
   const currencyCode = getCurrencyForCountry(regionCode) as "AOA" | "USD" | "EUR";
 
@@ -276,6 +286,18 @@ function PropertyDetailContent() {
           </button>
         </div>
       </div>
+
+      {property.country_policy && property.country_policy.launch_status !== "ready" ? (
+        <div className="border-b border-amber-200 bg-amber-50">
+          <p className="mx-auto max-w-7xl px-4 py-3 text-sm text-amber-950 sm:px-6 lg:px-8">
+            {property.country_policy.legal_notice ||
+              t(
+                "propertyTestMarketNotice",
+                "This market is still in test. Lease templates, deposits, and payments are not legally approved.",
+              )}
+          </p>
+        </div>
+      ) : null}
 
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">

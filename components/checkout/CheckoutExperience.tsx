@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/redux/store';
 import { selectUser, selectAuthHydrated } from '@/redux/slices/authSlice';
-import { clearAllCart } from '@/redux/slices/basketSlice';
+import { clearAllCart, clearCart, selectBasketHydrated } from '@/redux/slices/basketSlice';
 import { readAuthToken } from '@/lib/authToken';
 import { baseAPI } from '@/services/types';
 import type { CartItem } from '@/services/types';
@@ -13,6 +13,7 @@ import AddressInput from '@/app/Checkout/AddressInput';
 import PaymentDetails from '@/app/Checkout/PaymentDetails';
 import { validateCouponRequest } from '@/services/checkoutService';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useGroceryCartQuote } from '@/hooks/useGroceryCartQuote';
 import { useCreatePaymentMutation, useUploadPaymentProofMutation } from '@/redux/slices/paymentsApi';
 import type { PaymentInitializeResponse } from '@/types/payments';
 
@@ -25,12 +26,14 @@ type StoreGroup = {
 type CheckoutResult = {
   status?: string;
   error?: string;
-  errors?: Array<{ error: string }>;
+  errors?: Array<{ error: string; store_id?: number }>;
   created_orders?: number[];
+  order_totals?: Array<{ order_id: number; store_id: number; total: string }>;
 };
 
 type MultipleOrderPayload = {
   access_token: string;
+  coupon_code?: string;
   orders: Array<{
     store_id: number;
     address: string;
@@ -69,6 +72,7 @@ export default function CheckoutExperience() {
   const authHydrated = useAppSelector(selectAuthHydrated);
   const token = useAppSelector((state) => state.auth.token);
   const items = useAppSelector((state) => state.basket.items);
+  const basketHydrated = useAppSelector(selectBasketHydrated);
 
   const [useCurrentLocation, setUseCurrentLocation] = useState(true);
   const [userAddress, setUserAddress] = useState('');
@@ -82,14 +86,13 @@ export default function CheckoutExperience() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [quotedFees, setQuotedFees] = useState<Record<number, number>>({});
+  const [quoteFailed, setQuoteFailed] = useState(false);
   const [createPayment] = useCreatePaymentMutation();
   const [uploadProof] = useUploadPaymentProofMutation();
+  const orderPlacedRef = useRef(false);
 
   const storeGroups = useMemo(() => groupItemsByStore(items), [items]);
-  const subtotal = useMemo(
-    () => items.reduce((sum, item) => sum + item.price * item.quantity, 0),
-    [items],
-  );
+  const { subtotal } = useGroceryCartQuote(items);
   const deliveryFee = useMemo(
     () => storeGroups.reduce((sum, group) => sum + (quotedFees[group.storeId] ?? 0), 0),
     [storeGroups, quotedFees],
@@ -108,21 +111,28 @@ export default function CheckoutExperience() {
     let cancelled = false;
     const loadQuotes = async () => {
       const next: Record<number, number> = {};
+      let failed = false;
       await Promise.all(
         storeGroups.map(async (group) => {
           try {
             const response = await fetch(
               `${baseAPI}/api/v1/marketplace/checkout/quote/?store_id=${group.storeId}`,
             );
-            if (!response.ok) return;
+            if (!response.ok) {
+              failed = true;
+              return;
+            }
             const data = (await response.json()) as { delivery_fee?: string };
             next[group.storeId] = Number(data.delivery_fee) || 0;
           } catch {
-            next[group.storeId] = 0;
+            failed = true;
           }
         }),
       );
-      if (!cancelled) setQuotedFees(next);
+      if (!cancelled) {
+        setQuotedFees(next);
+        setQuoteFailed(failed);
+      }
     };
     void loadQuotes();
     return () => {
@@ -131,17 +141,20 @@ export default function CheckoutExperience() {
   }, [storeGroups]);
 
   useEffect(() => {
-    if (!authHydrated) return;
+    if (!authHydrated || !basketHydrated) return;
+    // After a successful order the cart is cleared on purpose; let the /orders redirect win.
+    if (orderPlacedRef.current) return;
     if (items.length === 0 && !loading) {
       router.replace('/CartPage');
     }
-  }, [authHydrated, items.length, loading, router]);
+  }, [authHydrated, basketHydrated, items.length, loading, router]);
 
   const handleApplyCoupon = async () => {
     setCouponMessage(null);
     if (!couponCode.trim()) return;
     try {
-      const result = await validateCouponRequest(couponCode.trim(), subtotal);
+      // The server applies a coupon to the first store's order only.
+      const result = await validateCouponRequest(couponCode.trim(), storeGroups[0]?.subtotal ?? subtotal);
       if (result.valid) {
         setCouponDiscount(Number(result.discount_amount) || 0);
         setCouponMessage(result.message || t('couponApplied', 'Coupon applied'));
@@ -171,6 +184,7 @@ export default function CheckoutExperience() {
 
     const payload: MultipleOrderPayload = {
       access_token: token,
+      ...(couponDiscount > 0 && couponCode.trim() ? { coupon_code: couponCode.trim() } : {}),
       orders: storeGroups.map((group) => ({
         store_id: group.storeId,
         address: useCurrentLocation ? '' : userAddress.trim(),
@@ -196,23 +210,56 @@ export default function CheckoutExperience() {
         body: JSON.stringify(payload),
       });
       const data = (await response.json()) as CheckoutResult;
-      if (data.status === 'success' || data.status === 'partial_success') {
-        const orderIds = data.created_orders ?? [];
-        if (paymentMethod && paymentMethod !== 'cash' && orderIds.length > 0) {
+      const orderIds = data.created_orders ?? [];
+      const firstError = data.errors?.[0]?.error || data.error || t('checkoutFailed', 'Checkout failed.');
+      // The backend answers "partial_success" even when every store failed; only treat it as
+      // placed when at least one order was actually created.
+      if ((data.status === 'success' || data.status === 'partial_success') && orderIds.length > 0) {
+        const failedStoreIds = new Set(
+          (data.errors ?? [])
+            .map((entry) => entry.store_id)
+            .filter((id): id is number => typeof id === 'number'),
+        );
+        const placedGroups = storeGroups.filter((group) => !failedStoreIds.has(group.storeId));
+        const isPartial = failedStoreIds.size > 0;
+        const clearPlacedItems = () => {
+          if (isPartial) {
+            placedGroups.forEach((group) => dispatch(clearCart(group.storeId)));
+          } else {
+            dispatch(clearAllCart());
+          }
+        };
+        const finish = (notice: string | null) => {
+          clearPlacedItems();
+          if (isPartial) {
+            // Stay on checkout so the customer sees which store failed; its items remain in the cart.
+            setError(
+              `${t('checkoutPartialSuccess', 'Some orders were placed, but not all.')} ${firstError}`,
+            );
+            return;
+          }
+          orderPlacedRef.current = true;
+          router.push('/orders');
+          if (notice) setError(notice);
+        };
+        if (paymentMethod && paymentMethod !== 'cash') {
           try {
             let redirectUrl: string | null = null;
             let notice: string | null = null;
-            for (let index = 0; index < orderIds.length; index += 1) {
-              const group = storeGroups[index];
-              const amount = group
-                ? group.subtotal + (quotedFees[group.storeId] ?? 0)
-                : total;
+            const serverTotals = new Map(
+              (data.order_totals ?? []).map((entry) => [entry.order_id, Number(entry.total)]),
+            );
+            for (const orderId of orderIds) {
+              const amount = serverTotals.get(orderId);
+              if (amount === undefined || !Number.isFinite(amount)) {
+                throw new Error('missing_order_total');
+              }
               const pay: PaymentInitializeResponse = await createPayment({
                 amount,
                 method: paymentMethod,
                 phone: paymentPhone || undefined,
                 service_type: 'order',
-                object_id: orderIds[index],
+                object_id: orderId,
               }).unwrap();
               if (proofFile && pay.requires_action === 'upload_proof') {
                 await uploadProof({ paymentId: pay.payment_id, file: proofFile }).unwrap();
@@ -220,26 +267,25 @@ export default function CheckoutExperience() {
               if (pay.authorization_url) redirectUrl = pay.authorization_url;
               if (pay.customer_message) notice = pay.customer_message;
             }
-            dispatch(clearAllCart());
             if (redirectUrl) {
+              clearPlacedItems();
+              orderPlacedRef.current = true;
               window.location.assign(redirectUrl);
               return;
             }
-            router.push('/orders');
-            if (notice) setError(notice);
+            finish(notice);
             return;
           } catch {
-            dispatch(clearAllCart());
+            clearPlacedItems();
+            orderPlacedRef.current = true;
             setError(t('paymentFollowUpFailed', 'Order placed. Complete payment from your orders if prompted.'));
             router.push('/orders');
             return;
           }
         }
-        dispatch(clearAllCart());
-        router.push('/orders');
+        finish(null);
         return;
       }
-      const firstError = data.errors?.[0]?.error || data.error || t('checkoutFailed', 'Checkout failed.');
       setError(firstError);
     } catch {
       setError(t('checkoutFailed', 'Checkout failed.'));
@@ -332,6 +378,11 @@ export default function CheckoutExperience() {
               <span>{t('deliveryFee', 'Delivery fee')}</span>
               <span>{deliveryFee.toFixed(2)}</span>
             </div>
+            {quoteFailed ? (
+              <p className="text-xs text-amber-700">
+                {t('deliveryFeeQuoteFailed', 'Delivery fee could not be loaded; the final total is confirmed when you place the order.')}
+              </p>
+            ) : null}
             {couponDiscount > 0 ? (
               <div className="flex justify-between text-green-700">
                 <span>{t('discount', 'Discount')}</span>

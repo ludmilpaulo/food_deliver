@@ -157,10 +157,11 @@ export default function ProductsPage() {
     color: string | null
   ) => {
     const cartItem = getCartItem(product.id, size, color);
+    const stockCount = Number(product.stock) || 0;
     if (change === 1) {
-      if (cartItem && cartItem.quantity >= product.stock) {
+      if (cartItem && cartItem.quantity >= stockCount) {
         alert(
-          `${t("stockLimitReached")}\n${t("only")} ${product.stock} ${t(
+          `${t("stockLimitReached")}\n${t("only")} ${stockCount} ${t(
             "itemsAvailable"
           )}.`
         );
@@ -172,9 +173,9 @@ export default function ProductsPage() {
           name: product.name,
           price:
             product.on_sale && product.discount_percentage > 0
-              ? product.price -
-                (product.price * product.discount_percentage) / 100
-              : product.price,
+              ? Number(product.price) -
+                (Number(product.price) * product.discount_percentage) / 100
+              : Number(product.price),
           image: product.image_url?.[0],
           size: size || "",
           color: color || "",
@@ -217,8 +218,8 @@ export default function ProductsPage() {
         name: product.name,
         price:
           product.on_sale && product.discount_percentage > 0
-            ? product.price - (product.price * product.discount_percentage) / 100
-            : product.price,
+            ? Number(product.price) - (Number(product.price) * product.discount_percentage) / 100
+            : Number(product.price),
         image: product.images?.[0],
         size: selectedSize || "",
         color: selectedColor || "",
@@ -331,15 +332,15 @@ export default function ProductsPage() {
             let stockLabel = "";
             let stockBadgeColor = "";
             let disableAddToCart = false;
-            if (product.stock <= 0) {
+            const stockCount = Number(product.stock) || 0;
+            if (stockCount <= 0) {
               stockLabel = t("outOfStock");
               stockBadgeColor = "#EF4444";
               disableAddToCart = true;
-            } else if (product.stock === 1) {
+            } else if (stockCount === 1) {
               stockLabel = t("lastOne");
               stockBadgeColor = "#F59E42";
-              disableAddToCart = true;
-            } else if (product.stock < 10) {
+            } else if (stockCount < 10) {
               stockLabel = t("lowStock");
               stockBadgeColor = "#FCD34D";
             }
@@ -543,7 +544,7 @@ export default function ProductsPage() {
                           onClick={() =>
                             handleChangeQuantity(1, product, selectedSize, selectedColor)
                           }
-                          disabled={cartItem.quantity >= product.stock}
+                          disabled={cartItem.quantity >= stockCount}
                         >
                           <span className="text-xl font-bold">+</span>
                         </button>

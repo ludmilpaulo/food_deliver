@@ -1,45 +1,39 @@
-// redux/slices/allStoresSlice.ts
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { Store } from "@/services/types";
-import { baseAPI } from "@/services/types";
+import { fetchStoreCatalog, type StoreCatalogParams } from "@/services/storeCatalog";
 
 interface AllStoresState {
   data: Store[];
+  count: number;
   loading: boolean;
   error: string | null;
 }
+
 const initialState: AllStoresState = {
   data: [],
+  count: 0,
   loading: false,
   error: null,
 };
 
-export const fetchAllStores = createAsyncThunk<Store[]>(
-  "allStores/fetchAll",
-  async () => {
-    const response = await fetch(`${baseAPI}/customer/customer/stores/`);
-    const data: unknown = await response.json();
-    if (!response.ok) {
-      const detail =
-        data && typeof data === "object" && typeof (data as { detail?: unknown }).detail === "string"
-          ? (data as { detail: string }).detail
-          : `Failed to load stores (${response.status})`;
-      throw new Error(detail);
-    }
-    const stores =
-      data && typeof data === "object" && Array.isArray((data as { stores?: unknown }).stores)
-        ? ((data as { stores: Store[] }).stores)
-        : Array.isArray(data)
-          ? (data as Store[])
-          : [];
-    return stores.filter((s) => s.is_approved);
-  }
-);
+export const fetchAllStores = createAsyncThunk<
+  { stores: Store[]; count: number },
+  StoreCatalogParams | undefined
+>("allStores/fetchAll", async (params) => {
+  const result = await fetchStoreCatalog(params ?? {});
+  return { stores: result.stores, count: result.count };
+});
 
 const allStoresSlice = createSlice({
   name: "allStores",
   initialState,
-  reducers: {},
+  reducers: {
+    clearStores: (state) => {
+      state.data = [];
+      state.count = 0;
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchAllStores.pending, (state) => {
@@ -48,7 +42,8 @@ const allStoresSlice = createSlice({
       })
       .addCase(fetchAllStores.fulfilled, (state, action) => {
         state.loading = false;
-        state.data = action.payload;
+        state.data = action.payload.stores;
+        state.count = action.payload.count;
       })
       .addCase(fetchAllStores.rejected, (state, action) => {
         state.loading = false;
@@ -56,4 +51,6 @@ const allStoresSlice = createSlice({
       });
   },
 });
+
+export const { clearStores } = allStoresSlice.actions;
 export default allStoresSlice.reducer;

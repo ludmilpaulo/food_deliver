@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { useGetAboutUsQuery } from "@/redux/slices/aboutApi";
 import Image from "next/image";
 import { useMemo } from "react";
+import { usePathname } from "next/navigation";
 import { useTranslation } from "@/hooks/useTranslation";
 
 function getUserCountryCode(): string {
@@ -27,6 +28,14 @@ const currentYear = new Date().getFullYear();
 
 const Footer: React.FC = () => {
   const { t } = useTranslation();
+  const pathname = usePathname();
+  const hideSiteChrome =
+    pathname === "/groceries" ||
+    pathname.startsWith("/groceries/") ||
+    pathname === "/SignupScreen" ||
+    pathname === "/LoginScreenUser" ||
+    pathname === "/provider/grocery" ||
+    pathname.startsWith("/provider/grocery/");
   const { data: aboutUsEntries = [] } = useGetAboutUsQuery();
   const userCountryCode =
     typeof window !== "undefined" ? getUserCountryCode() : "ZA";
@@ -40,6 +49,10 @@ const Footer: React.FC = () => {
     );
     return found || aboutUsEntries[0] || null;
   }, [aboutUsEntries, countryName]);
+
+  if (hideSiteChrome) {
+    return null;
+  }
 
   const gradient =
     "bg-gradient-to-br from-yellow-400 via-blue-50 to-blue-800";
@@ -99,7 +112,7 @@ const Footer: React.FC = () => {
 
           {/* LEGAL */}
           <div className="text-center md:text-left space-y-4">
-            <h4 className="text-lg font-extrabold text-blue-900">{t("quickLinks")}</h4>
+            <h4 className="text-lg font-extrabold text-blue-900">{t("legal", "Legal")}</h4>
             <ul className="space-y-2">
               {legalLinks.map((link) => (
                 <li key={link.href}>

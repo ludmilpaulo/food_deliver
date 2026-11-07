@@ -448,7 +448,8 @@ function PropertyDashboardPage() {
           body: JSON.stringify({
             start_date: blockStart,
             end_date: blockEnd,
-            reason: blockReason.trim(),
+            reason: "owner_block",
+            notes: blockReason.trim(),
           }),
         },
       );
@@ -987,18 +988,21 @@ function PropertyDashboardPage() {
                   setActiveTab("applications");
                   void (async () => {
                     setApplicationsLoading(true);
+                    setApplicationsError(false);
                     try {
                       const parsed = readAuthToken();
-                      if (!parsed) return;
+                      if (!parsed) throw new Error("Not signed in");
                       const response = await fetch(`${baseAPI}/api/properties/me/applications/`, {
                         headers: { Accept: "application/json", Authorization: `Bearer ${parsed}` },
                       });
+                      if (!response.ok) throw new Error("Failed to load applications");
                       const data: unknown = await response.json();
-                      if (Array.isArray(data)) {
-                        setApplications(
-                          data.filter((item): item is PropertyApplication => typeof item === "object" && item !== null),
-                        );
-                      }
+                      if (!Array.isArray(data)) throw new Error("Invalid applications response");
+                      setApplications(
+                        data.filter((item): item is PropertyApplication => typeof item === "object" && item !== null),
+                      );
+                    } catch {
+                      setApplicationsError(true);
                     } finally {
                       setApplicationsLoading(false);
                     }
@@ -1276,8 +1280,8 @@ function PropertyDashboardPage() {
                               <p className="text-sm font-semibold text-slate-800">
                                 {block.startDate} → {block.endDate}
                               </p>
-                              {block.reason ? (
-                                <p className="text-xs text-slate-500">{block.reason}</p>
+                              {block.notes ? (
+                                <p className="text-xs text-slate-500">{block.notes}</p>
                               ) : null}
                             </div>
                             <button

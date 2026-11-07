@@ -18,10 +18,8 @@ export default function ClientRoot({ children }: { children: React.ReactNode }) 
   // Restore the cart saved in localStorage (after mount, to avoid SSR
   // hydration mismatches).
   useEffect(() => {
-    const saved = loadBasketState();
-    if (saved.items.length > 0) {
-      dispatch(hydrateBasket(saved));
-    }
+    // Always dispatch so pages can tell "cart restored and empty" apart from "not restored yet".
+    dispatch(hydrateBasket(loadBasketState()));
   }, [dispatch]);
 
   useEffect(() => {

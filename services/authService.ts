@@ -1,4 +1,5 @@
 import { baseAPI } from "./types";
+import { readAuthToken } from "@/lib/authToken";
 
 import axios, { isAxiosError } from 'axios';
 const API_URL = baseAPI;
@@ -159,7 +160,10 @@ export const resetPassword = async (uid: string, token: string, newPassword: str
 
 export const getCurrentUser = async (user_id: number) => {
   try {
-    const response = await axios.get(`${API_URL}/customer/customer/profile/?user_id=${user_id}`);
+    const token = readAuthToken();
+    const response = await axios.get(`${API_URL}/customer/customer/profile/?user_id=${user_id}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    });
     return response.data;
   } catch (error) {
     if (isAxiosError(error)) {

@@ -6,6 +6,7 @@ const SuperAppAdmin = dynamic(() => import("@/components/SuperAppAdmin"));
 const PlatformModulesAdmin = dynamic(() => import("@/components/admin/PlatformModulesAdmin"));
 const PropertyReviewAdmin = dynamic(() => import("@/components/admin/PropertyReviewAdmin"));
 const PropertyApplicationsAdmin = dynamic(() => import("@/components/admin/PropertyApplicationsAdmin"));
+const PropertyCountryPolicyAdmin = dynamic(() => import("@/components/admin/PropertyCountryPolicyAdmin"));
 const PricingAdmin = dynamic(() => import("@/components/admin/PricingAdmin"));
 const VerticalOpsAdmin = dynamic(() => import("@/components/admin/VerticalOpsAdmin"));
 const TranslationsAdmin = dynamic(() => import("@/components/admin/TranslationsAdmin"));
@@ -47,6 +48,7 @@ export type AdminPanelId =
   | "platformControl"
   | "propertyReview"
   | "propertyApplications"
+  | "propertyCountryPolicies"
   | "pricing"
   | "verticalOps"
   | "translations"
@@ -64,6 +66,8 @@ export function AdminPanelContent({ activePanel }: { activePanel: AdminPanelId }
       return <PropertyReviewAdmin />;
     case "propertyApplications":
       return <PropertyApplicationsAdmin />;
+    case "propertyCountryPolicies":
+      return <PropertyCountryPolicyAdmin />;
     case "pricing":
       return <PricingAdmin />;
     case "verticalOps":

@@ -33,6 +33,10 @@ export const StoreCard: React.FC<StoreCardProps> = ({ store, userLocation }) => 
   }
 
   const distanceAndEta = useMemo(() => {
+    const apiDistance = store.distance_km ?? store.distance;
+    if (typeof apiDistance === "number" && Number.isFinite(apiDistance)) {
+      return { distance: apiDistance, timeAway: (apiDistance / 5) * 60 };
+    }
     if (!userLocation || !store.location) {
       return { distance: null as number | null, timeAway: null as number | null };
     }
@@ -46,9 +50,8 @@ export const StoreCard: React.FC<StoreCardProps> = ({ store, userLocation }) => 
       storeLat,
       storeLng,
     );
-    const walkingSpeedKmh = 5;
-    return { distance, timeAway: (distance / walkingSpeedKmh) * 60 };
-  }, [store.location, userLocation]);
+    return { distance, timeAway: (distance / 5) * 60 };
+  }, [store.distance_km, store.distance, store.location, userLocation]);
 
   // Opening hours logic
   function isOpenNow(): boolean {

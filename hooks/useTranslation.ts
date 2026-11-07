@@ -6,46 +6,62 @@ import {
   getLanguage,
   setLanguage,
   syncLanguageFromClientStorage,
-  t as localT,
   LANGUAGE_CHANGE_EVENT,
 } from "@/configs/i18n";
 import translations, {
   type SupportedLocale,
   type TranslationKey,
 } from "@/configs/translations";
+import { groceryT } from "@/configs/groceryTranslations";
+import { groceryPartnerT } from "@/configs/groceryPartnerTranslations";
+import { signupT } from "@/configs/signupTranslations";
 import { marketplaceT } from "@/configs/marketplaceTranslations";
 import { homeT } from "@/configs/homeTranslations";
 import { propertyApplicationT } from "@/configs/propertyApplicationTranslations";
+import { propertyPolicyT } from "@/configs/propertyPolicyTranslations";
 import { financialT } from "@/configs/financialTranslations";
 import { fetchApiTranslations } from "@/services/platformApi";
 import { store } from "@/redux/store";
 import { languageApi } from "@/redux/slices/languageApi";
 
 const CACHE_KEY = "kudya_api_translations";
+let userPickedLanguage = false;
 
 function englishBaseline(key: string): string | undefined {
   const typed = translations.en[key as TranslationKey];
   if (typed) return typed;
   return (
+    propertyPolicyT("en", key) ??
     propertyApplicationT("en", key) ??
     homeT("en", key) ??
-    marketplaceT("en", key)
+    groceryT("en", key) ??
+    groceryPartnerT("en", key) ??
+    marketplaceT("en", key) ??
+    signupT("en", key)
   );
 }
 
 function localForLocale(locale: SupportedLocale, key: string): string | undefined {
   const financial = financialT(locale, key);
   if (financial) return financial;
+  const policy = propertyPolicyT(locale, key);
+  if (policy) return policy;
   const app = propertyApplicationT(locale, key);
   if (app) return app;
   const home = homeT(locale, key);
   if (home) return home;
   const market = marketplaceT(locale, key);
   if (market) return market;
-  const typed = localT(key as TranslationKey);
-  if (typed !== key) return typed;
+  const grocery = groceryT(locale, key);
+  if (grocery) return grocery;
+  const groceryPartner = groceryPartnerT(locale, key);
+  if (groceryPartner) return groceryPartner;
+  const signup = signupT(locale, key);
+  if (signup) return signup;
   const table = translations[locale] as Record<string, string> | undefined;
   if (table?.[key]) return table[key];
+  const english = translations.en[key as TranslationKey];
+  if (english) return english;
   return undefined;
 }
 
@@ -63,6 +79,7 @@ export function useTranslation(initialLocale?: SupportedLocale) {
       .dispatch(languageApi.endpoints.getLanguagePreference.initiate())
       .unwrap()
       .then((pref) => {
+        if (userPickedLanguage) return;
         if (pref.preferredLanguage) {
           setLanguage(pref.preferredLanguage);
           setLanguageCode(pref.preferredLanguage);
@@ -131,6 +148,7 @@ export function useTranslation(initialLocale?: SupportedLocale) {
   }, [languageCode]);
 
   const changeLanguage = (next: SupportedLocale) => {
+    userPickedLanguage = true;
     setLanguage(next);
     setLanguageCode(next);
     void store

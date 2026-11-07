@@ -1,11 +1,12 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { IoMdMenu, IoMdClose, IoMdCart, IoMdPerson } from "react-icons/io";
 import { MdStore } from "react-icons/md";
 import { MdMedicalServices } from "react-icons/md";
 import { MdHome } from "react-icons/md";
-import { FiPackage } from "react-icons/fi";
+import { MdHotel } from "react-icons/md";
 import Image from "next/image";
 import logo from "@/assets/azul.png";
 import { selectUser, selectAuthHydrated } from "@/redux/slices/authSlice";
@@ -28,8 +29,19 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ initialLocale }) => {
-  initLanguage(initialLocale);
-
+  const didInitLanguage = useRef(false);
+  if (!didInitLanguage.current) {
+    initLanguage(initialLocale);
+    didInitLanguage.current = true;
+  }
+  const pathname = usePathname();
+  const hideSiteChrome =
+    pathname === "/groceries" ||
+    pathname.startsWith("/groceries/") ||
+    pathname === "/SignupScreen" ||
+    pathname === "/LoginScreenUser" ||
+    pathname === "/provider/grocery" ||
+    pathname.startsWith("/provider/grocery/");
   const [menuOpen, setMenuOpen] = useState(false);
   const { t, languageCode, changeLanguage } = useTranslation(initialLocale);
 
@@ -51,40 +63,32 @@ const Navbar: React.FC<NavbarProps> = ({ initialLocale }) => {
   const cartItems = useAppSelector((state) => state.basket.items);
   const cartQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const isLoggedIn = mounted && authHydrated && Boolean(user);
+  const showCart = mounted && cartQuantity > 0;
+
+  if (hideSiteChrome) {
+    return null;
+  }
 
   const navLinks = (
     <>
-      <NavLink href="/AllProducts" icon={<FiPackage size={20} className="text-blue-700" />} label={t("allProducts", "All Products")} />
       <NavLink href="/StoreTypes" icon={<MdStore size={20} className="text-yellow-500" />} label={t("Stores", "Stores")} />
       <NavLink href="/services" icon={<MdMedicalServices size={20} className="text-pink-600" />} label={t("Services", "Services")} />
       <NavLink href="/properties" icon={<MdHome size={20} className="text-teal-600" />} label={t("Properties", "Properties")} />
-      {/* TikTok / store review: Privacy & Terms must be visible without opening a menu */}
-      <Link
-        href="/PrivacyPolicy"
-        className="px-2 py-1 text-sm font-semibold text-blue-900/80 hover:text-blue-700"
-      >
-        {t("privacyPolicy", "Privacy Policy")}
-      </Link>
-      <Link
-        href="/TermsOfService"
-        className="px-2 py-1 text-sm font-semibold text-blue-900/80 hover:text-blue-700"
-      >
-        {t("termsOfService", "Terms of Service")}
-      </Link>
-      <NavLink href="/CartPage" icon={<IoMdCart size={22} className="text-green-700" />} label={t("Cart", "Cart")}>
-        {cartQuantity > 0 && (
-          <span className="absolute -top-2 -right-3 bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center shadow font-bold animate-bounce">
+      <NavLink href="/stay" icon={<MdHotel size={20} className="text-sky-600" />} label={t("stay", "Stay")} />
+      {showCart ? (
+        <NavLink href="/CartPage" icon={<IoMdCart size={22} className="text-green-700" />} label={t("Cart", "Cart")}>
+          <span className="absolute -top-2 -right-3 bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center shadow font-bold">
             {cartQuantity}
           </span>
-        )}
-      </NavLink>
+        </NavLink>
+      ) : null}
       {isLoggedIn ? (
         <>
           <NotificationBellLink />
           <NavLink href="/UserDashboard" icon={<IoMdPerson size={20} className="text-indigo-700" />} label={t("Profile")} />
         </>
       ) : (
-        <NavLink href="/LoginScreenUser" icon={<IoMdPerson size={20} className="text-indigo-700" />} label={t("login")} />
+        <NavLink href="/LoginScreenUser" icon={<IoMdPerson size={20} className="text-indigo-700" />} label={t("login", "Sign In")} />
       )}
     </>
   );
@@ -93,7 +97,6 @@ const Navbar: React.FC<NavbarProps> = ({ initialLocale }) => {
     <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/70 border-b border-blue-100 shadow-xl">
       <nav className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16 py-2">
-          {/* Logo + Brand */}
           <Link href="/" className="flex items-center gap-2 group">
             <Image
               src={logo}
@@ -108,7 +111,6 @@ const Navbar: React.FC<NavbarProps> = ({ initialLocale }) => {
             </span>
           </Link>
 
-          {/* Language selector */}
           <div className="flex items-center gap-2">
             <motion.select
               key={languageCode}
@@ -126,10 +128,8 @@ const Navbar: React.FC<NavbarProps> = ({ initialLocale }) => {
               ))}
             </motion.select>
 
-            {/* Desktop nav */}
             <div className="hidden md:flex items-center gap-1 ml-5">{navLinks}</div>
 
-            {/* Mobile menu button */}
             <button
               onClick={() => setMenuOpen((prev) => !prev)}
               aria-label={
@@ -148,7 +148,6 @@ const Navbar: React.FC<NavbarProps> = ({ initialLocale }) => {
           </div>
         </div>
 
-        {/* Mobile nav, animated */}
         <AnimatePresence>
           {menuOpen && (
             <motion.div
@@ -168,7 +167,6 @@ const Navbar: React.FC<NavbarProps> = ({ initialLocale }) => {
   );
 };
 
-// NavLink component for consistent styling
 interface NavLinkProps {
   href: string;
   icon: React.ReactNode;

@@ -1,93 +1,55 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useAppDispatch } from "@/redux/store";
 import { setAuthFromSocial } from "@/redux/slices/authSlice";
-import { completeTikTokWebCallback } from "@/services/socialAuth";
 import { resolvePostLoginRoute } from "@/utils/postLoginRoute";
-import { useTranslation } from "@/hooks/useTranslation";
+import {
+  completeTikTokWebCallback,
+  consumeOauthNextPath,
+} from "@/services/socialAuth";
 
-function OAuthCallbackInner() {
-  const { t } = useTranslation();
-  const router = useRouter();
-  const searchParams = useSearchParams();
+export default function OAuthCallbackPage() {
   const dispatch = useAppDispatch();
-  const [status, setStatus] = useState<"working" | "error">("working");
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const code = searchParams.get("code");
-    const state = searchParams.get("state");
-    const oauthError = searchParams.get("error");
-
-    let cancelled = false;
-    (async () => {
-      try {
-        const result = await completeTikTokWebCallback({
-          code,
-          state,
-          error: oauthError,
-        });
-        if (cancelled) return;
+    const params = new URLSearchParams(window.location.search);
+    const next = consumeOauthNextPath();
+    void completeTikTokWebCallback({
+      code: params.get("code"),
+      state: params.get("state"),
+      error: params.get("error"),
+    })
+      .then((result) => {
         dispatch(setAuthFromSocial(result));
-        window.location.assign(resolvePostLoginRoute(result));
-      } catch (err: unknown) {
-        if (cancelled) return;
+        window.location.assign(resolvePostLoginRoute(result, next));
+      })
+      .catch((err: unknown) => {
         const message = err instanceof Error ? err.message : "";
         if (message === "cancelled") {
-          router.replace("/LoginScreenUser");
+          window.location.assign("/LoginScreenUser");
           return;
         }
-        setStatus("error");
-        setError(
-          message === "network"
-            ? t("networkError", "Network error, please try again.")
-            : t("tiktokSignInFailed", "We couldn't sign you in with TikTok. Please try again."),
-        );
-      }
-    })();
+        setError("We couldn't finish social sign-in. Please try again.");
+      });
+  }, [dispatch]);
 
-    return () => {
-      cancelled = true;
-    };
-  }, [dispatch, router, searchParams, t]);
+  if (error) {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-6">
+        <p className="text-center text-sm text-rose-700">{error}</p>
+        <Link href="/LoginScreenUser" className="mt-4 font-semibold text-blue-700 underline">
+          Back to sign in
+        </Link>
+      </main>
+    );
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-100 via-blue-100 to-blue-200 px-4">
-      <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-2xl text-center">
-        {status === "working" ? (
-          <>
-            <div className="mx-auto mb-4 h-8 w-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-            <p className="text-gray-700">{t("loadingTiktok", "Loading TikTok...")}</p>
-          </>
-        ) : (
-          <>
-            <p className="text-red-600 mb-4">{error}</p>
-            <button
-              type="button"
-              className="w-full py-3 font-semibold text-white bg-gradient-to-r from-blue-700 to-yellow-500 rounded"
-              onClick={() => router.replace("/LoginScreenUser")}
-            >
-              {t("login", "Sign in")}
-            </button>
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
-
-export default function OAuthPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-100 via-blue-100 to-blue-200">
-          <div className="h-8 w-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-        </div>
-      }
-    >
-      <OAuthCallbackInner />
-    </Suspense>
+    <main className="flex min-h-screen items-center justify-center bg-slate-50">
+      <p className="text-sm text-slate-600">Completing sign-in…</p>
+    </main>
   );
 }

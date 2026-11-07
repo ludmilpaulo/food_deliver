@@ -10,6 +10,45 @@ const TIKTOK_CLIENT_KEY = process.env.NEXT_PUBLIC_TIKTOK_CLIENT_KEY ?? "";
 const TIKTOK_STATE_KEY = "kudya_oauth_state";
 const TIKTOK_VERIFIER_KEY = "kudya_oauth_verifier";
 const TIKTOK_PROVIDER_KEY = "kudya_oauth_provider";
+const TIKTOK_NEXT_KEY = "kudya_oauth_next";
+
+export type SocialPublicConfig = {
+  google_web_client_id: string;
+  facebook_app_id: string;
+  tiktok_client_key: string;
+};
+
+const emptyConfig = (): SocialPublicConfig => ({
+  google_web_client_id: GOOGLE_WEB,
+  facebook_app_id: FACEBOOK_APP_ID,
+  tiktok_client_key: TIKTOK_CLIENT_KEY,
+});
+
+let cachedPublicConfig: SocialPublicConfig | null = null;
+
+export async function getSocialPublicConfig(): Promise<SocialPublicConfig> {
+  if (cachedPublicConfig) return cachedPublicConfig;
+  const fallback = emptyConfig();
+  try {
+    const response = await fetch(`${baseAPI}/api/auth/social/config/`, {
+      headers: { Accept: "application/json" },
+    });
+    if (!response.ok) {
+      cachedPublicConfig = fallback;
+      return fallback;
+    }
+    const data = (await response.json()) as Partial<SocialPublicConfig>;
+    cachedPublicConfig = {
+      google_web_client_id: fallback.google_web_client_id || String(data.google_web_client_id || ""),
+      facebook_app_id: fallback.facebook_app_id || String(data.facebook_app_id || ""),
+      tiktok_client_key: fallback.tiktok_client_key || String(data.tiktok_client_key || ""),
+    };
+    return cachedPublicConfig;
+  } catch {
+    cachedPublicConfig = fallback;
+    return fallback;
+  }
+}
 
 export function oauthRedirectUri(): string {
   if (typeof window !== "undefined" && window.location?.origin) {
@@ -97,14 +136,18 @@ export async function exchangeSocialToken(
   };
 }
 
-export function isSocialLoginConfigured(provider: SocialProvider): boolean {
+export function isSocialLoginConfigured(
+  provider: SocialProvider,
+  config?: SocialPublicConfig | null,
+): boolean {
+  const resolved = config ?? cachedPublicConfig ?? emptyConfig();
   switch (provider) {
     case "google":
-      return Boolean(GOOGLE_WEB);
+      return Boolean(resolved.google_web_client_id);
     case "facebook":
-      return Boolean(FACEBOOK_APP_ID);
+      return Boolean(resolved.facebook_app_id);
     case "tiktok":
-      return Boolean(TIKTOK_CLIENT_KEY);
+      return Boolean(resolved.tiktok_client_key);
     default:
       return false;
   }
@@ -169,7 +212,9 @@ declare global {
 }
 
 export async function signInWithGoogleWeb(): Promise<LoginResult> {
-  if (!GOOGLE_WEB) {
+  const config = await getSocialPublicConfig();
+  const clientId = config.google_web_client_id;
+  if (!clientId) {
     throw new Error("not_configured");
   }
   await loadScript("https://accounts.google.com/gsi/client", "kudya-google-gis");
@@ -179,7 +224,7 @@ export async function signInWithGoogleWeb(): Promise<LoginResult> {
   }
   return new Promise((resolve, reject) => {
     const client = gis.accounts.oauth2.initTokenClient({
-      client_id: GOOGLE_WEB,
+      client_id: clientId,
       scope: "openid email profile",
       callback: (response) => {
         if (response.error || !response.access_token) {
@@ -195,15 +240,15 @@ export async function signInWithGoogleWeb(): Promise<LoginResult> {
   });
 }
 
-async function loadFacebookSdk(): Promise<FacebookSdk> {
+async function loadFacebookSdk(appId: string): Promise<FacebookSdk> {
   if (window.FB) {
     return window.FB;
   }
   await new Promise<void>((resolve, reject) => {
     window.fbAsyncInit = () => {
       window.FB?.init({
-        appId: FACEBOOK_APP_ID,
-        cookie: true,
+        appId,
+        cookie: false,
         xfbml: false,
         version: "v21.0",
       });
@@ -218,10 +263,11 @@ async function loadFacebookSdk(): Promise<FacebookSdk> {
 }
 
 export async function signInWithFacebookWeb(): Promise<LoginResult> {
-  if (!FACEBOOK_APP_ID) {
+  const config = await getSocialPublicConfig();
+  if (!config.facebook_app_id) {
     throw new Error("not_configured");
   }
-  const fb = await loadFacebookSdk();
+  const fb = await loadFacebookSdk(config.facebook_app_id);
   return new Promise((resolve, reject) => {
     fb.login(
       (response) => {
@@ -240,8 +286,9 @@ export async function signInWithFacebookWeb(): Promise<LoginResult> {
   });
 }
 
-export async function startTikTokWebLogin(): Promise<void> {
-  if (!TIKTOK_CLIENT_KEY) {
+export async function startTikTokWebLogin(nextPath?: string | null): Promise<void> {
+  const config = await getSocialPublicConfig();
+  if (!config.tiktok_client_key) {
     throw new Error("not_configured");
   }
   const verifier = randomOAuthString(32);
@@ -250,8 +297,11 @@ export async function startTikTokWebLogin(): Promise<void> {
   sessionStorage.setItem(TIKTOK_VERIFIER_KEY, verifier);
   sessionStorage.setItem(TIKTOK_STATE_KEY, state);
   sessionStorage.setItem(TIKTOK_PROVIDER_KEY, "tiktok");
+  if (nextPath) {
+    sessionStorage.setItem(TIKTOK_NEXT_KEY, nextPath);
+  }
   const params = new URLSearchParams({
-    client_key: TIKTOK_CLIENT_KEY,
+    client_key: config.tiktok_client_key,
     redirect_uri: oauthRedirectUri(),
     response_type: "code",
     scope: "user.info.basic",
@@ -260,6 +310,13 @@ export async function startTikTokWebLogin(): Promise<void> {
     code_challenge_method: "S256",
   });
   window.location.assign(`https://www.tiktok.com/v2/auth/authorize/?${params.toString()}`);
+}
+
+export function consumeOauthNextPath(): string | null {
+  if (typeof sessionStorage === "undefined") return null;
+  const next = sessionStorage.getItem(TIKTOK_NEXT_KEY);
+  sessionStorage.removeItem(TIKTOK_NEXT_KEY);
+  return next;
 }
 
 export async function completeTikTokWebCallback(params: {

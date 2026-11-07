@@ -18,6 +18,7 @@ interface LocationType {
 interface TrackOrder {
   id: number;
   status?: string;
+  secret_pin?: string | null;
 }
 
 interface DriverLocationEntry {
@@ -60,12 +61,18 @@ const haversineDistance = (coords1: LocationType, coords2: LocationType) => {
   return { distance, duration };
 };
 
-const parseLocation = (location: string): LocationType => {
-  const cleanedLocation = location.replace(/[{}]/g, '').replace(/[\s]/g, '').split(',');
-  const latitude = parseFloat(cleanedLocation[0].split(':')[1]);
-  const longitude = parseFloat(cleanedLocation[1].split(':')[1]);
+// Driver locations arrive as "{'latitude': x, 'longitude': y}" (legacy) or "lat,lng".
+const parseLocation = (location: string): LocationType | null => {
+  const parts = location.replace(/[{}'"\s]/g, '').split(',');
+  if (parts.length < 2) return null;
+  const read = (part: string) => parseFloat(part.includes(':') ? part.split(':')[1] : part);
+  const latitude = read(parts[0]);
+  const longitude = read(parts[1]);
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
   return { latitude, longitude };
 };
+
+const TRACKING_POLL_MS = 10000;
 
 const toLatLng = (loc: LocationType) => [loc.latitude, loc.longitude] as [number, number];
 
@@ -99,26 +106,46 @@ const TrackOrders: React.FC = () => {
 
   // Fetch orders & driver locations
   useEffect(() => {
-    if (!user?.token) return;
-    setLoading(true);
-    setFetchError(null);
-    Promise.all([
-      axios.post(`${baseAPI}/customer/customer/order/latest/`, { access_token: user.token }),
-      axios.post(`${baseAPI}/customer/customer/driver/location/`, { access_token: user.token }),
-    ])
-      .then(([ordersRes, locationsRes]) => {
-        setOrders(ordersRes.data.orders || []);
-        const locations = (locationsRes.data.order_locations as DriverLocationEntry[]).reduce(
-          (acc: Record<number, DriverLocationEntry>, loc) => {
-            acc[loc.order_id] = loc;
-            return acc;
-          },
-          {},
-        );
-        setOrderLocations(locations);
-      })
-      .catch(() => setFetchError('Failed to load orders.'))
-      .finally(() => setLoading(false));
+    const token = user?.token;
+    if (!token) {
+      setLoading(false);
+      setFetchError('Inicie sessão para acompanhar os seus pedidos.');
+      return;
+    }
+    let cancelled = false;
+    const headers = { Authorization: `Bearer ${token}` };
+    const load = (initial: boolean) => {
+      if (initial) {
+        setLoading(true);
+        setFetchError(null);
+      }
+      Promise.all([
+        axios.post(`${baseAPI}/customer/customer/order/latest/`, { access_token: token }, { headers }),
+        axios.post(`${baseAPI}/customer/customer/driver/location/`, { access_token: token }, { headers }),
+      ])
+        .then(([ordersRes, locationsRes]) => {
+          if (cancelled) return;
+          setOrders(ordersRes.data.orders || []);
+          const entries = (locationsRes.data.order_locations ?? []) as DriverLocationEntry[];
+          const locations = entries.reduce(
+            (acc: Record<number, DriverLocationEntry>, loc) => {
+              acc[loc.order_id] = loc;
+              return acc;
+            },
+            {},
+          );
+          setOrderLocations(locations);
+          setFetchError(null);
+        })
+        .catch(() => {
+          if (!cancelled && initial) setFetchError('Não foi possível carregar os pedidos.');
+        })
+        .finally(() => {
+          if (!cancelled && initial) setLoading(false);
+        });
+    };
+    load(true);
+    const interval = setInterval(() => load(false), TRACKING_POLL_MS);
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
         setUserLocation({
@@ -127,6 +154,10 @@ const TrackOrders: React.FC = () => {
         });
       });
     }
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
   }, [user?.token]);
 
   // Calculate distances — do not depend on `distances` (that caused an infinite setState loop).
@@ -137,6 +168,7 @@ const TrackOrders: React.FC = () => {
       const driverLocation = orderLocations[order.id]?.driver_location;
       if (!driverLocation) return;
       const parsedLocation = parseLocation(driverLocation);
+      if (!parsedLocation) return;
       const result = haversineDistance(userLocation, parsedLocation);
       newDistances[order.id] = {
         distance: `${result.distance.toFixed(2)} km`,
@@ -225,13 +257,17 @@ const TrackOrders: React.FC = () => {
         <p className="text-center text-red-600">{fetchError}</p>
       ) : orders.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {orders.map((order) => (
+          {orders.map((order) => {
+            const rawDriverLocation = orderLocations[order.id]?.driver_location;
+            const driverPosition = rawDriverLocation ? parseLocation(rawDriverLocation) : null;
+            const deliveryPin = order.secret_pin ?? orderLocations[order.id]?.secret_pin;
+            return (
             <div key={order.id} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
               <h2 className="text-xl font-semibold mb-2">Pedido ID: {order.id}</h2>
               <p className="text-gray-700 mb-1"><strong>Status:</strong> {order.status}</p>
-              {orderLocations[order.id]?.driver_location ? (
+              {driverPosition && rawDriverLocation ? (
                 <>
-                  <p className="text-gray-700 mb-1"><strong>Coordenadas do Motorista:</strong> {orderLocations[order.id].driver_location}</p>
+                  <p className="text-gray-700 mb-1"><strong>Coordenadas do Motorista:</strong> {rawDriverLocation}</p>
                   {distances[order.id] ? (
                     <>
                       <p className="text-gray-700 mb-1"><strong>Distância:</strong> {distances[order.id].distance}</p>
@@ -241,18 +277,14 @@ const TrackOrders: React.FC = () => {
                     <p className="text-gray-700 mb-1">Calculando distância e tempo...</p>
                   )}
                   <button
-                    onClick={() => openGoogleMaps(parseLocation(orderLocations[order.id].driver_location))}
+                    onClick={() => openGoogleMaps(driverPosition)}
                     className="mt-2 w-full p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300"
                   >
                     Ver no Google Maps
                   </button>
                   <div className="h-64 w-full mt-4">
                     <MapContainer
-                      center={
-                        orderLocations[order.id]?.driver_location
-                          ? toLatLng(parseLocation(orderLocations[order.id].driver_location))
-                          : toLatLng(DEFAULT_CENTER)
-                      }
+                      center={toLatLng(driverPosition ?? DEFAULT_CENTER)}
                       zoom={15}
                       scrollWheelZoom={false}
                       style={{ height: '100%', width: '100%', borderRadius: '0.5rem' }}
@@ -262,7 +294,7 @@ const TrackOrders: React.FC = () => {
                         attribution="&copy; OpenStreetMap contributors"
                       />
                       <Marker
-                        position={toLatLng(parseLocation(orderLocations[order.id].driver_location))}
+                        position={toLatLng(driverPosition)}
                       >
                         <Popup>Motorista está aqui</Popup>
                       </Marker>
@@ -277,7 +309,12 @@ const TrackOrders: React.FC = () => {
               ) : (
                 <p className="text-gray-700 mb-1"><strong>O pedido está sendo preparado por:</strong> {orderLocations[order.id]?.store}</p>
               )}
-              <p className="text-gray-700 mb-1"><strong>PIN Secreto:</strong> {orderLocations[order.id]?.secret_pin}</p>
+              {deliveryPin ? (
+                <p className="text-gray-700 mb-1">
+                  <strong>PIN de entrega:</strong> {deliveryPin}{' '}
+                  <span className="text-xs text-gray-500">(diga-o ao motorista quando receber o pedido)</span>
+                </p>
+              ) : null}
               <button
                 onClick={() => handleOrderSelection(order)}
                 className="mt-4 w-full p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300"
@@ -285,7 +322,8 @@ const TrackOrders: React.FC = () => {
                 Ver Detalhes e Conversar com o Motorista
               </button>
             </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <p className="text-center text-gray-700">Nenhum pedido activo encontrado.</p>

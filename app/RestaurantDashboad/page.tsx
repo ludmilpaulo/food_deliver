@@ -11,6 +11,8 @@ import { HelpCircle } from "lucide-react";
 import withPartnerAuth from "@/components/PartnerRouteGuard";
 import HelpGuideModal from "@/components/HelpGuideModal";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useRouter } from "next/navigation";
+import { isGroceryPartnerUser, GROCERY_DASHBOARD_PATH } from "@/utils/partnerDashboardKind";
 
 const Sidebar = dynamic(() => import("./Sidebar"), {
   ssr: false,
@@ -19,6 +21,7 @@ const Sidebar = dynamic(() => import("./Sidebar"), {
 
 const StoreDashboard: React.FC = () => {
   const { t } = useTranslation();
+  const router = useRouter();
   const user = useSelector(selectUser);
   const [fornecedor, setFornecedor] = useState<FornecedorType | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -128,7 +131,14 @@ const StoreDashboard: React.FC = () => {
   ];
 
   useEffect(() => {
+    if (isGroceryPartnerUser(user)) {
+      router.replace(GROCERY_DASHBOARD_PATH);
+    }
+  }, [router, user]);
+
+  useEffect(() => {
     const fetchData = async () => {
+      if (isGroceryPartnerUser(user)) return;
       if (user?.user_id) {
         try {
           setLoading(true);
@@ -145,7 +155,7 @@ const StoreDashboard: React.FC = () => {
   }, [user]);
 
   useEffect(() => {
-    if (!user?.user_id) return;
+    if (!user?.user_id || isGroceryPartnerUser(user)) return;
 
     syncStoreLocation(user.user_id);
     locationIntervalRef.current = setInterval(
@@ -163,6 +173,14 @@ const StoreDashboard: React.FC = () => {
   const closeMobileSidebar = () => {
     setIsSidebarOpen(false);
   };
+
+  if (isGroceryPartnerUser(user)) {
+    return (
+      <div className="flex min-h-[40vh] items-center justify-center text-sm text-slate-500">
+        {t("loading", "Loading...")}
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-gray-100">

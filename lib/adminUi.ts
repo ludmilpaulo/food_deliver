@@ -157,6 +157,14 @@ export const ADMIN_NAV_ITEMS: AdminNavItemMeta[] = [
     descDefault: "Overview rental applications and unblock stuck documents",
   },
   {
+    key: "propertyCountryPolicies",
+    group: "trust",
+    labelKey: "propertyCountryPolicies",
+    labelDefault: "Property countries",
+    descKey: "propertyCountryPoliciesDesc",
+    descDefault: "Country rules for stays, rentals, and launch status",
+  },
+  {
     key: "platformControl",
     group: "platform",
     labelKey: "platformServices",

@@ -24,6 +24,7 @@ import { formatCurrency, getCurrencyForCountry } from "@/utils/currency";
 import { useUserRegion } from "@/hooks/useUserRegion";
 import { useTranslation } from "@/hooks/useTranslation";
 import PlatformServiceGate from "@/components/platform/PlatformServiceGate";
+import PropertyLanguageCard from "@/components/property/PropertyLanguageCard";
 import {
   fetchCities,
   fetchCountries,
@@ -141,7 +142,7 @@ function PropertiesPageContent() {
   const [purpose, setPurpose] = useState<Purpose>(
     urlPurpose === "stay" || urlPurpose === "sale" || urlPurpose === "rent"
       ? urlPurpose
-      : "rent",
+      : "stay",
   );
   const [listingType, setListingType] = useState<ListingType>("");
   const [search, setSearch] = useState("");
@@ -404,6 +405,31 @@ function PropertiesPageContent() {
   };
 
   const totalPages = Math.max(1, Math.ceil(total / 12));
+  const destinations = useMemo(() => {
+    const groups = new Map<string, { name: string; count: number; cover: string }>();
+    for (const prop of properties) {
+      const name = (prop.location?.city?.name || prop.city || "").trim();
+      if (!name) continue;
+      const key = name.toLowerCase();
+      const cover = prop.image_urls?.[0] ? resolveMediaUrl(prop.image_urls[0]) : "";
+      const existing = groups.get(key);
+      if (existing) {
+        existing.count += 1;
+        if (!existing.cover && cover) existing.cover = cover;
+      } else {
+        groups.set(key, { name, count: 1, cover });
+      }
+    }
+    return Array.from(groups.values()).sort((a, b) => b.count - a.count);
+  }, [properties]);
+  const heroCover = destinations.find((item) => item.cover)?.cover || "";
+  const categoryChips = [
+    { value: "apartment", label: t("ptype_apartment", "Apartments") },
+    { value: "house", label: t("ptype_house", "Houses") },
+    { value: "villa", label: t("ptype_villa", "Villas") },
+    { value: "room", label: t("ptype_room", "Rooms") },
+    { value: "commercial", label: t("ptype_commercial", "Commercial") },
+  ] as const;
   const nearYouLabel = nearYou
     ? [nearYou.city?.name, nearYou.region?.name, nearYou.country?.name].filter(Boolean).join(", ")
     : "";
@@ -423,7 +449,7 @@ function PropertiesPageContent() {
             setDiscoveryMode("search");
             setPage(1);
           }}
-          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 focus:border-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-600/20"
         >
           <option value="">{t("anyCountry", "Any country")}</option>
           {countries.map((c) => (
@@ -505,7 +531,7 @@ function PropertiesPageContent() {
             setPropertyType(e.target.value);
             setPage(1);
           }}
-          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 focus:border-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-600/20"
         >
           {PROPERTY_TYPES.map((opt) => (
             <option key={opt.value || "any"} value={opt.value}>
@@ -628,7 +654,7 @@ function PropertiesPageContent() {
               setFurnished(e.target.checked);
               setPage(1);
             }}
-            className="rounded border-slate-300 text-amber-600 focus:ring-amber-500"
+            className="rounded border-slate-300 text-violet-700 focus:ring-violet-600"
           />
           {t("furnished", "Furnished")}
         </label>
@@ -640,7 +666,7 @@ function PropertiesPageContent() {
               setParking(e.target.checked);
               setPage(1);
             }}
-            className="rounded border-slate-300 text-amber-600 focus:ring-amber-500"
+            className="rounded border-slate-300 text-violet-700 focus:ring-violet-600"
           />
           {t("parking", "Parking")}
         </label>
@@ -661,7 +687,7 @@ function PropertiesPageContent() {
                   onClick={() => toggleAmenity(a.key)}
                   className={`rounded-full px-3 py-1 text-xs font-medium transition ${
                     active
-                      ? "bg-amber-500 text-white"
+                      ? "bg-violet-600 text-white"
                       : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                   }`}
                 >
@@ -690,137 +716,144 @@ function PropertiesPageContent() {
 
   return (
     <main className="min-h-screen bg-[#f4f6f8]">
-      <div className="border-b border-slate-200/80 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
-        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-amber-400">
-                <HiOutlineBuildingOffice2 size={16} />
-                {t("kudyaPropertiesBrand", "Kudya Properties")}
-              </p>
-              <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-                {t("findYourNextHome", "Find your next home")}
-              </h1>
-              <p className="mt-2 max-w-xl text-sm text-slate-300">
-                {t(
-                  "propertiesMarketplaceSubtitle",
-                  "Browse verified rentals and homes for sale across Angola. Looking for a short stay? Visit Stay.",
-                )}
-              </p>
-              {discoveryMode === "nearby" && nearYouLabel ? (
-                <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-sm text-amber-100">
-                  {nearYou?.country?.flag_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={nearYou.country.flag_url}
-                      alt=""
-                      className="h-3.5 w-5 rounded-sm object-cover"
-                    />
-                  ) : nearYou?.country?.flag_icon ? (
-                    <span aria-hidden>{nearYou.country.flag_icon}</span>
-                  ) : (
-                    <MdPlace size={16} />
-                  )}
-                  {t("nearYou", "Near you")}: {nearYouLabel}
-                </p>
-              ) : null}
-            </div>
-            <Link
-              href="/stay"
-              className="rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-medium text-white backdrop-blur hover:bg-white/10"
-            >
-              {t("exploreStay", "Explore Stay →")}
-            </Link>
-          </div>
+      <div className="relative overflow-hidden border-b border-violet-900 bg-violet-800 text-white">
+        {heroCover ? (
+          <Image
+            src={heroCover}
+            alt=""
+            fill
+            className="object-cover"
+            sizes="100vw"
+            priority
+          />
+        ) : null}
+        <div className="absolute inset-0 bg-violet-950/75" />
+        <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+          <p className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-violet-200">
+            <HiOutlineBuildingOffice2 size={16} />
+            {t("kudyaPropertiesBrand", "Kudya Property")}
+          </p>
+          <h1 className="max-w-3xl text-3xl font-semibold tracking-tight sm:text-4xl">
+            {t("propertiesWorldwideTitle", "Find, book or rent properties worldwide")}
+          </h1>
+          <p className="mt-2 max-w-xl text-sm text-violet-100">
+            {t("propertiesWorldwideSubtitle", "Short-term stays and long-term rentals")}
+          </p>
+          {discoveryMode === "nearby" && nearYouLabel ? (
+            <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-sm text-violet-50">
+              {nearYou?.country?.flag_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={nearYou.country.flag_url}
+                  alt=""
+                  className="h-3.5 w-5 rounded-sm object-cover"
+                />
+              ) : nearYou?.country?.flag_icon ? (
+                <span aria-hidden>{nearYou.country.flag_icon}</span>
+              ) : (
+                <MdPlace size={16} />
+              )}
+              {t("nearYou", "Near you")}: {nearYouLabel}
+            </p>
+          ) : null}
 
-          <div className="mt-6 flex flex-wrap gap-2">
+          <div className="mt-6 flex flex-wrap items-center gap-2">
+            {(
+              [
+                { value: "stay" as Purpose, label: t("shortTerm", "Short term") },
+                { value: "rent" as Purpose, label: t("longTerm", "Long term") },
+                { value: "sale" as Purpose, label: t("forSale", "For sale") },
+              ] as const
+            ).map((tab) => (
+              <button
+                key={tab.value}
+                type="button"
+                onClick={() => {
+                  setPurpose(tab.value);
+                  setListingType("");
+                  setPage(1);
+                }}
+                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                  purpose === tab.value
+                    ? "bg-white text-violet-800"
+                    : "bg-white/15 text-white hover:bg-white/25"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
             <button
               type="button"
               onClick={() => void switchToNearby()}
-              className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium ${
-                discoveryMode === "nearby"
-                  ? "bg-amber-500 text-slate-950"
-                  : "bg-white/10 text-white hover:bg-white/15"
+              className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium ${
+                discoveryMode === "nearby" ? "bg-white text-violet-800" : "bg-white/15 text-white"
               }`}
             >
               <MdMyLocation size={18} />
               {locating ? t("locating", "Locating…") : t("nearby", "Nearby")}
             </button>
-            <button
-              type="button"
-              onClick={switchToSearch}
-              className={`rounded-lg px-3 py-2 text-sm font-medium ${
-                discoveryMode === "search"
-                  ? "bg-amber-500 text-slate-950"
-                  : "bg-white/10 text-white hover:bg-white/15"
-              }`}
+            <Link
+              href="/stay"
+              className="rounded-full bg-white/15 px-4 py-2 text-sm font-medium text-white hover:bg-white/25"
             >
-              {t("searchManually", "Search manually")}
-            </button>
+              {t("exploreStay", "Explore Stay")}
+            </Link>
           </div>
 
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <div className="inline-flex rounded-xl bg-white/10 p-1 backdrop-blur">
-              {(
-                [
-                  { value: "rent" as Purpose, label: t("forRent", "For Rent") },
-                  { value: "stay" as Purpose, label: t("stay", "Stay") },
-                  { value: "sale" as Purpose, label: t("forSale", "For Sale") },
-                ] as const
-              ).map((tab) => (
-                <button
-                  key={tab.value}
-                  type="button"
-                  onClick={() => {
-                    setPurpose(tab.value);
-                    setListingType("");
-                    setPage(1);
-                  }}
-                  className={`rounded-lg px-5 py-2.5 text-sm font-semibold transition ${
-                    purpose === tab.value
-                      ? "bg-amber-500 text-slate-950 shadow"
-                      : "text-slate-200 hover:text-white"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-
-            <form
-              className="flex flex-1 gap-2"
-              onSubmit={(e) => {
-                e.preventDefault();
-                setSearch(searchDraft.trim());
-                setDiscoveryMode("search");
-                setPage(1);
-              }}
-            >
-              <div className="relative flex-1">
-                <MdSearch className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={22} />
-                <input
-                  type="search"
-                  value={searchDraft}
-                  onChange={(e) => setSearchDraft(e.target.value)}
-                  placeholder={t("searchPropertiesPlaceholder", "Search by title, city, suburb...")}
-                  className="w-full rounded-xl border-0 bg-white py-3 pl-11 pr-4 text-slate-900 shadow-lg placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400"
-                />
-              </div>
+          <form
+            className="mt-6"
+            onSubmit={(e) => {
+              e.preventDefault();
+              setSearch(searchDraft.trim());
+              setDiscoveryMode("search");
+              setPage(1);
+            }}
+          >
+            <div className="flex items-center gap-2 rounded-full bg-white py-2 pl-4 pr-2 shadow-lg">
+              <MdSearch className="shrink-0 text-slate-400" size={22} />
+              <input
+                type="search"
+                value={searchDraft}
+                onChange={(e) => setSearchDraft(e.target.value)}
+                placeholder={t("whereDoYouWantToStay", "Where do you want to stay?")}
+                className="w-full border-0 bg-transparent py-2 text-slate-900 placeholder:text-slate-400 focus:outline-none"
+              />
               <button
                 type="submit"
-                className="rounded-xl bg-amber-500 px-5 py-3 text-sm font-semibold text-slate-950 hover:bg-amber-400"
+                className="rounded-full bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-violet-500"
               >
                 {t("search", "Search")}
               </button>
-            </form>
+            </div>
+          </form>
+
+          <div className="mt-5 flex flex-wrap gap-2">
+            {categoryChips.map((chip) => {
+              const active = propertyType === chip.value;
+              return (
+                <button
+                  key={chip.value}
+                  type="button"
+                  onClick={() => {
+                    setPropertyType(active ? "" : chip.value);
+                    setPage(1);
+                  }}
+                  className={`rounded-full px-4 py-2 text-sm font-semibold ${
+                    active ? "bg-white text-violet-800" : "bg-white/15 text-white hover:bg-white/25"
+                  }`}
+                >
+                  {chip.label}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {showLocationFallback ? (
-          <div className="mb-6 rounded-2xl border border-dashed border-amber-300 bg-amber-50 px-6 py-10 text-center">
-            <MdMyLocation size={40} className="mx-auto text-amber-600" />
+          <div className="mb-6 rounded-2xl border border-dashed border-violet-300 bg-violet-50 px-6 py-10 text-center">
+            <MdMyLocation size={40} className="mx-auto text-violet-700" />
             <p className="mt-3 text-lg font-semibold text-slate-900">
               {t("locationNeeded", "Enable location to see homes near you")}
             </p>
@@ -891,11 +924,57 @@ function PropertiesPageContent() {
         </div>
 
         <div className="grid gap-8 lg:grid-cols-[260px_1fr]">
-          <div className={`rounded-2xl border border-slate-200 bg-white p-5 shadow-sm ${filtersOpen ? "block" : "hidden"} lg:block`}>
-            {FiltersPanel}
+          <div className="space-y-4">
+            <PropertyLanguageCard />
+            <div className={`rounded-2xl border border-slate-200 bg-white p-5 shadow-sm ${filtersOpen ? "block" : "hidden"} lg:block`}>
+              {FiltersPanel}
+            </div>
           </div>
 
           <div>
+            {destinations.length > 0 ? (
+              <section className="mb-8">
+                <h2 className="mb-3 text-lg font-semibold text-slate-900">
+                  {t("popularDestinations", "Popular destinations")}
+                </h2>
+                <div className="flex gap-3 overflow-x-auto pb-1">
+                  {destinations.map((destination) => (
+                    <button
+                      key={destination.name}
+                      type="button"
+                      onClick={() => {
+                        setSearch(destination.name);
+                        setSearchDraft(destination.name);
+                        setDiscoveryMode("search");
+                        setPage(1);
+                      }}
+                      className="w-40 shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm"
+                    >
+                      <div className="relative h-24 bg-violet-100">
+                        {destination.cover ? (
+                          <Image
+                            src={destination.cover}
+                            alt=""
+                            fill
+                            className="object-cover"
+                            sizes="160px"
+                          />
+                        ) : null}
+                      </div>
+                      <div className="px-3 py-2">
+                        <p className="truncate text-sm font-semibold text-slate-900">{destination.name}</p>
+                        <p className="text-xs text-violet-700">
+                          {t("destinationListings", "{{count}} listings").replace(
+                            "{{count}}",
+                            String(destination.count),
+                          )}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </section>
+            ) : null}
             {showLocationFallback ? null : loading || (discoveryMode === "nearby" && locating && !coords) ? (
               <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                 {Array.from({ length: 6 }).map((_, i) => (
@@ -952,24 +1031,12 @@ function PropertiesPageContent() {
                               <MdHome size={48} className="text-slate-300" />
                             </div>
                           )}
-                          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/80 to-transparent p-3 pt-10">
-                            <p className="text-lg font-semibold text-white">
-                              {formatCurrency(parseFloat(prop.price), currencyCode)}
-                              <span className="ml-1 text-xs font-normal text-slate-200">
-                                {prop.purpose === "stay" || prop.listing_type === "rent_daily"
-                                  ? t("perNightShort", "/ night")
-                                  : prop.purpose === "rent" || prop.listing_type === "rent_monthly"
-                                    ? t("perMonthShort", "/ month")
-                                    : ""}
-                              </span>
-                            </p>
-                          </div>
-                          <span className="absolute left-3 top-3 rounded-md bg-white/95 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-slate-800 shadow">
-                            {prop.purpose === "stay"
-                              ? t("stay", "Stay")
+                          <span className="absolute left-3 top-3 rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-violet-800 shadow">
+                            {prop.purpose === "stay" || prop.listing_type === "rent_daily"
+                              ? t("shortTerm", "Short term")
                               : prop.listing_type === "buy" || prop.purpose === "sale"
-                                ? t("forSale", "For Sale")
-                                : t("forRent", "For Rent")}
+                                ? t("forSale", "For sale")
+                                : t("longTerm", "Long term")}
                           </span>
                           <span className="absolute right-3 top-3 rounded-full bg-white/90 p-1.5 text-slate-500 shadow">
                             <MdFavoriteBorder size={16} />
@@ -1017,6 +1084,16 @@ function PropertiesPageContent() {
                               </span>
                             ) : null}
                           </div>
+                          <p className="mt-3 text-base font-bold text-violet-700">
+                            {formatCurrency(parseFloat(prop.price), currencyCode)}
+                            <span className="ml-1 text-xs font-medium text-violet-500">
+                              {prop.purpose === "stay" || prop.listing_type === "rent_daily"
+                                ? t("perNightShort", "/ night")
+                                : prop.purpose === "rent" || prop.listing_type === "rent_monthly"
+                                  ? t("perMonthShort", "/ month")
+                                  : ""}
+                            </span>
+                          </p>
                         </div>
                       </Link>
                     );

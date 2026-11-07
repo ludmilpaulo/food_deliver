@@ -7,6 +7,7 @@ import type {
   City,
   Country,
   PackageEstimate,
+  Province,
   RentalVehicle,
   WalletSummary,
   WalletTransaction,
@@ -39,6 +40,17 @@ function mapCity(raw: RawRecord): City {
     name: String(raw.name ?? ''),
     slug: String(raw.slug ?? raw.name ?? '').toLowerCase().replace(/\s+/g, '-'),
     country_code: String(raw.country_code ?? ''),
+    province: raw.province == null ? null : Number(raw.province),
+    latitude: raw.latitude == null ? null : Number(raw.latitude),
+    longitude: raw.longitude == null ? null : Number(raw.longitude),
+  };
+}
+
+function mapProvince(raw: RawRecord): Province {
+  return {
+    id: Number(raw.id),
+    name: String(raw.name ?? ''),
+    country: Number(raw.country ?? 0),
   };
 }
 
@@ -61,7 +73,7 @@ const marketplaceBaseQuery = fetchBaseQuery({
 export const marketplaceApi = createApi({
   reducerPath: 'marketplaceApi',
   baseQuery: marketplaceBaseQuery,
-  tagTypes: ['Countries', 'Cities', 'Wallet', 'Rentals', 'Stays', 'Courier', 'PartnerRentals'],
+  tagTypes: ['Countries', 'Cities', 'Provinces', 'Wallet', 'Rentals', 'Stays', 'Courier', 'PartnerRentals'],
   endpoints: (builder) => ({
     getCountries: builder.query<Country[], void>({
       query: () => '/api/countries/',
@@ -69,11 +81,29 @@ export const marketplaceApi = createApi({
         unwrapList(response).map(mapCountry).filter((c) => c.is_active !== false),
       providesTags: ['Countries'],
     }),
-    getCities: builder.query<City[], number>({
-      query: (countryId) => `/api/platform/cities/?country=${countryId}`,
+    getCities: builder.query<City[], number | { countryId: number; provinceId?: number | null }>({
+      query: (arg) => {
+        const countryId = typeof arg === 'number' ? arg : arg.countryId;
+        const provinceId = typeof arg === 'number' ? undefined : arg.provinceId;
+        const params: Record<string, number> = { country: countryId };
+        if (provinceId) params.province = provinceId;
+        return { url: '/api/platform/cities/', params };
+      },
       transformResponse: (response: RawRecord[] | { results?: RawRecord[] }) =>
         unwrapList(response).map(mapCity),
-      providesTags: (_result, _error, countryId) => [{ type: 'Cities', id: countryId }],
+      providesTags: (_result, _error, arg) => {
+        const countryId = typeof arg === 'number' ? arg : arg.countryId;
+        return [{ type: 'Cities', id: countryId }];
+      },
+    }),
+    getProvinces: builder.query<Province[], number>({
+      query: (countryId) => ({
+        url: '/api/countries/provinces/',
+        params: { country: countryId },
+      }),
+      transformResponse: (response: RawRecord[] | { results?: RawRecord[] }) =>
+        unwrapList(response).map(mapProvince),
+      providesTags: (_result, _error, countryId) => [{ type: 'Provinces', id: countryId }],
     }),
     getWallet: builder.query<WalletSummary, string | void>({
       query: (currency) => ({
@@ -115,11 +145,42 @@ export const marketplaceApi = createApi({
         unwrapList(response) as AccommodationListing[],
       providesTags: ['Stays'],
     }),
-    getStayProperties: builder.query<RawRecord[], { country?: number; city?: number }>({
-      query: ({ country, city }) => {
+    getStayProperties: builder.query<
+      RawRecord[],
+      {
+        country?: number;
+        province?: number;
+        city?: number;
+        search?: string;
+        min_price?: number;
+        max_price?: number;
+        property_type?: string;
+        amenities?: string;
+        guests?: number;
+        check_in?: string;
+        check_out?: string;
+        latitude?: number;
+        longitude?: number;
+        radius?: number;
+      }
+    >({
+      query: (args) => {
         const params: Record<string, string | number> = { purpose: 'stay' };
-        if (country) params.country = country;
-        if (city) params.city = city;
+        if (args.country) params.country = args.country;
+        if (args.province) params.province = args.province;
+        if (args.city) params.city = args.city;
+        if (args.search) params.search = args.search;
+        if (args.min_price != null) params.min_price = args.min_price;
+        if (args.max_price != null) params.max_price = args.max_price;
+        if (args.property_type) params.property_type = args.property_type;
+        if (args.amenities) params.amenities = args.amenities;
+        if (args.guests) params.guests = args.guests;
+        if (args.check_in) params.check_in = args.check_in;
+        if (args.check_out) params.check_out = args.check_out;
+        if (args.latitude != null) params.latitude = args.latitude;
+        if (args.longitude != null) params.longitude = args.longitude;
+        if (args.radius != null) params.radius = args.radius;
+        if (args.latitude != null && args.longitude != null) params.ordering = 'distance';
         return { url: '/api/properties/search/', params };
       },
       transformResponse: (response: RawRecord[] | { results?: RawRecord[] }) => unwrapList(response),
@@ -207,6 +268,7 @@ export const marketplaceApi = createApi({
 export const {
   useGetCountriesQuery,
   useGetCitiesQuery,
+  useGetProvincesQuery,
   useGetWalletQuery,
   useGetWalletHistoryQuery,
   useTopUpWalletMutation,

@@ -88,6 +88,15 @@ const ProductDetailPage: React.FC<Props> = () => {
 
   // Final product to show
   const productToShow: Product | undefined = reduxProduct || apiProduct || undefined;
+  // The API serializes stock as a decimal string ("12.000").
+  const stockCount = Number(productToShow?.stock ?? 0) || 0;
+  const isOutOfStock = stockCount <= 0;
+  const firstImage = productToShow?.images?.[0] || productToShow?.image_url?.[0] || "";
+  const firstImageSrc = firstImage
+    ? firstImage.startsWith("http")
+      ? firstImage
+      : `${baseAPI}${firstImage}`
+    : "/no-image.png";
 
   // UI State
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
@@ -120,16 +129,25 @@ const ProductDetailPage: React.FC<Props> = () => {
   // Reviews
   useEffect(() => {
     if (!productToShow) return;
-    fetch(`/api/product/${productToShow.id}/reviews`)
-      .then((r) => r.json())
-      .then((data: Review[]) => {
+    let ignore = false;
+    fetch(`${baseAPI}/store/reviews/?product=${productToShow.id}`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then((payload: Review[] | { results?: Review[] }) => {
+        if (ignore) return;
+        const data = Array.isArray(payload) ? payload : payload.results ?? [];
         setReviews(data);
         const avg =
           data.length > 0
-            ? data.reduce((sum, r) => sum + r.rating, 0) / data.length
+            ? data.reduce((sum, r) => sum + Number(r.rating || 0), 0) / data.length
             : 0;
         setAverageRating(Number(avg.toFixed(1)));
+      })
+      .catch(() => {
+        if (!ignore) setReviews([]);
       });
+    return () => {
+      ignore = true;
+    };
   }, [productToShow]);
 
   // Share product (web)
@@ -154,7 +172,7 @@ const ProductDetailPage: React.FC<Props> = () => {
       alert(t("selectSize"));
       return;
     }
-    if (productToShow.stock === 0) {
+    if (isOutOfStock) {
       alert(t("outOfStock"));
       return;
     }
@@ -168,8 +186,8 @@ const ProductDetailPage: React.FC<Props> = () => {
     size: selectedSize || "",
     color: selectedColor || "", // <-- Add this line!
     price,
-    image: productToShow.images?.[0] || "",
-    store: productToShow.store_id,
+    image: firstImage,
+    store: productToShow.store ?? productToShow.store_id,
     quantity,
   })
 );
@@ -225,9 +243,9 @@ const ProductDetailPage: React.FC<Props> = () => {
 
       {/* Product Images Carousel */}
       <div className="w-full relative aspect-square bg-gray-100">
-        {productToShow.images?.length ? (
+        {firstImage ? (
           <Image
-            src={productToShow.image_url[0] || "/no-image.png"}
+            src={firstImageSrc}
             alt={productToShow.name}
             fill
             className="object-cover rounded-xl"
@@ -272,14 +290,14 @@ const ProductDetailPage: React.FC<Props> = () => {
             </span>
           )}
         </div>
-        <span className={`text-sm ${productToShow.stock <= 3 ? "text-red-500" : "text-green-600"}`}>
-          {productToShow.stock === 0
+        <span className={`text-sm ${stockCount <= 3 ? "text-red-500" : "text-green-600"}`}>
+          {isOutOfStock
             ? t("outOfStock")
-            : productToShow.stock === 1
+            : stockCount === 1
             ? t("lastOne")
-            : productToShow.stock <= 3
+            : stockCount <= 3
             ? t("lowStock")
-            : `${productToShow.stock} ${t("inStock")}`}
+            : `${stockCount} ${t("inStock")}`}
         </span>
 
         {/* Sizes */}
@@ -318,10 +336,10 @@ const ProductDetailPage: React.FC<Props> = () => {
             <span className="px-4 py-2 border-t border-b border-gray-300">{quantity}</span>
             <button
               onClick={() => {
-                if (quantity < (productToShow.stock || 1)) {
+                if (quantity < stockCount) {
                   setQuantity((q) => q + 1);
                 } else {
-                  alert(`${t("only")} ${productToShow.stock} ${t("itemsAvailable")}.`);
+                  alert(`${t("only")} ${stockCount} ${t("itemsAvailable")}.`);
                 }
               }}
               className="px-4 py-2 bg-gray-200 rounded-r"
@@ -336,23 +354,23 @@ const ProductDetailPage: React.FC<Props> = () => {
         <div className="mt-6">
           <button
             onClick={() => {
-              if (productToShow.stock === 0) return;
+              if (isOutOfStock) return;
               if (isInCart) {
                 router.push("/CartPage");
               } else {
                 handleAddToCart();
               }
             }}
-            disabled={productToShow.stock === 0}
+            disabled={isOutOfStock}
             className={`w-full py-4 rounded-xl shadow-lg font-bold text-lg ${
-              productToShow.stock === 0
+              isOutOfStock
                 ? "bg-gray-400"
                 : isInCart
                 ? "bg-blue-600"
                 : "bg-green-600"
             } text-white`}
           >
-            {productToShow.stock === 0
+            {isOutOfStock
               ? t("outOfStock")
               : isInCart
               ? t("goToCart")

@@ -6,6 +6,7 @@ import { selectUser, selectAuthHydrated } from "@/redux/slices/authSlice";
 import ProfileUpdateModal from "@/components/ProfileUpdateModal";
 import { getCurrentUser, updateUserDetails } from "@/services/authService";
 import { isDevLoginEnabled, isSeedTestUsername } from "@/configs/devTestLogin";
+import PageSpinner from "@/components/ui/PageSpinner";
 
 const withAuth = <P extends object>(WrappedComponent: React.ComponentType<P>) => {
   const Wrapper: React.FC<P> = (props) => {
@@ -65,7 +66,9 @@ const withAuth = <P extends object>(WrappedComponent: React.ComponentType<P>) =>
       fetchProfile();
     }, [authHydrated, user, router]);
 
-    if (!authHydrated || !user || loading) return null;
+    if (!authHydrated || !user || loading) {
+      return <PageSpinner fullPage />;
+    }
 
     return (
       <>

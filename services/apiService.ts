@@ -13,6 +13,7 @@ import {
   updatePartnerProduct,
   updatePartnerStore,
 } from '@/features/partner/api/partnerDashboardApi';
+import { fetchStoreCategories } from './storeCatalog';
 import { Categoria, FornecedorType, OpeningHourType, OrderTypes, Product, Store as StoreType } from './types';
 
 export const fetchFornecedorData = async (_userId: number): Promise<FornecedorType | null> => {
@@ -39,7 +40,7 @@ export const fetchCategorias = async (): Promise<Categoria[]> => {
 };
 
 export const fetchstoreCategory = async (): Promise<Categoria[]> => {
-  return fetchPartnerProductCategories();
+  return fetchStoreCategories();
 };
 
 export const fetchProducts = async (_userId: number): Promise<Product[]> => {

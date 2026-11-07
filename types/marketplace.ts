@@ -12,6 +12,15 @@ export type City = {
   name: string;
   slug: string;
   country_code: string;
+  province?: number | null;
+  latitude?: number | null;
+  longitude?: number | null;
+};
+
+export type Province = {
+  id: number;
+  name: string;
+  country: number;
 };
 
 export type WalletSummary = {

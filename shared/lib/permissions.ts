@@ -33,6 +33,26 @@ export function isPlatformAdmin(role?: string | null): boolean {
   return !!role && ADMIN_ROLES.includes(role as PlatformRole);
 }
 
+export const PARTNER_BUSINESS_ROLES = new Set<string>([
+  'restaurant',
+  'merchant',
+  'grocery_store_owner',
+  'agent',
+  'host',
+  'doctor',
+  'service_provider',
+  'rental_partner',
+  'courier',
+  'business_admin',
+  'business_employee',
+  'clinic_admin',
+  'landlord',
+]);
+
+export function isPartnerBusinessRole(role?: string | null): boolean {
+  return Boolean(role && PARTNER_BUSINESS_ROLES.has(role.toLowerCase()));
+}
+
 export function hasRole(userRole: string | undefined, ...allowed: PlatformRole[]): boolean {
   if (!userRole) return false;
   return allowed.includes(userRole as PlatformRole);

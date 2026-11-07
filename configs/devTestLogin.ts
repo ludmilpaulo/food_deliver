@@ -18,10 +18,16 @@ export const DEV_TEST_CUSTOMER_LOGIN = {
   password: "seedpass123",
 } as const;
 
+export const DEV_TEST_GROCERY_LOGIN = {
+  username: "grocery@kudya.shop",
+  password: "seedpass123",
+} as const;
+
 export const DEV_TEST_ADMIN_LOGIN_BUTTON_LABEL = "Fill test admin login";
 export const DEV_TEST_DOCTOR_LOGIN_BUTTON_LABEL = "Fill test doctor login";
 export const DEV_TEST_STORE_LOGIN_BUTTON_LABEL = "Fill test store login";
 export const DEV_TEST_CUSTOMER_LOGIN_BUTTON_LABEL = "Fill test customer login";
+export const DEV_TEST_GROCERY_LOGIN_BUTTON_LABEL = "Fill test grocery login";
 
 export const SEED_TEST_USERNAMES = [
   DEV_TEST_CUSTOMER_LOGIN.username,
@@ -30,6 +36,7 @@ export const SEED_TEST_USERNAMES = [
   "admin@kudya.shop",
   "driver@kudya.shop",
   "ana@kudya.shop",
+  "grocery@kudya.shop",
 ] as const;
 
 export function isDevLoginEnabled(): boolean {

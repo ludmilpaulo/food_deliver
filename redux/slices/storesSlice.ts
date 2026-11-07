@@ -23,11 +23,27 @@ const initialState: StoresState = {
   vertical: null,
 };
 
-export const fetchStoresByType = createAsyncThunk<Store[], number>(
+export const fetchStoresByType = createAsyncThunk<
+  Store[],
+  number | { storeTypeId: number; latitude?: number; longitude?: number; search?: string }
+>(
   'stores/fetchByType',
-  async (storeTypeId) => {
-    const response = await API.get(`/store/stores/?store_type=${storeTypeId}`);
-    return response.data;
+  async (arg) => {
+    const storeTypeId = typeof arg === 'number' ? arg : arg.storeTypeId;
+    const params = new URLSearchParams({ store_type: String(storeTypeId) });
+    if (typeof arg !== 'number') {
+      if (arg.latitude != null) params.set('latitude', String(arg.latitude));
+      if (arg.longitude != null) params.set('longitude', String(arg.longitude));
+      if (arg.search) params.set('search', arg.search);
+    }
+    const response = await API.get(`/store/stores/?${params.toString()}`);
+    const data: unknown = response.data;
+    if (Array.isArray(data)) return data as Store[];
+    if (data && typeof data === 'object') {
+      const record = data as { stores?: Store[]; results?: Store[] };
+      return record.stores ?? record.results ?? [];
+    }
+    return [];
   }
 );
 

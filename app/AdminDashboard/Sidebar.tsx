@@ -24,6 +24,7 @@ import {
   MdSettingsBackupRestore,
   MdHotel,
   MdSearch,
+  MdPublic,
   MdDashboard,
   MdKeyboardArrowRight,
 } from "react-icons/md";
@@ -65,6 +66,7 @@ const PANEL_ICONS: Record<AdminPanelId, React.ReactNode> = {
   platformControl: <MdTune className="text-[1.05rem]" />,
   propertyReview: <MdHome className="text-[1.05rem]" />,
   propertyApplications: <MdHome className="text-[1.05rem]" />,
+  propertyCountryPolicies: <MdPublic className="text-[1.05rem]" />,
   pricing: <MdAttachMoney className="text-[1.05rem]" />,
   verticalOps: <MdHotel className="text-[1.05rem]" />,
   translations: <MdTranslate className="text-[1.05rem]" />,

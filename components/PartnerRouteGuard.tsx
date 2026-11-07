@@ -6,6 +6,8 @@ import withAuth from "@/components/ProtectedPage";
 import { selectAuthHydrated, selectUser } from "@/redux/slices/authSlice";
 import { useAppSelector } from "@/redux/store";
 import { isPlatformAdminUser } from "@/utils/postLoginRoute";
+import { isPartnerBusinessRole } from "@/shared/lib/permissions";
+import PageSpinner from "@/components/ui/PageSpinner";
 
 function canAccessPartnerPortal(user: {
   is_customer: boolean;
@@ -15,6 +17,7 @@ function canAccessPartnerPortal(user: {
   business_profile?: unknown;
 }): boolean {
   if (user.business_profile) return true;
+  if (isPartnerBusinessRole(user.role)) return true;
   if (user.is_driver) return true;
   if (isPlatformAdminUser({ role: user.role, is_platform_admin: user.is_platform_admin })) {
     return true;
@@ -37,11 +40,7 @@ function PartnerGate({ children }: { children: React.ReactNode }) {
   }, [allowed, authHydrated, router, user]);
 
   if (!authHydrated || !user || !allowed) {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center text-sm text-slate-500">
-        Checking partner access…
-      </div>
-    );
+    return <PageSpinner fullPage />;
   }
 
   return <>{children}</>;

@@ -2,7 +2,7 @@
 
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { loginUserService } from "../../services/authService"; // adjust as needed
-import { readStoredAuthUser, writeStoredAuthUser } from "../../lib/authToken";
+import { readStoredAuthUser, writeRefreshToken, writeStoredAuthUser } from "../../lib/authToken";
 
 export type BusinessProfile = {
   id: number;
@@ -92,6 +92,7 @@ export const loginUser = createAsyncThunk<
 function persistLoginSession(result: LoginResult, access: string): void {
   try {
     localStorage.setItem("auth_token", JSON.stringify(access));
+    if (result.refresh) writeRefreshToken(result.refresh);
     writeStoredAuthUser({
       user_id: result.user_id,
       username: result.username,
@@ -122,6 +123,7 @@ const authSlice = createSlice({
       try {
         localStorage.removeItem("auth_token");
         localStorage.removeItem("auth_user");
+        localStorage.removeItem("auth_refresh");
       } catch {}
     },
     clearAuthMessage(state) {

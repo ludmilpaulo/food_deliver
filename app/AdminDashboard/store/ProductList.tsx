@@ -126,7 +126,9 @@ const ProductList: React.FC = () => {
                     />
                     <div className="text-center">
                       <h3 className="text-lg font-semibold">{product.name}</h3>
-                      <p className="text-gray-500">{product.description}</p>
+                      <p className="text-gray-500">
+                        {(product.description || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim()}
+                      </p>
                       <p className="text-gray-700">{t("store", "Store")}: {product.store_name}</p>
                       <p className="text-gray-700">
                         {t("originalPrice", "Original Price")}: {(product.original_price ?? product.price ?? 0).toFixed(2)} Kz

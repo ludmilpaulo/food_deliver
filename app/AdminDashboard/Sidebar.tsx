@@ -29,6 +29,7 @@ import {
   MdKeyboardArrowRight,
 } from "react-icons/md";
 import Image from "next/image";
+import logo from "@/assets/azul.png";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -135,7 +136,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, activePanel, onSele
             <div className="flex min-w-0 items-center gap-3">
               <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-white ring-1 ring-white/20">
                 <Image
-                  src="https://www.kudya.shop/media/logo/azul.png"
+                  src={logo}
                   width={80}
                   height={80}
                   className="h-full w-full object-contain p-1"

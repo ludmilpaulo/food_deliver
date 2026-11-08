@@ -4,10 +4,12 @@ import { CartItem } from "../../services/types";
 
 type BasketState = {
   items: CartItem[];
+  hydrated: boolean;
 };
 
 const initialState: BasketState = {
   items: [],
+  hydrated: false,
 };
 
 const BASKET_STORAGE_KEY = "kudya_basket";
@@ -16,13 +18,13 @@ export function loadBasketState(): BasketState {
   if (typeof window === "undefined") return initialState;
   try {
     const raw = localStorage.getItem(BASKET_STORAGE_KEY);
-    if (!raw) return initialState;
+    if (!raw) return { items: [], hydrated: false };
     const parsed = JSON.parse(raw);
     if (parsed && Array.isArray(parsed.items)) {
-      return { items: parsed.items };
+      return { items: parsed.items, hydrated: false };
     }
   } catch {}
-  return initialState;
+  return { items: [], hydrated: false };
 }
 
 // Start with the initial reference so the empty pre-hydration state is never
@@ -43,8 +45,9 @@ const basketSlice = createSlice({
   name: "basket",
   initialState,
   reducers: {
-    hydrateBasket: (state, action: PayloadAction<BasketState>) => {
+    hydrateBasket: (state, action: PayloadAction<Pick<BasketState, "items">>) => {
       state.items = action.payload.items;
+      state.hydrated = true;
     },
     addItem: (state, action: PayloadAction<AddItemPayload>) => {
       const { id, size, color } = action.payload;
@@ -139,5 +142,6 @@ export const {
   clearAllCart,
 } = basketSlice.actions;
 export const selectCartItems = (state: RootState) => state.basket.items;
+export const selectBasketHydrated = (state: RootState) => state.basket.hydrated;
 
 export default basketSlice.reducer;

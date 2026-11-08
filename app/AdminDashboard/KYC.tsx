@@ -41,6 +41,9 @@ export default function KYCAdmin() {
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-3">{t("kyc", "KYC")}</h2>
+      {list.length === 0 ? (
+        <p className="text-sm text-slate-500">{t("noKycSubmissions", "No KYC submissions.")}</p>
+      ) : null}
       <div className="space-y-3">
         {list.map((k) => (
           <div key={k.id} className="border rounded-xl p-3 bg-white">

@@ -14,7 +14,7 @@ const Store: React.FC = () => {
   const user = useSelector(selectUser);
   const [stores, setStores] = useState<StoreType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<string>("stores");
+  const [activeTab, setActiveTab] = useState<string>("storees");
   const [editData, setEditData] = useState<Partial<StoreType> | null>(null);
   const [selectedStore, setSelectedStore] = useState<StoreType | null>(null);
   const [showMap, setShowMap] = useState<boolean>(false);

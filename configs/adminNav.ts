@@ -23,6 +23,7 @@ export const ADMIN_PANEL_IDS: AdminPanelId[] = [
   'translations',
   'backupExport',
   'payments',
+  'financial',
 ];
 
 export function isAdminPanelId(value: string | null | undefined): value is AdminPanelId {
@@ -31,6 +32,5 @@ export function isAdminPanelId(value: string | null | undefined): value is Admin
 
 /** Canonical URL for an admin dashboard panel. */
 export function adminPanelUrl(panel: AdminPanelId): string {
-  if (panel === 'drivers') return '/admin/drivers';
   return `/AdminDashboard?panel=${panel}`;
 }

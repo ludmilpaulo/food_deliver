@@ -424,6 +424,7 @@ export default function StayBookingPanel({
       )}
 
       <PaymentDetails
+        serviceType="stay"
         paymentMethod={paymentMethod}
         setPaymentMethod={setPaymentMethod}
         phone={paymentPhone}

@@ -101,6 +101,25 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_BASE_API: process.env.NEXT_PUBLIC_BASE_API,
   },
+  async redirects() {
+    return [
+      {
+        source: '/products',
+        has: [
+          { type: 'query', key: 'vertical', value: 'food' },
+          { type: 'query', key: 'storeId', value: '(?<storeId>\\d+)' },
+        ],
+        destination: '/food/restaurants/:storeId',
+        permanent: false,
+      },
+      {
+        source: '/storeMenuPage',
+        has: [{ type: 'query', key: 'store_id', value: '(?<storeId>\\d+)' }],
+        destination: '/products?storeId=:storeId',
+        permanent: false,
+      },
+    ];
+  },
   async rewrites() {
     return [
       { source: '/Doctors', destination: '/doctors' },

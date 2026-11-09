@@ -189,6 +189,14 @@ export const ADMIN_NAV_ITEMS: AdminNavItemMeta[] = [
     descDefault: "Country methods, EcoCash, bank/EFT, and verification",
   },
   {
+    key: "thunes",
+    group: "platform",
+    labelKey: "thunesGateway",
+    labelDefault: "Thunes",
+    descKey: "thunesGatewayHelp",
+    descDefault: "International payment gateway credentials and controls",
+  },
+  {
     key: "financial",
     group: "platform",
     labelKey: "financialOverview",

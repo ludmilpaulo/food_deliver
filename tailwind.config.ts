@@ -13,6 +13,16 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      colors: {
+        kudya: {
+          DEFAULT: "rgb(var(--brand-primary) / <alpha-value>)",
+          secondary: "rgb(var(--brand-secondary) / <alpha-value>)",
+        },
+        food: {
+          DEFAULT: "rgb(var(--food-accent) / <alpha-value>)",
+          soft: "rgb(var(--food-accent-soft) / <alpha-value>)",
+        },
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":

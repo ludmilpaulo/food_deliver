@@ -190,6 +190,7 @@ export default function ServiceDetailPage() {
           </div>
 
           <PaymentDetails
+            serviceType="service"
             paymentMethod={paymentMethod}
             setPaymentMethod={setPaymentMethod}
             phone={paymentPhone}

@@ -190,6 +190,7 @@ export default function RidesPage() {
         <>
           <div className="mt-4 rounded-xl bg-white p-3 text-slate-900">
             <PaymentDetails
+              serviceType="ride"
               paymentMethod={paymentMethod}
               setPaymentMethod={setPaymentMethod}
               phone={paymentPhone}

@@ -27,6 +27,7 @@ const Payouts = dynamic(() => import("./Payouts"));
 const DatabaseActions = dynamic(() => import("./DatabaseActions"));
 const BackupExport = dynamic(() => import("@/components/BackupExport"));
 const PaymentsAdmin = dynamic(() => import("@/components/admin/PaymentsAdmin"));
+const ThunesGatewayAdmin = dynamic(() => import("@/components/admin/ThunesGatewayAdmin"));
 const FinancialAdmin = dynamic(() =>
   import("@/components/admin/FinancialAdmin").then((mod) => mod.default),
 );
@@ -54,6 +55,7 @@ export type AdminPanelId =
   | "translations"
   | "backupExport"
   | "payments"
+  | "thunes"
   | "financial";
 
 export function AdminPanelContent({ activePanel }: { activePanel: AdminPanelId }) {
@@ -101,6 +103,8 @@ export function AdminPanelContent({ activePanel }: { activePanel: AdminPanelId }
       return <BackupExport />;
     case "payments":
       return <PaymentsAdmin />;
+    case "thunes":
+      return <ThunesGatewayAdmin />;
     case "financial":
       return <FinancialAdmin />;
     default:

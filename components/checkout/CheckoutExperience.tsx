@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/store';
 import { selectUser, selectAuthHydrated } from '@/redux/slices/authSlice';
 import { clearAllCart, clearCart, selectBasketHydrated } from '@/redux/slices/basketSlice';
 import { readAuthToken } from '@/lib/authToken';
+import { redirectToCheckout } from '@/lib/pendingPayment';
 import { baseAPI } from '@/services/types';
 import type { CartItem } from '@/services/types';
 import AddressInput from '@/app/Checkout/AddressInput';
@@ -42,7 +43,7 @@ type MultipleOrderPayload = {
     delivery_fee: string;
     payment_method: string;
     delivery_notes: string;
-    order_details: Array<{ product_id: number; quantity: number }>;
+    order_details: Array<{ product_id: number; quantity: number; addons?: number[]; special_instructions?: string }>;
   }>;
 };
 
@@ -75,6 +76,7 @@ export default function CheckoutExperience() {
   const basketHydrated = useAppSelector(selectBasketHydrated);
 
   const [useCurrentLocation, setUseCurrentLocation] = useState(true);
+  const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   const [userAddress, setUserAddress] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('');
   const [paymentPhone, setPaymentPhone] = useState('');
@@ -105,6 +107,15 @@ export default function CheckoutExperience() {
       router.replace('/LoginScreenUser?next=/Checkout');
     }
   }, [authHydrated, user, token, router]);
+
+  useEffect(() => {
+    if (!useCurrentLocation || coords || typeof navigator === 'undefined' || !navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (position) => setCoords({ latitude: position.coords.latitude, longitude: position.coords.longitude }),
+      () => setCoords(null),
+      { enableHighAccuracy: false, timeout: 15000 },
+    );
+  }, [useCurrentLocation, coords]);
 
   useEffect(() => {
     if (!storeGroups.length) return;
@@ -174,8 +185,13 @@ export default function CheckoutExperience() {
       router.push('/LoginScreenUser?next=/Checkout');
       return;
     }
-    if (!useCurrentLocation && !userAddress.trim()) {
-      setError(t('addressRequired', 'Delivery address is required.'));
+    const hasCoords = useCurrentLocation && coords !== null;
+    if (!hasCoords && !userAddress.trim()) {
+      setError(
+        useCurrentLocation
+          ? t('locationUnavailableEnterAddress', 'We could not get your location. Enter a delivery address.')
+          : t('addressRequired', 'Delivery address is required.'),
+      );
       return;
     }
 
@@ -187,15 +203,17 @@ export default function CheckoutExperience() {
       ...(couponDiscount > 0 && couponCode.trim() ? { coupon_code: couponCode.trim() } : {}),
       orders: storeGroups.map((group) => ({
         store_id: group.storeId,
-        address: useCurrentLocation ? '' : userAddress.trim(),
-        location: '',
-        use_current_location: useCurrentLocation,
+        address: userAddress.trim(),
+        location: hasCoords && coords ? `${coords.latitude},${coords.longitude}` : '',
+        use_current_location: hasCoords,
         delivery_fee: String(quotedFees[group.storeId] ?? 0),
         payment_method: paymentMethod,
         delivery_notes: deliveryNotes,
         order_details: group.items.map((item) => ({
           product_id: item.id,
           quantity: item.quantity,
+          ...(item.addon_ids?.length ? { addons: item.addon_ids } : {}),
+          ...(item.special_instructions ? { special_instructions: item.special_instructions } : {}),
         })),
       })),
     };
@@ -245,6 +263,7 @@ export default function CheckoutExperience() {
         if (paymentMethod && paymentMethod !== 'cash') {
           try {
             let redirectUrl: string | null = null;
+            let redirectReference: string | null = null;
             let notice: string | null = null;
             const serverTotals = new Map(
               (data.order_totals ?? []).map((entry) => [entry.order_id, Number(entry.total)]),
@@ -264,13 +283,16 @@ export default function CheckoutExperience() {
               if (proofFile && pay.requires_action === 'upload_proof') {
                 await uploadProof({ paymentId: pay.payment_id, file: proofFile }).unwrap();
               }
-              if (pay.authorization_url) redirectUrl = pay.authorization_url;
+              if (pay.authorization_url) {
+                redirectUrl = pay.authorization_url;
+                redirectReference = pay.kudya_reference;
+              }
               if (pay.customer_message) notice = pay.customer_message;
             }
             if (redirectUrl) {
               clearPlacedItems();
               orderPlacedRef.current = true;
-              window.location.assign(redirectUrl);
+              redirectToCheckout(redirectUrl, redirectReference);
               return;
             }
             finish(notice);
@@ -336,6 +358,7 @@ export default function CheckoutExperience() {
             setUserAddress={setUserAddress}
           />
           <PaymentDetails
+            serviceType="order"
             paymentMethod={paymentMethod}
             setPaymentMethod={setPaymentMethod}
             phone={paymentPhone}

@@ -207,6 +207,7 @@ export default function SendPackageExperience() {
           rows={3}
         />
         <PaymentDetails
+          serviceType="package"
           paymentMethod={paymentMethod}
           setPaymentMethod={setPaymentMethod}
           phone={paymentPhone}

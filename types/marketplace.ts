@@ -44,6 +44,7 @@ export type WalletTransaction = {
 
 export type WalletTopUpResponse = {
   payment_id: number;
+  kudya_reference?: string;
   authorization_url: string | null;
   provider: string;
   provider_reference: string;

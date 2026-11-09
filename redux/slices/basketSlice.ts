@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { CartItem } from "../../services/types";
+import { cartLineKey } from "../../features/food/lib/cartLines";
 
 type BasketState = {
   items: CartItem[];
@@ -40,6 +41,13 @@ export function saveBasketState(state: BasketState): void {
 }
 
 type AddItemPayload = Omit<CartItem, "quantity"> & { quantity?: number };
+type LinePayload = Pick<CartItem, "id"> &
+  Partial<Pick<CartItem, "size" | "color" | "addon_ids" | "special_instructions">>;
+
+function findLine(items: CartItem[], line: LinePayload): CartItem | undefined {
+  const key = cartLineKey(line);
+  return items.find((item) => cartLineKey(item) === key);
+}
 
 const basketSlice = createSlice({
   name: "basket",
@@ -50,13 +58,8 @@ const basketSlice = createSlice({
       state.hydrated = true;
     },
     addItem: (state, action: PayloadAction<AddItemPayload>) => {
-      const { id, size, color } = action.payload;
-      const existingItem = state.items.find(
-        (item) =>
-          item.id === id &&
-          (item.size || "") === (size || "") &&
-          (item.color || "") === (color || "")
-      );
+      const { size, color } = action.payload;
+      const existingItem = findLine(state.items, action.payload);
       if (existingItem) {
         existingItem.quantity = Number((existingItem.quantity + (action.payload.quantity || 1)).toFixed(3));
       } else {
@@ -68,17 +71,9 @@ const basketSlice = createSlice({
         });
       }
     },
-    setItemQuantity: (
-      state,
-      action: PayloadAction<{ id: number; quantity: number; size?: string; color?: string }>
-    ) => {
-      const { id, quantity, size = "", color = "" } = action.payload;
-      const existingItem = state.items.find(
-        (item) =>
-          item.id === id &&
-          (item.size || "") === size &&
-          (item.color || "") === color
-      );
+    setItemQuantity: (state, action: PayloadAction<LinePayload & { quantity: number }>) => {
+      const { quantity } = action.payload;
+      const existingItem = findLine(state.items, action.payload);
       if (!existingItem) return;
       if (quantity <= 0) {
         state.items = state.items.filter((item) => item !== existingItem);
@@ -86,17 +81,9 @@ const basketSlice = createSlice({
       }
       existingItem.quantity = Number(quantity.toFixed(3));
     },
-    removeItem: (
-      state,
-      action: PayloadAction<{ id: number; size?: string; color?: string }>
-    ) => {
-      const { id, size = "", color = "" } = action.payload;
-      const index = state.items.findIndex(
-        (item) =>
-          item.id === id &&
-          (item.size || "") === size &&
-          (item.color || "") === color
-      );
+    removeItem: (state, action: PayloadAction<LinePayload>) => {
+      const existingItem = findLine(state.items, action.payload);
+      const index = existingItem ? state.items.indexOf(existingItem) : -1;
       if (index !== -1) {
         if (state.items[index].quantity > 0.5) {
           state.items[index].quantity = Number((state.items[index].quantity - (state.items[index].selling_unit === "kg" || state.items[index].selling_unit === "litre" ? 0.5 : 1)).toFixed(3));
@@ -108,20 +95,10 @@ const basketSlice = createSlice({
         }
       }
     },
-    // NEW: Remove entire item (all quantities)
-    removeLine: (
-      state,
-      action: PayloadAction<{ id: number; size?: string; color?: string }>
-    ) => {
-      const { id, size = "", color = "" } = action.payload;
-      state.items = state.items.filter(
-        (item) =>
-          !(
-            item.id === id &&
-            (item.size || "") === size &&
-            (item.color || "") === color
-          )
-      );
+    // Remove an entire line (all quantities)
+    removeLine: (state, action: PayloadAction<LinePayload>) => {
+      const key = cartLineKey(action.payload);
+      state.items = state.items.filter((item) => cartLineKey(item) !== key);
     },
     clearCart: (state, action: PayloadAction<number>) => {
       state.items = state.items.filter((item) => item.store !== action.payload);
@@ -137,7 +114,7 @@ export const {
   addItem,
   removeItem,
   setItemQuantity,
-  removeLine, // <--- export new reducer
+  removeLine,
   clearCart,
   clearAllCart,
 } = basketSlice.actions;

@@ -110,6 +110,8 @@ export function GroceryPartnerRevenuePage({ titleKey = "gpRevenue" }: { titleKey
           <Card label={t("gpNetEarnings")} value={data.net_earnings} />
           <Card label={t("gpPendingPayout")} value={data.pending_payout} />
           <Card label={t("gpPaidOut")} value={data.paid_out} />
+          <Card label={t("thunesCollected", "Thunes collected")} value={data.thunes_collected ?? 0} />
+          <Card label={t("thunesCommission", "Thunes commission")} value={data.thunes_commission ?? 0} />
         </div>
       )}
     </div>

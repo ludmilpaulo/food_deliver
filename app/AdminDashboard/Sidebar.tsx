@@ -29,6 +29,7 @@ import {
   MdKeyboardArrowRight,
 } from "react-icons/md";
 import Image from "next/image";
+import Link from "next/link";
 import logo from "@/assets/azul.png";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
@@ -73,6 +74,7 @@ const PANEL_ICONS: Record<AdminPanelId, React.ReactNode> = {
   translations: <MdTranslate className="text-[1.05rem]" />,
   backupExport: <MdSettingsBackupRestore className="text-[1.05rem]" />,
   payments: <MdPayments className="text-[1.05rem]" />,
+  thunes: <MdPublic className="text-[1.05rem]" />,
   financial: <MdAccountBalanceWallet className="text-[1.05rem]" />,
 };
 
@@ -177,6 +179,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, activePanel, onSele
         </div>
 
         <nav className="flex-1 overflow-y-auto px-2.5 py-3 scrollbar-thin">
+          <Link
+            href="/admin/food"
+            className="mb-4 flex items-center gap-2.5 rounded-xl bg-orange-500/15 px-2 py-2 text-sm font-semibold text-orange-200 transition hover:bg-orange-500/25"
+          >
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-500/20">
+              <MdRestaurantMenu className="text-[1.05rem]" />
+            </span>
+            {t("faTitle", "Food administration")}
+          </Link>
           {ADMIN_NAV_GROUPS.map((group) => {
             const items = filteredByGroup.get(group.id);
             if (!items?.length) return null;

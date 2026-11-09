@@ -1,4 +1,5 @@
 
+import axios from 'axios';
 import {
   advancePartnerOrderStatus,
   createPartnerOpeningHour,
@@ -30,7 +31,10 @@ export const updateLocation = async (_userId: number, location: string) => {
   try {
     return await updatePartnerLocation(location);
   } catch (error) {
-    console.error('Error updating location:', error);
+    const status = axios.isAxiosError(error) ? error.response?.status : undefined;
+    if (status !== 401 && status !== 403) {
+      console.warn('Store location update failed:', status ?? (error instanceof Error ? error.message : error));
+    }
     throw error;
   }
 };

@@ -660,6 +660,7 @@ export default function BookAppointmentExperience({ doctorId }: Props) {
               <h2 className="text-lg font-bold text-slate-900">{ht('paymentMethod')}</h2>
               <div className="mt-4">
                 <PaymentDetails
+                  serviceType="doctor"
                   paymentMethod={paymentMethod}
                   setPaymentMethod={setPaymentMethod}
                   phone={paymentPhone}

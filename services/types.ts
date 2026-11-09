@@ -234,6 +234,7 @@ export interface Store {
   is_approved?: boolean;
   store_type?: number | null;
   distance?: number | null;
+  distance_km?: number | null;
   category: StoreCategory | null;
   opening_hours: StoreOpeningHour[]; 
    // Calculated client-side
@@ -250,4 +251,10 @@ export interface CartItem {
   quantity: number;
   store: number;
   selling_unit?: string;
+  /** Marketplace vertical the line was added from ("food" lines use the Food cart and checkout). */
+  vertical?: 'food' | 'groceries';
+  store_name?: string;
+  addon_ids?: number[];
+  addon_names?: string[];
+  special_instructions?: string;
 }

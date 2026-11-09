@@ -9,6 +9,10 @@ export function getWebSocketBaseUrl(): string {
   return api.replace(/^http/, 'ws');
 }
 
+export function orderWsUrl(orderId: number, token: string): string {
+  return `${getWebSocketBaseUrl()}/ws/orders/${orderId}/?token=${encodeURIComponent(token)}`;
+}
+
 export function adminDriverLiveWsUrl(token: string): string {
   return `${getWebSocketBaseUrl()}/ws/admin/drivers/live-location/?token=${encodeURIComponent(token)}`;
 }

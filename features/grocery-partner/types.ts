@@ -147,6 +147,19 @@ export type GrocerySalesData = {
   };
 };
 
+export type GroceryPartnerRevenue = {
+  gross_sales: number;
+  kudya_commission: number;
+  delivery_charges: number;
+  discounts: number;
+  refunds: number;
+  net_earnings: number;
+  pending_payout: number;
+  paid_out: number;
+  thunes_collected?: number;
+  thunes_commission?: number;
+};
+
 export type GroceryRevenueData = {
   gross_sales: number;
   commission: number;

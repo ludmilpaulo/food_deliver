@@ -11,6 +11,7 @@ type PaymentDetailsProps = {
   setPhone: (value: string) => void;
   proofFile: File | null;
   setProofFile: (file: File | null) => void;
+  serviceType?: string;
 };
 
 export default function PaymentDetails({
@@ -20,8 +21,9 @@ export default function PaymentDetails({
   setPhone,
   proofFile,
   setProofFile,
+  serviceType,
 }: PaymentDetailsProps) {
-  const { data, isLoading, error } = useGetPaymentMethodsQuery();
+  const { data, isLoading, error } = useGetPaymentMethodsQuery(serviceType);
   const methods: AvailablePaymentMethod[] = data?.methods ?? [];
 
   useEffect(() => {

@@ -71,12 +71,12 @@ const initialState: AuthState = {
 export const loginUser = createAsyncThunk<
   LoginResult,
   // Arg type:
-  { username: string; password: string },
+  { username: string; password: string; mfaCode?: string },
   // ThunkAPI:
   { rejectValue: string }
->("auth/loginUser", async ({ username, password }, { rejectWithValue }) => {
+>("auth/loginUser", async ({ username, password, mfaCode }, { rejectWithValue }) => {
   try {
-    const data = await loginUserService(username, password);
+    const data = await loginUserService(username, password, mfaCode);
     if (!data.token) {
       return rejectWithValue(data.message || "Erro desconhecido.");
     }

@@ -1,8 +1,10 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
+import axios from "axios";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/redux/slices/authSlice";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { Transition } from "@headlessui/react";
 import { fetchFornecedorData, updateLocation } from "@/services/apiService";
 import { FornecedorType } from "@/services/types";
@@ -41,7 +43,13 @@ const StoreDashboard: React.FC = () => {
   const updateLocationWithRetry = async (userId: number, location: string, retries = 2) => {
     try {
       await updateLocation(userId, location);
-    } catch {
+    } catch (err) {
+      const status = axios.isAxiosError(err) ? err.response?.status : undefined;
+      if (status === 401 || status === 403) {
+        locationDeniedRef.current = true;
+        stopLocationTracking();
+        return;
+      }
       if (retries > 0) {
         setTimeout(() => {
           void updateLocationWithRetry(userId, location, retries - 1);
@@ -200,7 +208,13 @@ const StoreDashboard: React.FC = () => {
       {error && <p className="text-red-500">{error}</p>}
       {!loading && !error && (
         <>
-          <div className="absolute top-4 right-4 z-40">
+          <div className="absolute top-4 right-4 z-40 flex items-center gap-2">
+            <Link
+              href="/partner/food/orders"
+              className="rounded-full bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-lg hover:bg-orange-600"
+            >
+              {t("fpOpenWorkspace", "Open the new order board")}
+            </Link>
             <button
               onClick={() => setShowHelp(true)}
               className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-colors"

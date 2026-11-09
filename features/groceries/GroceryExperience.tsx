@@ -28,6 +28,7 @@ import {
 } from "@/redux/slices/groceryApi";
 import type { GroceryBanner, GroceryProductQuery } from "@/types/grocery";
 import GroceryProductCard from "./components/GroceryProductCard";
+import { mapGroceryProduct, type GroceryProduct as CardProduct } from "./types";
 import { CategorySkeleton, HeroSkeleton, ProductCardSkeleton } from "./components/GrocerySkeletons";
 import PageSpinner from "@/components/ui/PageSpinner";
 
@@ -67,6 +68,10 @@ function pad(value: number) {
   return String(value).padStart(2, "0");
 }
 
+function toCardProducts(rows: unknown[]): CardProduct[] {
+  return rows.map(mapGroceryProduct).filter((product): product is CardProduct => product !== null);
+}
+
 export default function GroceryExperience() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -86,7 +91,6 @@ export default function GroceryExperience() {
   const [page, setPage] = useState(1);
   const [mounted, setMounted] = useState(false);
   const debouncedSearch = useDebouncedValue(search.trim(), 300);
-  const regionCode = country?.code || "ZA";
   const locationLabel = mounted
     ? city?.name || country?.name || t("location", "Your location")
     : t("location", "Your location");
@@ -442,8 +446,8 @@ export default function GroceryExperience() {
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
-                  {products.map((product) => (
-                    <GroceryProductCard key={product.id} product={product} regionCode={regionCode} />
+                  {toCardProducts(products).map((product) => (
+                    <GroceryProductCard key={product.id} product={product} />
                   ))}
                 </div>
               )}
@@ -513,9 +517,9 @@ export default function GroceryExperience() {
                     <p className="rounded-2xl bg-white px-6 py-10 text-center text-[#6B7280]">{t("groceryNoDeals")}</p>
                   ) : (
                     <div className="flex gap-3 overflow-x-auto pb-2">
-                      {(dealsQuery.data?.results ?? []).map((product) => (
+                      {toCardProducts(dealsQuery.data?.results ?? []).map((product) => (
                         <div key={product.id} className="w-44 shrink-0 sm:w-52">
-                          <GroceryProductCard product={product} regionCode={regionCode} compact />
+                          <GroceryProductCard product={product} compact />
                         </div>
                       ))}
                     </div>

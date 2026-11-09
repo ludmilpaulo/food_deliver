@@ -129,6 +129,7 @@ export default function CarRentalDetailPage() {
           className="w-full rounded-xl border border-slate-200 px-4 py-3"
         />
         <PaymentDetails
+          serviceType="car_rental"
           paymentMethod={paymentMethod}
           setPaymentMethod={setPaymentMethod}
           phone={paymentPhone}

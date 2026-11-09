@@ -17,6 +17,7 @@ import Link from "next/link";
 import logo from "@/assets/azul.png";
 import { loginUser, selectAuth, setAuthFromSocial, type LoginResult } from "@/redux/slices/authSlice";
 import { resolvePostLoginRoute } from "@/utils/postLoginRoute";
+import { MFA_REQUIRED_ERROR } from "@/services/authService";
 import ForgotPasswordModal from "./ForgotPasswordModal";
 import { SupportedLocale, supportedLocales } from "@/configs/translations";
 import { initLanguage } from "@/configs/i18n";
@@ -71,6 +72,8 @@ function LoginScreenUser() {
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
   const [formError, setFormError] = useState("");
+  const [mfaStep, setMfaStep] = useState(false);
+  const [mfaCode, setMfaCode] = useState("");
 
   useEffect(() => {
     analytics.trackPageView("Login Page");
@@ -113,9 +116,13 @@ function LoginScreenUser() {
       setFormError(t("fillAllFields"));
       return;
     }
+    if (mfaStep && !/^\d{6}$/.test(mfaCode.trim())) {
+      setFormError(t("mfaCodeHint", "Enter the 6-digit code from your authenticator app."));
+      return;
+    }
     try {
       const resultAction: LoginResult = await dispatch(
-        loginUser({ username, password }),
+        loginUser({ username, password, mfaCode: mfaStep ? mfaCode.trim() : undefined }),
       ).unwrap();
       const destination = resolvePostLoginRoute(resultAction, nextPath);
       const userType = resultAction.is_customer
@@ -137,6 +144,11 @@ function LoginScreenUser() {
       }
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage === MFA_REQUIRED_ERROR) {
+        setMfaStep(true);
+        setMfaCode("");
+        return;
+      }
       analytics.trackError("Login Failed", { username, error: errorMessage });
       if (typeof error === "string" && error.trim()) {
         setFormError(error);
@@ -353,6 +365,33 @@ function LoginScreenUser() {
                     </button>
                   </div>
                 </div>
+
+                {mfaStep ? (
+                  <div className="space-y-1.5">
+                    <label htmlFor="login-mfa" className="block text-sm font-medium text-slate-700">
+                      {t("mfaCode", "Authenticator code")}
+                    </label>
+                    <div className="relative">
+                      <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                      <input
+                        id="login-mfa"
+                        value={mfaCode}
+                        onChange={(e) => {
+                          setMfaCode(e.target.value.replace(/\D/g, "").slice(0, 6));
+                          if (formError) setFormError("");
+                        }}
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        autoFocus
+                        placeholder="123456"
+                        className={inputClass}
+                      />
+                    </div>
+                    <p className="text-xs text-slate-500">
+                      {t("mfaCodeHint", "Enter the 6-digit code from your authenticator app.")}
+                    </p>
+                  </div>
+                ) : null}
 
                 <div className="flex justify-end">
                   <button

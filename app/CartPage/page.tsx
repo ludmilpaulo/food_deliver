@@ -54,28 +54,16 @@ const CartPage: React.FC = () => {
   const handleQuantityChange = (item: CartItem, diff: 1 | -1) => {
     const step = item.selling_unit === "kg" || item.selling_unit === "litre" ? 0.5 : 1;
     if (diff === 1) {
-      dispatch(
-        addItem({
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          image: item.image,
-          size: item.size || "",
-          color: item.color || "",
-          store: item.store,
-          selling_unit: item.selling_unit,
-          quantity: step,
-        })
-      );
+      dispatch(addItem({ ...item, size: item.size || "", color: item.color || "", quantity: step }));
     } else {
-      dispatch(removeItem({ id: item.id, size: item.size || "", color: item.color || "" }));
+      dispatch(removeItem(item));
     }
   };
 
   // Remove the entire item (all quantities)
   const handleRemoveLine = (item: CartItem) => {
     analytics.trackRemoveFromCart(item.id.toString(), item.name);
-    dispatch(removeLine({ id: item.id, size: item.size || "", color: item.color || "" }));
+    dispatch(removeLine(item));
   };
 
   // Confirm clear cart

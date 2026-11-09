@@ -323,6 +323,165 @@ export async function fetchPaymentAudit() {
   return Array.isArray(data) ? data : [];
 }
 
+const THUNES_ADMIN = `${PAYMENTS_ADMIN}/thunes`;
+
+export async function fetchThunesOverview() {
+  const { data } = await api.get(`${THUNES_ADMIN}/overview/`);
+  return data;
+}
+
+export async function saveThunesCredentials(payload: Record<string, unknown>) {
+  const { data } = await api.post(`${THUNES_ADMIN}/credentials/`, payload);
+  return data;
+}
+
+export async function testThunesConnection(payload: Record<string, unknown>) {
+  const { data } = await api.post(`${THUNES_ADMIN}/test/`, payload);
+  return data;
+}
+
+export async function patchThunesControls(payload: Record<string, unknown>) {
+  const { data } = await api.patch(`${THUNES_ADMIN}/configuration/`, payload);
+  return data;
+}
+
+export async function fetchThunesServices() {
+  const { data } = await api.get(`${THUNES_ADMIN}/services/`);
+  return data as Array<{ service_type: string; thunes_enabled: boolean }>;
+}
+
+export async function updateThunesService(service_type: string, thunes_enabled: boolean) {
+  const { data } = await api.patch(`${THUNES_ADMIN}/services/`, { service_type, thunes_enabled });
+  return data;
+}
+
+export async function setThunesProductActive(payload: {
+  product: string;
+  environment: string;
+  active: boolean;
+  mfa_code: string;
+}) {
+  const { data } = await api.post(`${THUNES_ADMIN}/active/`, payload);
+  return data;
+}
+
+export async function decideThunesApproval(approvalId: number, approve: boolean, mfa_code: string) {
+  const { data } = await api.post(`${THUNES_ADMIN}/approvals/${approvalId}/`, { approve, mfa_code });
+  return data as { id: number; status: string };
+}
+
+export async function fetchThunesCredentialHistory(product: string, environment: string) {
+  const { data } = await api.get(`${THUNES_ADMIN}/credentials/history/`, { params: { product, environment } });
+  return (Array.isArray(data) ? data : []) as import("@/types/payments").ThunesCredentialVersion[];
+}
+
+export async function fetchThunesMethods() {
+  const { data } = await api.get(`${THUNES_ADMIN}/methods/`);
+  return (Array.isArray(data) ? data : []) as import("@/types/payments").ThunesMethodConfig[];
+}
+
+export async function saveThunesMethod(payload: Record<string, unknown>) {
+  const { data } = await api.post(`${THUNES_ADMIN}/methods/`, payload);
+  return data;
+}
+
+export async function fetchThunesFees() {
+  const { data } = await api.get(`${THUNES_ADMIN}/fees/`);
+  return (Array.isArray(data) ? data : []) as import("@/types/payments").ThunesFeeRule[];
+}
+
+export async function createThunesFee(payload: Record<string, unknown>) {
+  const { data } = await api.post(`${THUNES_ADMIN}/fees/`, payload);
+  return data;
+}
+
+export async function setThunesFeeEnabled(feeId: number, enabled: boolean) {
+  const { data } = await api.patch(`${THUNES_ADMIN}/fees/${feeId}/`, { enabled });
+  return data;
+}
+
+export async function fetchThunesCompliance() {
+  const { data } = await api.get(`${THUNES_ADMIN}/compliance/`);
+  return (Array.isArray(data) ? data : []) as import("@/types/payments").ThunesCountryCompliance[];
+}
+
+export async function setThunesCompliance(configId: number, compliance_status: string, mfa_code: string, note: string) {
+  const { data } = await api.post(`${THUNES_ADMIN}/compliance/${configId}/`, { compliance_status, mfa_code, note });
+  return data as import("@/types/payments").ThunesCountryCompliance;
+}
+
+export async function fetchThunesReconciliation(resolved?: boolean) {
+  const params = resolved === undefined ? undefined : { resolved: String(resolved) };
+  const { data } = await api.get(`${THUNES_ADMIN}/reconciliation/`, { params });
+  return (Array.isArray(data) ? data : []) as import("@/types/payments").ThunesReconciliationRow[];
+}
+
+export async function fetchWalletReconciliation() {
+  const { data } = await api.get(`${THUNES_ADMIN}/reconciliation/wallets/`);
+  return data as import("@/types/payments").WalletReconciliationReport;
+}
+
+export async function resolveThunesReconciliation(recordId: number, note: string) {
+  const { data } = await api.post(`${THUNES_ADMIN}/reconciliation/${recordId}/resolve/`, { note });
+  return data;
+}
+
+export async function fetchThunesRfis(status?: string) {
+  const { data } = await api.get(`${THUNES_ADMIN}/rfi/`, { params: status ? { status } : undefined });
+  return (Array.isArray(data) ? data : []) as import("@/types/payments").ThunesRfi[];
+}
+
+export async function syncThunesRfis(days = 7) {
+  const { data } = await api.post(`${THUNES_ADMIN}/rfi/sync/`, { days });
+  return data as { synced: number };
+}
+
+export async function uploadThunesRfiDocument(rfiId: number, file: File, type: string) {
+  const form = new FormData();
+  form.append("document", file);
+  if (type) form.append("type", type);
+  const { data } = await api.post(`${THUNES_ADMIN}/rfi/${rfiId}/document/`, form, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return data as import("@/types/payments").ThunesRfi;
+}
+
+export async function provideThunesRfiInformation(rfiId: number, information: Record<string, unknown>, comments: string) {
+  const { data } = await api.post(`${THUNES_ADMIN}/rfi/${rfiId}/information/`, { information, comments });
+  return data as import("@/types/payments").ThunesRfi;
+}
+
+export async function submitThunesRfi(rfiId: number) {
+  const { data } = await api.post(`${THUNES_ADMIN}/rfi/${rfiId}/submit/`, {});
+  return data as import("@/types/payments").ThunesRfi;
+}
+
+export async function runThunesJobs(mfa_code: string) {
+  const { data } = await api.post(`${THUNES_ADMIN}/jobs/`, { mfa_code });
+  return data as { processed: number };
+}
+
+export async function fetchMfaStatus() {
+  const { data } = await api.get("/api/auth/mfa/status/");
+  return data as { enabled: boolean; required: boolean; enrolled: boolean };
+}
+
+export async function startMfaSetup() {
+  const { data } = await api.post("/api/auth/mfa/setup/", {});
+  return data as { secret: string; otpauth_uri: string };
+}
+
+export async function confirmMfaSetup(code: string) {
+  const { data } = await api.post("/api/auth/mfa/confirm/", { code });
+  return data as { enabled: boolean };
+}
+
+export async function fetchThunesAudit() {
+  const { data } = await api.get<import("@/types/payments").PaymentAuditEvent[]>(`${PAYMENTS_ADMIN}/audit/`);
+  const rows = Array.isArray(data) ? data : [];
+  return rows.filter((row) => String(row.action || "").startsWith("thunes_"));
+}
+
 function unwrapAdminList<T>(data: T[] | { results?: T[] }): T[] {
   if (Array.isArray(data)) return data;
   return data.results ?? [];

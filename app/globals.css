@@ -4,8 +4,10 @@
 
 @layer base {
   :root {
-    --brand-primary: 37 99 235;
-    --brand-secondary: 14 165 233;
+    --brand-primary: 109 40 217;
+    --brand-secondary: 124 58 237;
+    --food-accent: 249 115 22;
+    --food-accent-soft: 255 237 213;
     --brand-ink: 15 23 42;
     --brand-muted: 100 116 139;
     --brand-surface: 255 255 255;

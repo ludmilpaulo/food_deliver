@@ -7,7 +7,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { groceryOrderStatusTranslationKey } from "@/utils/groceryUnits";
 import PageSpinner from "@/components/ui/PageSpinner";
 
-const STATUSES = ["", "new", "accepted", "preparing", "ready", "picked_up", "delivered", "cancelled"];
+const STATUSES = ["", "new", "accepted", "preparing", "ready", "packed", "courier_assigned", "out_for_delivery", "picked_up", "delivered", "completed", "cancelled"];
 
 export default function GroceryPartnerOrders() {
   const { t } = useTranslation();

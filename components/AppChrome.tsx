@@ -14,12 +14,13 @@ export default function AppChrome({
 }) {
   const pathname = usePathname();
   const isGrocery = Boolean(pathname?.startsWith('/groceries'));
+  const isWorkspace = Boolean(pathname?.startsWith('/partner/food') || pathname?.startsWith('/admin/food'));
 
   return (
     <>
       {isGrocery ? null : <Navbar initialLocale={locale} />}
       {children}
-      {isGrocery ? null : <Footer />}
+      {isGrocery || isWorkspace ? null : <Footer />}
     </>
   );
 }

@@ -170,6 +170,11 @@ export type CountryPaymentConfigAdmin = {
   wallet_enabled: boolean;
   card_enabled: boolean;
   manual_proof_required: boolean;
+  thunes_accept_enabled?: boolean;
+  thunes_money_transfer_enabled?: boolean;
+  thunes_refunds_enabled?: boolean;
+  settlement_currency?: string;
+  compliance_status?: string;
   default_payment_method: string;
   min_amount: string;
   max_amount: string | null;
@@ -230,5 +235,165 @@ export type PaymentAuditEvent = {
   target_id: string;
   target_repr: string;
   country_name: string | null;
+  created_at: string;
+};
+
+export type ThunesCredentialState = {
+  id?: number;
+  product: string;
+  environment: string;
+  base_url: string;
+  active: boolean;
+  credentials_status: string;
+  key_hint: string;
+  secret_hint: string;
+  credential_version: number | null;
+  credentials_updated_at?: string | null;
+  last_test_at?: string | null;
+  last_test_ok?: boolean | null;
+  last_test_detail?: string;
+  pending_approval_id?: number | null;
+  callback_url: string;
+};
+
+export type ThunesCredentialVersion = {
+  version: number;
+  key_hint: string;
+  secret_hint: string;
+  is_active: boolean;
+  created_at: string;
+  retired_at: string | null;
+  created_by: string;
+};
+
+export type ThunesMethodConfig = {
+  id: number;
+  country: number;
+  country_code: string;
+  currency: string;
+  method_code: string;
+  display_name: string;
+  min_amount: string;
+  max_amount: string | null;
+  display_order: number;
+  enabled: boolean;
+  can_cancel: boolean;
+  can_charge: boolean;
+  can_refund: boolean;
+  services: string[];
+  payment_page_id: string;
+  integration_mode: string;
+};
+
+export type ThunesFeeRule = {
+  id: number;
+  audience: string;
+  fee_type: string;
+  value: string;
+  country: number | null;
+  currency: string;
+  service_type: string;
+  enabled: boolean;
+  waiver_until: string | null;
+};
+
+export type ThunesCountryCompliance = {
+  id: number;
+  country_code: string;
+  country_name: string;
+  currency: string;
+  compliance_status: string;
+  thunes_accept_enabled: boolean;
+  thunes_money_transfer_enabled: boolean;
+  thunes_refunds_enabled: boolean;
+};
+
+export type ThunesReconciliationRow = {
+  id: number;
+  kind: string;
+  reference: string;
+  detail: Record<string, unknown>;
+  resolved: boolean;
+  created_at: string;
+};
+
+export type WalletReconciliationReport = {
+  currencies: Array<{
+    currency: string;
+    wallet_liabilities: string;
+    ledger_liabilities: string;
+    difference: string;
+  }>;
+  mismatches: Array<{ wallet_id: number; owner_type: string; currency: string; balance: string; ledger: string; delta: string }>;
+};
+
+export type TransferRequirements =
+  | { credit_party_identifier?: string[][]; beneficiary?: string[][] }
+  | Array<string | string[]>;
+
+export type TransferDestination = {
+  payer_id: string;
+  name: string;
+  country: string;
+  currency: string;
+  service: string;
+  min_amount: string | null;
+  max_amount: string | null;
+  required_fields: TransferRequirements;
+};
+
+export type TransferQuote = {
+  id: number;
+  payer_id: string;
+  source_amount: string;
+  source_currency: string;
+  destination_amount: string;
+  destination_currency: string;
+  fee: string;
+  total_debit: string;
+  fx_rate: string;
+  expires_at: string;
+  required_fields: TransferRequirements;
+};
+
+export type TransferVerification = {
+  verified: boolean;
+  verification_available: boolean;
+  warning: string;
+  account_status?: string;
+};
+
+export type MoneyTransferRow = {
+  id: number;
+  external_id: string;
+  status_class: string;
+  raw_status: string;
+  customer_message: string;
+  completed: boolean;
+  beneficiary_received: boolean;
+  reversed_to_wallet: boolean;
+  amount: string;
+  fee: string;
+  currency: string;
+  destination_amount: string;
+  destination_currency: string;
+  open_rfi: boolean;
+  created_at: string;
+};
+
+export type ThunesRfi = {
+  id: number;
+  transfer_id: number;
+  transfer_external_id: string;
+  transfer_status: string;
+  provider_rfi_id: string;
+  provider_status: string;
+  status: string;
+  deadline: string | null;
+  requested_fields: string[];
+  requested_information: Record<string, string[]>;
+  requested_documents: string[];
+  description: string;
+  has_document: boolean;
   created_at: string;
 };

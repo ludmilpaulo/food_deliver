@@ -3,21 +3,36 @@ import { baseAPI } from "@/services/api";
 import type { SupportedLocale } from "@/configs/translations";
 
 export type LanguagePreference = {
-  preferredLanguage: SupportedLocale;
+  preferredLanguage: SupportedLocale | null;
   systemLanguage: SupportedLocale | null;
-  activeLanguage: SupportedLocale;
+  activeLanguage: SupportedLocale | null;
+  preferenceSet: boolean;
 };
 
 type RawRecord = Record<string, unknown>;
 
+function asLocale(value: unknown): SupportedLocale | null {
+  if (typeof value !== "string" || !value) return null;
+  const code = value.slice(0, 2).toLowerCase();
+  if (code === "en" || code === "pt" || code === "fr" || code === "es") {
+    return code;
+  }
+  return null;
+}
+
 function mapLanguagePreference(raw: RawRecord): LanguagePreference {
-  const preferred = String(raw.preferredLanguage ?? raw.preferred_language ?? "en") as SupportedLocale;
-  const systemRaw = raw.systemLanguage ?? raw.system_language;
-  const active = String(raw.activeLanguage ?? raw.active_language ?? preferred) as SupportedLocale;
+  const hasFlag = "preferenceSet" in raw || "preference_set" in raw;
+  const preferenceSet = raw.preferenceSet === true || raw.preference_set === true;
+  const preferred =
+    hasFlag && !preferenceSet
+      ? null
+      : asLocale(raw.preferredLanguage ?? raw.preferred_language);
+  const system = asLocale(raw.systemLanguage ?? raw.system_language);
   return {
     preferredLanguage: preferred,
-    systemLanguage: systemRaw ? (String(systemRaw) as SupportedLocale) : null,
-    activeLanguage: active,
+    systemLanguage: system,
+    activeLanguage: asLocale(raw.activeLanguage ?? raw.active_language) ?? preferred ?? system,
+    preferenceSet: hasFlag ? preferenceSet : preferred != null,
   };
 }
 
@@ -51,14 +66,14 @@ export const languageApi = createApi({
     }),
     updateLanguagePreference: builder.mutation<
       LanguagePreference,
-      { preferredLanguage: SupportedLocale; systemLanguage?: SupportedLocale | null }
+      { preferredLanguage?: SupportedLocale; systemLanguage?: SupportedLocale | null }
     >({
       query: (body) => ({
         url: "/language/",
         method: "PATCH",
         body: {
-          preferredLanguage: body.preferredLanguage,
-          systemLanguage: body.systemLanguage,
+          ...(body.preferredLanguage ? { preferredLanguage: body.preferredLanguage } : {}),
+          ...(body.systemLanguage ? { systemLanguage: body.systemLanguage } : {}),
         },
       }),
       transformResponse: (response: RawRecord) => mapLanguagePreference(response),

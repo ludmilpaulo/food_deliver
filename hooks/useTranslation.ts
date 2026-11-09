@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
   detectBrowserLanguage,
   getLanguage,
+  isManualLanguage,
   setLanguage,
   syncLanguageFromClientStorage,
   LANGUAGE_CHANGE_EVENT,
@@ -20,6 +21,8 @@ import { homeT } from "@/configs/homeTranslations";
 import { propertyApplicationT } from "@/configs/propertyApplicationTranslations";
 import { propertyPolicyT } from "@/configs/propertyPolicyTranslations";
 import { financialT } from "@/configs/financialTranslations";
+import { thunesT } from "@/configs/thunesTranslations";
+import { foodT } from "@/configs/foodTranslations";
 import { fetchApiTranslations } from "@/services/platformApi";
 import { store } from "@/redux/store";
 import { languageApi } from "@/redux/slices/languageApi";
@@ -31,6 +34,8 @@ function englishBaseline(key: string): string | undefined {
   const typed = translations.en[key as TranslationKey];
   if (typed) return typed;
   return (
+    foodT("en", key) ??
+    thunesT("en", key) ??
     propertyPolicyT("en", key) ??
     propertyApplicationT("en", key) ??
     homeT("en", key) ??
@@ -42,8 +47,12 @@ function englishBaseline(key: string): string | undefined {
 }
 
 function localForLocale(locale: SupportedLocale, key: string): string | undefined {
+  const food = foodT(locale, key);
+  if (food) return food;
   const financial = financialT(locale, key);
   if (financial) return financial;
+  const thunes = thunesT(locale, key);
+  if (thunes) return thunes;
   const policy = propertyPolicyT(locale, key);
   if (policy) return policy;
   const app = propertyApplicationT(locale, key);
@@ -79,14 +88,28 @@ export function useTranslation(initialLocale?: SupportedLocale) {
       .dispatch(languageApi.endpoints.getLanguagePreference.initiate())
       .unwrap()
       .then((pref) => {
-        if (userPickedLanguage) return;
+        if (userPickedLanguage || isManualLanguage()) {
+          void store.dispatch(
+            languageApi.endpoints.updateLanguagePreference.initiate({
+              preferredLanguage: getLanguage(),
+              systemLanguage: detectBrowserLanguage(),
+            }),
+          );
+          return;
+        }
         if (pref.preferredLanguage) {
           setLanguage(pref.preferredLanguage);
           setLanguageCode(pref.preferredLanguage);
+          return;
         }
+        void store.dispatch(
+          languageApi.endpoints.updateLanguagePreference.initiate({
+            systemLanguage: detectBrowserLanguage(),
+          }),
+        );
       })
       .catch(() => {
-        // Local/cookie language remains active when unauthenticated or offline.
+        // Local/browser language remains active when unauthenticated or offline.
       });
   }, []);
 

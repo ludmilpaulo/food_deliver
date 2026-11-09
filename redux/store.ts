@@ -26,6 +26,9 @@ import { ridesApi } from "./slices/ridesApi";
 import { paymentsApi } from "./slices/paymentsApi";
 import { financialApi } from "./slices/financialApi";
 import { groceriesApi } from "./slices/groceriesApi";
+import { foodApi } from "@/features/food/api/foodApi";
+import { foodPartnerApi } from "@/features/food/partner/partnerApi";
+import { foodAdminApi } from "@/features/food/admin/adminApi";
 
 
 export const store = configureStore({
@@ -58,6 +61,9 @@ export const store = configureStore({
     [paymentsApi.reducerPath]: paymentsApi.reducer,
     [financialApi.reducerPath]: financialApi.reducer,
     [groceriesApi.reducerPath]: groceriesApi.reducer,
+    [foodApi.reducerPath]: foodApi.reducer,
+    [foodPartnerApi.reducerPath]: foodPartnerApi.reducer,
+    [foodAdminApi.reducerPath]: foodAdminApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
@@ -77,7 +83,10 @@ export const store = configureStore({
       .concat(ridesApi.middleware)
       .concat(paymentsApi.middleware)
       .concat(financialApi.middleware)
-      .concat(groceriesApi.middleware),
+      .concat(groceriesApi.middleware)
+      .concat(foodApi.middleware)
+      .concat(foodPartnerApi.middleware)
+      .concat(foodAdminApi.middleware),
 });
 
 // Keep the cart in localStorage so it survives reloads and login redirects.

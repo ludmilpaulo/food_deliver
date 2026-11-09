@@ -9,6 +9,8 @@ import { useLocationFilter } from '@/contexts/LocationContext';
 import type { RootState } from '@/redux/store';
 import { useGetWalletHistoryQuery, useGetWalletQuery, useTopUpWalletMutation } from '@/redux/slices/marketplaceApi';
 import { useGetPaymentMethodsQuery } from '@/redux/slices/paymentsApi';
+import { redirectToCheckout } from '@/lib/pendingPayment';
+import ThunesTransferPanel from '@/components/marketplace/ThunesTransferPanel';
 import {
   useCreateTransferMutation,
   useCreateWithdrawalMutation,
@@ -28,7 +30,7 @@ export default function WalletExperience() {
   const token = useSelector((state: RootState) => state.auth.token);
   const { country } = useLocationFilter();
   const [tab, setTab] = useState<Tab>('balance');
-  const { data: methods } = useGetPaymentMethodsQuery(undefined, { skip: !token });
+  const { data: methods } = useGetPaymentMethodsQuery('wallet_top_up', { skip: !token });
   const currency = methods?.currency ?? country?.currency ?? 'ZAR';
   const { data: wallet, isLoading, refetch } = useGetWalletQuery(currency, { skip: !token });
   const { data: financial } = useGetFinancialAccountQuery(currency, { skip: !token });
@@ -72,7 +74,7 @@ export default function WalletExperience() {
         phone: phone || undefined,
       }).unwrap();
       if (result.authorization_url) {
-        window.location.assign(result.authorization_url);
+        redirectToCheckout(result.authorization_url, result.kudya_reference);
         return;
       }
       setMessage(t('topUpStarted'));
@@ -206,6 +208,9 @@ export default function WalletExperience() {
         <p className="mt-2 text-sm text-slate-400">
           {t('pending')}: {displayWallet?.currency ?? currency} {Number(displayWallet?.pending_balance ?? 0).toFixed(2)}
         </p>
+        <p className="mt-2 text-sm text-slate-300">
+          {t('walletNotThunesBalance', 'This is your Kudya wallet balance. It is separate from a payment provider balance.')}
+        </p>
         {displayWallet?.reserved_balance ? (
           <p className="mt-1 text-sm text-slate-400">
             {t('reservedBalance')}: {displayWallet.currency} {Number(displayWallet.reserved_balance).toFixed(2)}
@@ -284,6 +289,8 @@ export default function WalletExperience() {
           </button>
         </form>
       )}
+
+      {tab === 'remittance' && <ThunesTransferPanel currency={currency} />}
 
       {tab === 'remittance' && (
         <div className="mt-6 rounded-2xl border border-slate-100 bg-white p-4">

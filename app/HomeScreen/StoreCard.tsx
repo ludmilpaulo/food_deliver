@@ -86,7 +86,7 @@ export const StoreCard: React.FC<StoreCardProps> = ({ store, userLocation }) => 
       alert(t("storeClosed", "This store is currently closed."));
       return;
     }
-    router.push(`/storeMenuPage?store_id=${store.id}`);
+    router.push(`/products?storeId=${store.id}&storeName=${encodeURIComponent(store.name)}`);
   };
 
   if (!store) return null;

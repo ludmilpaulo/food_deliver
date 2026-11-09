@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { analytics } from '@/utils/mixpanel';
 import { useAppDispatch } from '@/redux/store';
 import { hydrateBasket, loadBasketState } from '@/redux/slices/basketSlice';
+import { logoutUser } from '@/redux/slices/authSlice';
+import { AUTH_EXPIRED_EVENT, type AuthExpiredDetail } from '@/services/api';
 import {
   getLanguage,
   LANGUAGE_CHANGE_EVENT,
@@ -13,6 +15,7 @@ import {
 
 export default function ClientRoot({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const dispatch = useAppDispatch();
 
   // Restore the cart saved in localStorage (after mount, to avoid SSR
@@ -35,6 +38,20 @@ export default function ClientRoot({ children }: { children: React.ReactNode }) 
       window.removeEventListener(LANGUAGE_CHANGE_EVENT, onLanguageChanged);
     };
   }, []);
+
+  useEffect(() => {
+    const onAuthExpired = (event: Event) => {
+      dispatch(logoutUser());
+      const detail = (event as CustomEvent<AuthExpiredDetail>).detail;
+      if (detail?.requiresLogin) {
+        router.replace('/LoginScreenUser');
+      }
+    };
+    window.addEventListener(AUTH_EXPIRED_EVENT, onAuthExpired);
+    return () => {
+      window.removeEventListener(AUTH_EXPIRED_EVENT, onAuthExpired);
+    };
+  }, [dispatch, router]);
 
   useEffect(() => {
     // Track page views on route changes

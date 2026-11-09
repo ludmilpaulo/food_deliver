@@ -17,7 +17,13 @@ const NEXT: Record<string, { status: string; labelKey: string } | undefined> = {
   new: { status: "accepted", labelKey: "gpAcceptOrder" },
   accepted: { status: "preparing", labelKey: "gpStartPreparing" },
   preparing: { status: "ready", labelKey: "gpReadyPickup" },
-  ready: { status: "picked_up", labelKey: "gpHandToDriver" },
+  ready: { status: "packed", labelKey: "gpPackOrder" },
+  packed: { status: "courier_assigned", labelKey: "gpAssignCourier" },
+  courier_assigned: { status: "out_for_delivery", labelKey: "gpOutForDelivery" },
+  out_for_delivery: { status: "delivered", labelKey: "gpMarkDelivered" },
+  picked_up: { status: "delivered", labelKey: "gpMarkDelivered" },
+  handed_to_driver: { status: "delivered", labelKey: "gpMarkDelivered" },
+  delivered: { status: "completed", labelKey: "gpCompleteOrder" },
 };
 
 export default function GroceryPartnerOrderDetail() {

@@ -18,7 +18,9 @@ type SignupData = {
   business_category?: string;
 };
 
-export const loginUserService = async (username: string, password: string) => {
+export const MFA_REQUIRED_ERROR = "mfa_required";
+
+export const loginUserService = async (username: string, password: string, mfaCode?: string) => {
   let response: Response;
   try {
     response = await fetch(`${baseAPI}/api/auth/login/`, {
@@ -27,7 +29,7 @@ export const loginUserService = async (username: string, password: string) => {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify(mfaCode ? { username, password, mfa_code: mfaCode } : { username, password }),
     });
   } catch {
     throw new Error(
@@ -45,6 +47,14 @@ export const loginUserService = async (username: string, password: string) => {
       );
     }
     throw new Error("Server returned an invalid response.");
+  }
+
+  if (data.mfa_required && !data.access && !data.token) {
+    if (mfaCode) throw new Error(String(data.detail || "Invalid authenticator code."));
+    throw new Error(MFA_REQUIRED_ERROR);
+  }
+  if (data.mfa_setup_required && !data.access && !data.token) {
+    throw new Error(String(data.detail || "This account must set up an authenticator before signing in."));
   }
 
   if (!response.ok) {

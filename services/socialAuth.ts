@@ -8,7 +8,6 @@ const FACEBOOK_APP_ID = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID ?? "";
 const TIKTOK_CLIENT_KEY = process.env.NEXT_PUBLIC_TIKTOK_CLIENT_KEY ?? "";
 
 const TIKTOK_STATE_KEY = "kudya_oauth_state";
-const TIKTOK_VERIFIER_KEY = "kudya_oauth_verifier";
 const TIKTOK_PROVIDER_KEY = "kudya_oauth_provider";
 const TIKTOK_NEXT_KEY = "kudya_oauth_next";
 
@@ -73,12 +72,6 @@ export function randomOAuthString(byteLength = 32): string {
   const bytes = new Uint8Array(byteLength);
   crypto.getRandomValues(bytes);
   return toBase64Url(bytes);
-}
-
-export async function pkceChallenge(verifier: string): Promise<string> {
-  const data = new TextEncoder().encode(verifier);
-  const digest = await crypto.subtle.digest("SHA-256", data);
-  return toBase64Url(new Uint8Array(digest));
 }
 
 export type SocialTokenPayload = {
@@ -267,6 +260,10 @@ export async function signInWithFacebookWeb(): Promise<LoginResult> {
   if (!config.facebook_app_id) {
     throw new Error("not_configured");
   }
+  // The SDK refuses FB.login on http pages and never invokes the callback.
+  if (window.location.protocol !== "https:") {
+    throw new Error("Facebook sign-in requires HTTPS.");
+  }
   const fb = await loadFacebookSdk(config.facebook_app_id);
   return new Promise((resolve, reject) => {
     fb.login(
@@ -291,10 +288,8 @@ export async function startTikTokWebLogin(nextPath?: string | null): Promise<voi
   if (!config.tiktok_client_key) {
     throw new Error("not_configured");
   }
-  const verifier = randomOAuthString(32);
+  // TikTok web Login Kit uses state + the server-held secret; it has no standard PKCE.
   const state = randomOAuthString(16);
-  const challenge = await pkceChallenge(verifier);
-  sessionStorage.setItem(TIKTOK_VERIFIER_KEY, verifier);
   sessionStorage.setItem(TIKTOK_STATE_KEY, state);
   sessionStorage.setItem(TIKTOK_PROVIDER_KEY, "tiktok");
   if (nextPath) {
@@ -306,8 +301,6 @@ export async function startTikTokWebLogin(nextPath?: string | null): Promise<voi
     response_type: "code",
     scope: "user.info.basic",
     state,
-    code_challenge: challenge,
-    code_challenge_method: "S256",
   });
   window.location.assign(`https://www.tiktok.com/v2/auth/authorize/?${params.toString()}`);
 }
@@ -328,9 +321,7 @@ export async function completeTikTokWebCallback(params: {
     throw new Error("cancelled");
   }
   const expectedState = sessionStorage.getItem(TIKTOK_STATE_KEY);
-  const verifier = sessionStorage.getItem(TIKTOK_VERIFIER_KEY);
   sessionStorage.removeItem(TIKTOK_STATE_KEY);
-  sessionStorage.removeItem(TIKTOK_VERIFIER_KEY);
   sessionStorage.removeItem(TIKTOK_PROVIDER_KEY);
   if (!params.code) {
     throw new Error("cancelled");
@@ -341,6 +332,5 @@ export async function completeTikTokWebCallback(params: {
   return exchangeSocialToken("tiktok", {
     code: params.code,
     redirect_uri: oauthRedirectUri(),
-    code_verifier: verifier || "",
   });
 }

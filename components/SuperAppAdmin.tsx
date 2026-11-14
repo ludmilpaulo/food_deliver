@@ -281,7 +281,7 @@ export default function SuperAppAdmin() {
     },
   ];
 
-  const apiDocs = `${process.env.NEXT_PUBLIC_BASE_API || "https://www.kudya.store"}/api/docs/`;
+  const apiDocs = `${process.env.NEXT_PUBLIC_BASE_API || "https://www.appkudya.online"}/api/docs/`;
 
   return (
     <div className="space-y-7">

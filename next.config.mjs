@@ -54,6 +54,11 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
+        hostname: 'www.appkudya.online',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'www.kudya.store',
         pathname: '/**',
       },

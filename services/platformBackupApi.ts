@@ -63,7 +63,7 @@ function authHeaders(): HeadersInit {
 }
 
 function getBaseApi(): string {
-  return process.env.NEXT_PUBLIC_BASE_API || "https://www.kudya.store";
+  return process.env.NEXT_PUBLIC_BASE_API || "https://www.appkudya.online";
 }
 
 export function formatBytes(bytes: number): string {

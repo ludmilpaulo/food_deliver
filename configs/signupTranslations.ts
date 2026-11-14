@@ -32,6 +32,8 @@ export const signupTranslationKeys = [
   'orContinueWithEmail',
   'signingIn',
   'devSignIn',
+  'mfaLoginSetupTitle',
+  'mfaLoginSetupHint',
 ] as const;
 
 export type SignupTranslationKey = (typeof signupTranslationKeys)[number];
@@ -73,6 +75,9 @@ const en: SignupTable = {
   orContinueWithEmail: 'or sign in with email',
   signingIn: 'Signing in...',
   devSignIn: 'Developer sign-in',
+  mfaLoginSetupTitle: 'Set up an authenticator app',
+  mfaLoginSetupHint:
+    'This account needs an authenticator app. Scan the code (or enter the key) in Google Authenticator, Microsoft Authenticator or similar, then type the 6-digit code below.',
 };
 
 const pt: SignupTable = {
@@ -111,6 +116,9 @@ const pt: SignupTable = {
   orContinueWithEmail: 'ou entre com o email',
   signingIn: 'A entrar...',
   devSignIn: 'Início de sessão de programador',
+  mfaLoginSetupTitle: 'Configure uma aplicação de autenticação',
+  mfaLoginSetupHint:
+    'Esta conta precisa de uma aplicação de autenticação. Leia o código (ou introduza a chave) no Google Authenticator, Microsoft Authenticator ou semelhante e escreva abaixo o código de 6 dígitos.',
 };
 
 const fr: SignupTable = {
@@ -149,6 +157,9 @@ const fr: SignupTable = {
   orContinueWithEmail: 'ou connectez-vous par e-mail',
   signingIn: 'Connexion...',
   devSignIn: 'Connexion développeur',
+  mfaLoginSetupTitle: "Configurez une application d'authentification",
+  mfaLoginSetupHint:
+    "Ce compte nécessite une application d'authentification. Scannez le code (ou saisissez la clé) dans Google Authenticator, Microsoft Authenticator ou une application similaire, puis saisissez le code à 6 chiffres ci-dessous.",
 };
 
 const es: SignupTable = {
@@ -187,6 +198,9 @@ const es: SignupTable = {
   orContinueWithEmail: 'o inicia sesión con el correo',
   signingIn: 'Iniciando sesión...',
   devSignIn: 'Inicio de sesión de desarrollador',
+  mfaLoginSetupTitle: 'Configura una aplicación de autenticación',
+  mfaLoginSetupHint:
+    'Esta cuenta necesita una aplicación de autenticación. Escanea el código (o introduce la clave) en Google Authenticator, Microsoft Authenticator o similar y escribe abajo el código de 6 dígitos.',
 };
 
 const tables: Record<SupportedLocale, SignupTable> = { en, pt, fr, es };

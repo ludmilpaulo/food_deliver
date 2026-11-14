@@ -19,6 +19,35 @@ type SignupData = {
 };
 
 export const MFA_REQUIRED_ERROR = "mfa_required";
+/** Login error prefix; the rest of the message is the short-lived setup token. */
+export const MFA_SETUP_REQUIRED_PREFIX = "mfa_setup_required:";
+
+async function postMfa<T>(path: string, body: Record<string, string>, fallback: string): Promise<T> {
+  const response = await fetch(`${baseAPI}/api/auth/mfa/${path}`, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const data = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+  if (!response.ok) throw new Error(String(data.detail || fallback));
+  return data as T;
+}
+
+export function startLoginMfaSetup(mfaToken: string) {
+  return postMfa<{ secret: string; otpauth_uri: string }>(
+    "setup-token/",
+    { mfa_token: mfaToken },
+    "Authenticator setup could not start.",
+  );
+}
+
+export function confirmLoginMfaSetup(mfaToken: string, code: string) {
+  return postMfa<{ enabled: boolean }>(
+    "confirm/",
+    { mfa_token: mfaToken, code },
+    "That code did not match. Try the current code.",
+  );
+}
 
 export const loginUserService = async (username: string, password: string, mfaCode?: string) => {
   let response: Response;
@@ -54,7 +83,10 @@ export const loginUserService = async (username: string, password: string, mfaCo
     throw new Error(MFA_REQUIRED_ERROR);
   }
   if (data.mfa_setup_required && !data.access && !data.token) {
-    throw new Error(String(data.detail || "This account must set up an authenticator before signing in."));
+    if (!data.mfa_token) {
+      throw new Error(String(data.detail || "This account must set up an authenticator before signing in."));
+    }
+    throw new Error(`${MFA_SETUP_REQUIRED_PREFIX}${String(data.mfa_token)}`);
   }
 
   if (!response.ok) {

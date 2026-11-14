@@ -17,7 +17,13 @@ import Link from "next/link";
 import logo from "@/assets/azul.png";
 import { loginUser, selectAuth, setAuthFromSocial, type LoginResult } from "@/redux/slices/authSlice";
 import { resolvePostLoginRoute } from "@/utils/postLoginRoute";
-import { MFA_REQUIRED_ERROR } from "@/services/authService";
+import { QRCodeSVG } from "qrcode.react";
+import {
+  confirmLoginMfaSetup,
+  MFA_REQUIRED_ERROR,
+  MFA_SETUP_REQUIRED_PREFIX,
+  startLoginMfaSetup,
+} from "@/services/authService";
 import ForgotPasswordModal from "./ForgotPasswordModal";
 import { SupportedLocale, supportedLocales } from "@/configs/translations";
 import { initLanguage } from "@/configs/i18n";
@@ -74,6 +80,7 @@ function LoginScreenUser() {
   const [formError, setFormError] = useState("");
   const [mfaStep, setMfaStep] = useState(false);
   const [mfaCode, setMfaCode] = useState("");
+  const [mfaSetup, setMfaSetup] = useState<{ token: string; secret: string; otpauthUri: string } | null>(null);
 
   useEffect(() => {
     analytics.trackPageView("Login Page");
@@ -116,13 +123,24 @@ function LoginScreenUser() {
       setFormError(t("fillAllFields"));
       return;
     }
-    if (mfaStep && !/^\d{6}$/.test(mfaCode.trim())) {
+    const needsCode = mfaStep || mfaSetup !== null;
+    if (needsCode && !/^\d{6}$/.test(mfaCode.trim())) {
       setFormError(t("mfaCodeHint", "Enter the 6-digit code from your authenticator app."));
       return;
     }
+    if (mfaSetup) {
+      try {
+        await confirmLoginMfaSetup(mfaSetup.token, mfaCode.trim());
+      } catch (error: unknown) {
+        setFormError(error instanceof Error ? error.message : t("loginFailed"));
+        return;
+      }
+      setMfaSetup(null);
+      setMfaStep(true);
+    }
     try {
       const resultAction: LoginResult = await dispatch(
-        loginUser({ username, password, mfaCode: mfaStep ? mfaCode.trim() : undefined }),
+        loginUser({ username, password, mfaCode: needsCode ? mfaCode.trim() : undefined }),
       ).unwrap();
       const destination = resolvePostLoginRoute(resultAction, nextPath);
       const userType = resultAction.is_customer
@@ -147,6 +165,17 @@ function LoginScreenUser() {
       if (errorMessage === MFA_REQUIRED_ERROR) {
         setMfaStep(true);
         setMfaCode("");
+        return;
+      }
+      if (errorMessage.startsWith(MFA_SETUP_REQUIRED_PREFIX)) {
+        const token = errorMessage.slice(MFA_SETUP_REQUIRED_PREFIX.length);
+        try {
+          const setup = await startLoginMfaSetup(token);
+          setMfaSetup({ token, secret: setup.secret, otpauthUri: setup.otpauth_uri });
+          setMfaCode("");
+        } catch (setupError: unknown) {
+          setFormError(setupError instanceof Error ? setupError.message : t("loginFailed"));
+        }
         return;
       }
       analytics.trackError("Login Failed", { username, error: errorMessage });
@@ -366,7 +395,20 @@ function LoginScreenUser() {
                   </div>
                 </div>
 
-                {mfaStep ? (
+                {mfaSetup ? (
+                  <div className="space-y-3 rounded-xl border border-blue-100 bg-blue-50/60 p-4 text-sm text-slate-700">
+                    <p className="font-semibold text-slate-900">{t("mfaLoginSetupTitle")}</p>
+                    <p>{t("mfaLoginSetupHint")}</p>
+                    <div className="flex justify-center rounded-lg bg-white p-3">
+                      <QRCodeSVG value={mfaSetup.otpauthUri} size={168} />
+                    </div>
+                    <code className="block break-all rounded-lg bg-white px-3 py-2 text-center font-mono text-slate-900">
+                      {mfaSetup.secret}
+                    </code>
+                  </div>
+                ) : null}
+
+                {mfaStep || mfaSetup ? (
                   <div className="space-y-1.5">
                     <label htmlFor="login-mfa" className="block text-sm font-medium text-slate-700">
                       {t("mfaCode", "Authenticator code")}

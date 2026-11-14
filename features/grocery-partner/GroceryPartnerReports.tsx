@@ -2,19 +2,19 @@
 
 import { useState } from "react";
 import {
-  useGetGroceryPartnerAnalyticsQuery,
-  useGetGroceryPartnerRevenueQuery,
-  useGetGroceryPartnerSalesQuery,
-  useGetGroceryPartnerSettingsQuery,
-  useUpdateGroceryPartnerSettingsMutation,
-} from "./groceryPartnerApi";
+  useGetGroceryAnalyticsQuery,
+  useGetGroceryDashboardQuery,
+  useGetGroceryRevenueQuery,
+  useGetGrocerySalesQuery,
+  useUpdateGroceryAvailabilityMutation,
+} from "@/redux/slices/groceryPartnerApi";
 import { useTranslation } from "@/hooks/useTranslation";
 import PageSpinner from "@/components/ui/PageSpinner";
 
 export function GroceryPartnerSalesPage() {
   const { t } = useTranslation();
   const [period, setPeriod] = useState("7d");
-  const { data, isFetching } = useGetGroceryPartnerSalesQuery(period);
+  const { data, isFetching } = useGetGrocerySalesQuery(period);
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-bold">{t("gpSales")}</h1>
@@ -23,8 +23,8 @@ export function GroceryPartnerSalesPage() {
           ["today", "gpToday"],
           ["7d", "gp7Days"],
           ["30d", "gp30Days"],
-          ["90d", "gp3Months"],
-          ["365d", "gp12Months"],
+          ["3m", "gp3Months"],
+          ["12m", "gp12Months"],
         ].map(([value, key]) => (
           <button
             key={value}
@@ -53,10 +53,10 @@ export function GroceryPartnerSalesPage() {
             })}
           </div>
           <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
-            <Stat label={t("gpTodaySales")} value={String(data.total_sales)} />
-            <Stat label={t("gpOrders")} value={String(data.order_count)} />
-            <Stat label={t("gpAvgOrder")} value={String(data.average_order_value)} />
-            <Stat label={t("gpCompletedOrders")} value={String(data.completed_orders)} />
+            <Stat label={t("gpSales")} value={String(data.summary.total_sales)} />
+            <Stat label={t("gpOrders")} value={String(data.summary.orders)} />
+            <Stat label={t("gpAvgOrder")} value={String(data.summary.average_order_value)} />
+            <Stat label={t("gpCompletedOrders")} value={String(data.summary.completed_orders)} />
           </div>
         </div>
       )}
@@ -76,7 +76,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 export function GroceryPartnerRevenuePage({ titleKey = "gpRevenue" }: { titleKey?: string }) {
   const { t } = useTranslation();
   const [period, setPeriod] = useState("month");
-  const { data, isFetching } = useGetGroceryPartnerRevenueQuery(period);
+  const { data, isFetching } = useGetGroceryRevenueQuery({ range: period });
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-bold">{t(titleKey)}</h1>
@@ -103,15 +103,13 @@ export function GroceryPartnerRevenuePage({ titleKey = "gpRevenue" }: { titleKey
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Card label={t("gpGrossSales")} value={data.gross_sales} />
-          <Card label={t("gpCommission")} value={data.kudya_commission} />
+          <Card label={t("gpCommission")} value={data.commission} />
           <Card label={t("gpDeliveryCharges")} value={data.delivery_charges} />
           <Card label={t("gpDiscounts")} value={data.discounts} />
           <Card label={t("gpRefunds")} value={data.refunds} />
           <Card label={t("gpNetEarnings")} value={data.net_earnings} />
           <Card label={t("gpPendingPayout")} value={data.pending_payout} />
           <Card label={t("gpPaidOut")} value={data.paid_out} />
-          <Card label={t("thunesCollected", "Thunes collected")} value={data.thunes_collected ?? 0} />
-          <Card label={t("thunesCommission", "Thunes commission")} value={data.thunes_commission ?? 0} />
         </div>
       )}
     </div>
@@ -129,7 +127,7 @@ function Card({ label, value }: { label: string; value: number }) {
 
 export function GroceryPartnerAnalyticsPage() {
   const { t } = useTranslation();
-  const { data, isFetching } = useGetGroceryPartnerAnalyticsQuery();
+  const { data, isFetching } = useGetGroceryAnalyticsQuery();
   if (isFetching || !data) return <PageSpinner color="green" />;
   return (
     <div className="space-y-4">
@@ -156,9 +154,10 @@ export function GroceryPartnerAnalyticsPage() {
 
 export function GroceryPartnerSettingsPage({ titleKey = "gpStoreProfile" }: { titleKey?: string }) {
   const { t } = useTranslation();
-  const { data, isFetching } = useGetGroceryPartnerSettingsQuery();
-  const [save] = useUpdateGroceryPartnerSettingsMutation();
-  if (isFetching || !data) return <PageSpinner color="green" />;
+  const { data, isFetching } = useGetGroceryDashboardQuery();
+  const [save] = useUpdateGroceryAvailabilityMutation();
+  if (isFetching && !data) return <PageSpinner color="green" />;
+  if (!data) return null;
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-bold">{t(titleKey)}</h1>
@@ -171,9 +170,9 @@ export function GroceryPartnerSettingsPage({ titleKey = "gpStoreProfile" }: { ti
         <span>{data.accepting_orders ? t("gpAcceptingOrders") : t("gpStoreUnavailable")}</span>
       </label>
       <div className="grid gap-3 rounded-2xl border border-[#E5E7EB] bg-white p-5">
-        <p className="font-semibold">{data.store_name}</p>
-        <p className="text-sm text-[#6B7280]">{data.address}</p>
-        <p className="text-sm text-[#6B7280]">{data.phone}</p>
+        <p className="font-semibold">{data.store.name}</p>
+        <p className="text-sm text-[#6B7280]">{data.store.address}</p>
+        <p className="text-sm text-[#6B7280]">{data.store.phone}</p>
         <a href="/groceries" className="text-sm font-medium text-[#0B8F45]">
           {t("gpViewAsCustomer")}
         </a>

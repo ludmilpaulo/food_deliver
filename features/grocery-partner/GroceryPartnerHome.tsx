@@ -11,14 +11,14 @@ import {
   Clock,
   Wallet,
 } from "lucide-react";
-import { useGetGroceryPartnerDashboardQuery, useGetGroceryPartnerSalesQuery } from "./groceryPartnerApi";
+import { useGetGroceryDashboardQuery, useGetGrocerySalesQuery } from "@/redux/slices/groceryPartnerApi";
 import { useTranslation } from "@/hooks/useTranslation";
 import { GROCERY_THEME } from "@/features/groceries/theme";
-import type { GroceryPartnerSales } from "./types";
+import type { GrocerySalesData } from "./types";
 import { groceryOrderStatusTranslationKey, groceryPaymentStatusTranslationKey } from "@/utils/groceryUnits";
 import PageSpinner from "@/components/ui/PageSpinner";
 
-function SalesBars({ data }: { data: GroceryPartnerSales }) {
+function SalesBars({ data }: { data: GrocerySalesData }) {
   const max = Math.max(...data.sales, 1);
   return (
     <div className="flex h-40 items-end gap-1">
@@ -77,8 +77,8 @@ function statusClass(status: string): string {
 
 export default function GroceryPartnerHome() {
   const { t } = useTranslation();
-  const { data, isFetching, isError, refetch } = useGetGroceryPartnerDashboardQuery();
-  const sales = useGetGroceryPartnerSalesQuery("7d");
+  const { data, isFetching, isError, refetch } = useGetGroceryDashboardQuery();
+  const sales = useGetGrocerySalesQuery("7d");
 
   if (!isError && (isFetching || !data)) {
     return <PageSpinner color="green" />;
@@ -123,12 +123,12 @@ export default function GroceryPartnerHome() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <KpiCard label={t("gpTodaySales")} value={money(kpis.today_sales)} change={kpis.today_sales_change} changeLabel={t("gpVsYesterday")} icon={Wallet} />
+        <KpiCard label={t("gpTodaySales")} value={money(kpis.sales_today)} change={kpis.sales_today_change} changeLabel={t("gpVsYesterday")} icon={Wallet} />
         <KpiCard label={t("gpOrdersToday")} value={String(kpis.orders_today)} change={kpis.orders_today_change} changeLabel={t("gpVsYesterday")} icon={ShoppingBag} />
         <KpiCard label={t("gpProductsCount")} value={String(kpis.products)} icon={Package} />
         <KpiCard label={t("gpLowStock")} value={String(kpis.low_stock)} icon={AlertTriangle} />
         <KpiCard label={t("gpPendingOrders")} value={String(kpis.pending_orders)} icon={Clock} />
-        <KpiCard label={t("gpRevenueKpi")} value={money(kpis.revenue)} change={kpis.revenue_change} changeLabel={t("gpVsLastMonth")} icon={Wallet} />
+        <KpiCard label={t("gpRevenueKpi")} value={money(kpis.revenue)} icon={Wallet} />
       </div>
 
       {sales.data ? (
@@ -136,10 +136,10 @@ export default function GroceryPartnerHome() {
           <h2 className="mb-4 font-semibold">{t("gpSales")}</h2>
           <SalesBars data={sales.data} />
           <div className="mt-4 grid grid-cols-2 gap-3 text-sm md:grid-cols-4">
-            <div><p className="text-[#6B7280]">{t("gpTodaySales")}</p><p className="font-semibold">{money(sales.data.total_sales)}</p></div>
-            <div><p className="text-[#6B7280]">{t("gpOrders")}</p><p className="font-semibold">{sales.data.order_count}</p></div>
-            <div><p className="text-[#6B7280]">{t("gpAvgOrder")}</p><p className="font-semibold">{money(sales.data.average_order_value)}</p></div>
-            <div><p className="text-[#6B7280]">{t("gpCompletedOrders")}</p><p className="font-semibold">{sales.data.completed_orders}</p></div>
+            <div><p className="text-[#6B7280]">{t("gpSales")}</p><p className="font-semibold">{money(sales.data.summary.total_sales)}</p></div>
+            <div><p className="text-[#6B7280]">{t("gpOrders")}</p><p className="font-semibold">{sales.data.summary.orders}</p></div>
+            <div><p className="text-[#6B7280]">{t("gpAvgOrder")}</p><p className="font-semibold">{money(sales.data.summary.average_order_value)}</p></div>
+            <div><p className="text-[#6B7280]">{t("gpCompletedOrders")}</p><p className="font-semibold">{sales.data.summary.completed_orders}</p></div>
           </div>
         </section>
       ) : null}
@@ -171,18 +171,18 @@ export default function GroceryPartnerHome() {
                   <tr key={order.id} className="border-t border-[#E5E7EB]">
                     <td className="py-3 font-medium">
                       <Link href={`/provider/grocery/orders/${order.id}`} className="text-[#056B34]">
-                        {order.number}
+                        #{order.id}
                       </Link>
                     </td>
-                    <td>{order.customer}</td>
-                    <td>{order.items}</td>
+                    <td>{order.customer?.name || "—"}</td>
+                    <td>{order.order_details.length}</td>
                     <td>{money(order.total)}</td>
                     <td>
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${statusClass(order.status)}`}>
-                        {t(groceryOrderStatusTranslationKey(order.status))}
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${statusClass(order.grocery_status || order.status)}`}>
+                        {t(groceryOrderStatusTranslationKey(order.grocery_status || order.status))}
                       </span>
                     </td>
-                    <td>{t(groceryPaymentStatusTranslationKey(order.payment_status))}</td>
+                    <td>{t(groceryPaymentStatusTranslationKey(order.payment_status_store))}</td>
                   </tr>
                 ))}
               </tbody>

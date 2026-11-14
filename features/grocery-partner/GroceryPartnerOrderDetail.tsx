@@ -3,12 +3,11 @@
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import {
-  useGetGroceryPartnerOrderQuery,
-  useGetGroceryPartnerProductsQuery,
-  usePickGroceryOrderLineMutation,
-  useSubstituteGroceryOrderLineMutation,
-  useUpdateGroceryPartnerOrderStatusMutation,
-} from "./groceryPartnerApi";
+  useGetGroceryOrdersQuery,
+  useGetGroceryProductsQuery,
+  usePickGroceryOrderItemMutation,
+  useUpdateGroceryOrderStatusMutation,
+} from "@/redux/slices/groceryPartnerApi";
 import { useTranslation } from "@/hooks/useTranslation";
 import { sellingUnitTranslationKey } from "@/utils/groceryUnits";
 import PageSpinner from "@/components/ui/PageSpinner";
@@ -30,15 +29,17 @@ export default function GroceryPartnerOrderDetail() {
   const { t } = useTranslation();
   const params = useParams<{ id: string }>();
   const id = Number(params.id);
-  const { data, isFetching, isError, refetch } = useGetGroceryPartnerOrderQuery(id);
-  const products = useGetGroceryPartnerProductsQuery();
-  const [advance] = useUpdateGroceryPartnerOrderStatusMutation();
-  const [pick] = usePickGroceryOrderLineMutation();
-  const [substitute] = useSubstituteGroceryOrderLineMutation();
+  // The partner API has no single-order endpoint; the order list carries full line items.
+  const { data, isFetching, isError, refetch } = useGetGroceryOrdersQuery(undefined, {
+    selectFromResult: (result) => ({ ...result, data: result.data?.find((order) => order.id === id) }),
+  });
+  const products = useGetGroceryProductsQuery();
+  const [advance] = useUpdateGroceryOrderStatusMutation();
+  const [pick] = usePickGroceryOrderItemMutation();
   const [subLine, setSubLine] = useState<number | null>(null);
   const [subProduct, setSubProduct] = useState("");
 
-  if (!isError && (isFetching || !data)) return <PageSpinner color="green" />;
+  if (!isError && isFetching && !data) return <PageSpinner color="green" />;
   if (isError || !data) {
     return (
       <button type="button" onClick={() => void refetch()} className="text-[#0B8F45]">
@@ -47,17 +48,18 @@ export default function GroceryPartnerOrderDetail() {
     );
   }
 
-  const next = NEXT[data.status];
+  const groceryStatus = data.grocery_status || "new";
+  const next = NEXT[groceryStatus];
 
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">{data.number}</h1>
-          <p className="text-[#6B7280]">{data.customer}</p>
+          <h1 className="text-2xl font-bold">#{data.id}</h1>
+          <p className="text-[#6B7280]">{data.customer?.name || "—"}</p>
         </div>
         <div className="flex gap-2">
-          {data.status === "new" ? (
+          {groceryStatus === "new" ? (
             <button
               type="button"
               onClick={() => void advance({ id, status: "cancelled" })}
@@ -80,16 +82,16 @@ export default function GroceryPartnerOrderDetail() {
       <section className="rounded-2xl border border-[#E5E7EB] bg-white p-5">
         <h2 className="mb-3 font-semibold">{t("gpItems")}</h2>
         <ul className="space-y-3">
-          {data.lines.map((line) => (
+          {data.order_details.map((line) => (
             <li key={line.id} className="rounded-xl border border-[#E5E7EB] p-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <p className="font-medium">
-                    {line.name} — {line.quantity} {t(sellingUnitTranslationKey(line.selling_unit, "gp"))}
+                    {line.product.name} — {line.quantity} {t(sellingUnitTranslationKey(line.selling_unit, "gp"))}
                   </p>
                   <p className="text-xs text-[#6B7280]">
                     {line.unit_price}/{t(sellingUnitTranslationKey(line.selling_unit, "gp")).toLowerCase()} · {line.sub_total}
-                    {line.substituted_product_name ? ` · ${t("gpSubstituted")}: ${line.substituted_product_name}` : ""}
+                    {line.substituted_product ? ` · ${t("gpSubstituted")}: ${line.substituted_product.name}` : ""}
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -97,7 +99,7 @@ export default function GroceryPartnerOrderDetail() {
                     <button
                       key={pickStatus}
                       type="button"
-                      onClick={() => void pick({ id, line_id: line.id, pick_status: pickStatus })}
+                      onClick={() => void pick({ orderId: id, itemId: line.id, pick_status: pickStatus })}
                       className={`rounded-full px-3 py-1 text-xs font-semibold ${
                         line.pick_status === pickStatus ? "bg-[#0B8F45] text-white" : "bg-[#F8FAF9]"
                       }`}
@@ -123,7 +125,7 @@ export default function GroceryPartnerOrderDetail() {
                   >
                     <option value="">{t("gpProducts")}</option>
                     {(products.data ?? [])
-                      .filter((item) => item.id !== line.product_id)
+                      .filter((item) => item.id !== line.product.id)
                       .map((item) => (
                         <option key={item.id} value={item.id}>
                           {item.name}
@@ -134,10 +136,11 @@ export default function GroceryPartnerOrderDetail() {
                     type="button"
                     disabled={!subProduct}
                     onClick={() => {
-                      void substitute({
-                        id,
-                        line_id: line.id,
-                        substitute_product_id: Number(subProduct),
+                      void pick({
+                        orderId: id,
+                        itemId: line.id,
+                        pick_status: "substituted",
+                        substituted_product: Number(subProduct),
                       });
                       setSubLine(null);
                     }}

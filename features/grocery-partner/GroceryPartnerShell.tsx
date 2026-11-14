@@ -34,7 +34,7 @@ import { logoutUser, selectUser } from "@/redux/slices/authSlice";
 import { GROCERY_THEME } from "@/features/groceries/theme";
 import { initLanguage } from "@/configs/i18n";
 import { supportedLocales, type SupportedLocale } from "@/configs/translations";
-import { useGetGroceryPartnerNotificationsQuery } from "./groceryPartnerApi";
+import { useGetUnreadNotificationCountQuery } from "@/redux/slices/notificationApi";
 import {
   isGroceryPartnerUser,
   isRestaurantPartnerUser,
@@ -128,7 +128,7 @@ function GroceryPartnerShell({ children }: { children: React.ReactNode }) {
   const user = useAppSelector(selectUser);
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { data: notes } = useGetGroceryPartnerNotificationsQuery(undefined, {
+  const { data: notes } = useGetUnreadNotificationCountQuery(undefined, {
     skip: Boolean(user && isRestaurantPartnerUser(user) && !isGroceryPartnerUser(user)),
   });
 
@@ -248,9 +248,9 @@ function GroceryPartnerShell({ children }: { children: React.ReactNode }) {
             </select>
             <span className="relative rounded-full bg-[#EAF7EE] p-2 text-[#056B34]" title={t("gpNotifications")}>
               <Bell size={18} />
-              {notes && notes.count > 0 ? (
+              {notes && notes.unreadCount > 0 ? (
                 <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#0B8F45] px-1 text-[10px] font-bold text-white">
-                  {notes.count}
+                  {notes.unreadCount}
                 </span>
               ) : null}
             </span>

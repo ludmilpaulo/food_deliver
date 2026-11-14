@@ -41,8 +41,11 @@ export type GroceryProduct = {
   price: number;
   original_price?: number;
   category: string | null;
+  category_id?: number | null;
   subcategory?: string | null;
   subcategory_id?: number | null;
+  price_per_unit?: number | string;
+  available_quantity?: number;
   brand?: string;
   images: string[];
   image_url?: string[];

@@ -3,72 +3,68 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
-  useCreateGroceryPartnerProductMutation,
-  useGetGroceryPartnerMetaQuery,
-  useGetGroceryPartnerProductQuery,
-  useUpdateGroceryPartnerProductMutation,
-} from "./groceryPartnerApi";
+  useCreateGroceryProductMutation,
+  useGetGroceryMetaQuery,
+  useGetGroceryProductsQuery,
+  useUpdateGroceryProductMutation,
+} from "@/redux/slices/groceryPartnerApi";
 import { useTranslation } from "@/hooks/useTranslation";
-import type { GrocerySellingUnit } from "./types";
-import { groceryCategoryTranslationKey, grocerySubcategoryTranslationKey, sellingUnitTranslationKey } from "@/utils/groceryUnits";
+import { groceryCategoryLabel, grocerySubcategoryLabel, sellingUnitTranslationKey } from "@/utils/groceryUnits";
 import PageSpinner from "@/components/ui/PageSpinner";
-
-const UNIT_KEYS: Record<GrocerySellingUnit, string> = {
-  item: "gpUnitItem",
-  kg: "gpUnitKg",
-  g: "gpUnitG",
-  l: "gpUnitL",
-  ml: "gpUnitMl",
-  pack: "gpUnitPack",
-  box: "gpUnitBox",
-  bottle: "gpUnitBottle",
-  dozen: "gpUnitDozen",
-  tray: "gpUnitTray",
-};
+import { allowsFractional } from "./format";
 
 export default function GroceryPartnerProductForm({ mode }: { mode: "create" | "edit" }) {
   const { t } = useTranslation();
   const router = useRouter();
   const params = useParams<{ id?: string }>();
   const productId = mode === "edit" && params.id ? Number(params.id) : null;
-  const existing = useGetGroceryPartnerProductQuery(productId ?? 0, { skip: !productId });
-  const meta = useGetGroceryPartnerMetaQuery();
-  const [createProduct, createState] = useCreateGroceryPartnerProductMutation();
-  const [updateProduct, updateState] = useUpdateGroceryPartnerProductMutation();
+  const existing = useGetGroceryProductsQuery(undefined, {
+    skip: !productId,
+    selectFromResult: (result) => ({ ...result, data: result.data?.find((item) => item.id === productId) }),
+  });
+  const meta = useGetGroceryMetaQuery();
+  const [createProduct, createState] = useCreateGroceryProductMutation();
+  const [updateProduct, updateState] = useUpdateGroceryProductMutation();
   const product = existing.data;
-  const [name, setName] = useState(product?.name ?? "");
-  const [description, setDescription] = useState(product?.description ?? "");
-  const [category, setCategory] = useState(product?.category_slug ?? "fresh-produce");
-  const [subcategory, setSubcategory] = useState(product?.subcategory ?? "");
-  const [brand, setBrand] = useState(product?.brand ?? "");
-  const [sellingUnit, setSellingUnit] = useState<GrocerySellingUnit>(product?.selling_unit ?? "item");
-  const [price, setPrice] = useState(product?.price ?? "");
-  const [stock, setStock] = useState(product?.stock ?? "");
-  const [weight, setWeight] = useState(product?.weight ?? "");
-  const [weightUnit, setWeightUnit] = useState(product?.weight_unit ?? "");
-  const [threshold, setThreshold] = useState(product?.low_stock_threshold ?? "10");
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
+  const [subcategory, setSubcategory] = useState("");
+  const [brand, setBrand] = useState("");
+  const [sellingUnit, setSellingUnit] = useState("item");
+  const [price, setPrice] = useState("");
+  const [stock, setStock] = useState("");
+  const [weight, setWeight] = useState("");
+  const [weightUnit, setWeightUnit] = useState("");
+  const [threshold, setThreshold] = useState("10");
   const [error, setError] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (!product) return;
     setName(product.name);
-    setDescription(product.description);
-    setCategory(product.category_slug || "fresh-produce");
-    setSubcategory(product.subcategory);
-    setBrand(product.brand);
-    setSellingUnit(product.selling_unit);
-    setPrice(String(product.price));
-    setStock(String(product.stock));
+    setDescription(product.description ?? "");
+    setCategory(product.category_id ? String(product.category_id) : "");
+    setSubcategory(product.subcategory ?? "");
+    setBrand(product.brand ?? "");
+    setSellingUnit(product.selling_unit || "item");
+    // `price` in the API includes the platform markup; the partner edits the base price.
+    setPrice(String(product.original_price ?? product.price));
+    setStock(String(product.stock_quantity));
     setWeight(product.weight ? String(product.weight) : "");
-    setWeightUnit(product.weight_unit);
-    setThreshold(String(product.low_stock_threshold));
+    setWeightUnit(product.weight_unit ?? "");
+    setThreshold(String(product.low_stock_threshold ?? 10));
   }, [product]);
 
+  useEffect(() => {
+    if (!category && meta.data?.categories.length) setCategory(String(meta.data.categories[0].id));
+  }, [category, meta.data]);
+
   const selectedCategory = useMemo(
-    () => meta.data?.categories.find((item) => item.slug === category),
+    () => meta.data?.categories.find((item) => String(item.id) === category),
     [meta.data, category],
   );
+  const weightUnits = (meta.data?.selling_units ?? []).filter((unit) => allowsFractional(unit.value));
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
@@ -76,7 +72,7 @@ export default function GroceryPartnerProductForm({ mode }: { mode: "create" | "
     const body = new FormData();
     body.set("name", name);
     body.set("description", description);
-    body.set("category", selectedCategory?.name || category);
+    if (category) body.set("category_id", category);
     body.set("subcategory", subcategory);
     body.set("brand", brand);
     body.set("selling_unit", sellingUnit);
@@ -85,7 +81,7 @@ export default function GroceryPartnerProductForm({ mode }: { mode: "create" | "
     body.set("low_stock_threshold", threshold);
     if (weight) body.set("weight", weight);
     if (weightUnit) body.set("weight_unit", weightUnit);
-    if (file) body.set("image", file);
+    if (file) body.append("images", file);
     try {
       if (productId) {
         await updateProduct({ id: productId, body }).unwrap();
@@ -98,7 +94,7 @@ export default function GroceryPartnerProductForm({ mode }: { mode: "create" | "
     }
   }
 
-  if (productId && (existing.isFetching || existing.isLoading)) {
+  if (productId && existing.isFetching && !product) {
     return <PageSpinner color="green" />;
   }
 
@@ -119,9 +115,16 @@ export default function GroceryPartnerProductForm({ mode }: { mode: "create" | "
           <div className="grid gap-3 md:grid-cols-2">
             <label className="text-sm">
               {t("gpCategory")}
-              <select value={category} onChange={(e) => setCategory(e.target.value)} className="mt-1 w-full rounded-xl border border-[#E5E7EB] px-3 py-2">
+              <select
+                value={category}
+                onChange={(e) => {
+                  setCategory(e.target.value);
+                  setSubcategory("");
+                }}
+                className="mt-1 w-full rounded-xl border border-[#E5E7EB] px-3 py-2"
+              >
                 {(meta.data?.categories ?? []).map((item) => (
-                    <option key={item.slug} value={item.slug}>{t(groceryCategoryTranslationKey(item.slug), item.name)}</option>
+                  <option key={item.id} value={String(item.id)}>{groceryCategoryLabel(t, item.slug, item.name)}</option>
                 ))}
               </select>
             </label>
@@ -129,8 +132,8 @@ export default function GroceryPartnerProductForm({ mode }: { mode: "create" | "
               {t("gpSubcategory")}
               <select value={subcategory} onChange={(e) => setSubcategory(e.target.value)} className="mt-1 w-full rounded-xl border border-[#E5E7EB] px-3 py-2">
                 <option value="">{t("gpAll")}</option>
-                {(selectedCategory?.subcategories ?? []).map((item) => (
-                    <option key={item} value={item}>{t(grocerySubcategoryTranslationKey(item), item)}</option>
+                {(selectedCategory?.children ?? []).map((item) => (
+                  <option key={item.id} value={item.name}>{grocerySubcategoryLabel(t, item.name)}</option>
                 ))}
               </select>
             </label>
@@ -160,18 +163,18 @@ export default function GroceryPartnerProductForm({ mode }: { mode: "create" | "
             {t("gpSoldBy")}
             <select
               value={sellingUnit}
-              onChange={(e) => setSellingUnit(e.target.value as GrocerySellingUnit)}
+              onChange={(e) => setSellingUnit(e.target.value)}
               className="mt-1 w-full rounded-xl border border-[#E5E7EB] px-3 py-2"
             >
               {(meta.data?.selling_units ?? []).map((unit) => (
                 <option key={unit.value} value={unit.value}>
-                  {t(UNIT_KEYS[unit.value], unit.label)}
+                  {t(sellingUnitTranslationKey(unit.value, "gp"), unit.label)}
                 </option>
               ))}
             </select>
           </label>
           <label className="text-sm">
-            {t("gpPricePer")} ({t(UNIT_KEYS[sellingUnit])})
+            {t("gpPricePer")} ({t(sellingUnitTranslationKey(sellingUnit, "gp"))})
             <input required value={price} onChange={(e) => setPrice(e.target.value)} className="mt-1 w-full rounded-xl border border-[#E5E7EB] px-3 py-2" />
           </label>
           <label className="text-sm">
@@ -190,7 +193,7 @@ export default function GroceryPartnerProductForm({ mode }: { mode: "create" | "
             {t("gpWeightUnit")}
             <select value={weightUnit} onChange={(e) => setWeightUnit(e.target.value)} className="mt-1 w-full rounded-xl border border-[#E5E7EB] px-3 py-2">
               <option value="">{t("gpAll")}</option>
-              {(meta.data?.weight_units ?? []).map((unit) => (
+              {weightUnits.map((unit) => (
                 <option key={unit.value} value={unit.value}>
                   {t(sellingUnitTranslationKey(unit.value, "gp"), unit.label)}
                 </option>

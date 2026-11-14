@@ -3,9 +3,9 @@
 import { useState } from "react";
 import {
   useAdjustGroceryStockMutation,
-  useGetGroceryPartnerProductsQuery,
+  useGetGroceryInventoryQuery,
   useGetGroceryStockHistoryQuery,
-} from "./groceryPartnerApi";
+} from "@/redux/slices/groceryPartnerApi";
 import { useTranslation } from "@/hooks/useTranslation";
 import {
   partnerStatusTranslationKey,
@@ -13,20 +13,21 @@ import {
   stockReasonTranslationKey,
 } from "@/utils/groceryUnits";
 import PageSpinner from "@/components/ui/PageSpinner";
+import { allowsFractional, partnerStatus } from "./format";
 
 export default function GroceryPartnerInventory() {
   const { t } = useTranslation();
-  const { data, isFetching, isError, refetch } = useGetGroceryPartnerProductsQuery();
+  const { data, isFetching, isError, refetch } = useGetGroceryInventoryQuery();
   const history = useGetGroceryStockHistoryQuery();
   const [adjust] = useAdjustGroceryStockMutation();
   const [busyId, setBusyId] = useState<number | null>(null);
   const products = data ?? [];
   const pending = !isError && (isFetching || data === undefined);
 
-  async function changeStock(id: number, delta: string) {
+  async function changeStock(id: number, adjustment: number) {
     setBusyId(id);
     try {
-      await adjust({ id, delta, reason: "manual" }).unwrap();
+      await adjust({ id, adjustment, reason: "manual" }).unwrap();
     } finally {
       setBusyId(null);
     }
@@ -61,18 +62,18 @@ export default function GroceryPartnerInventory() {
                     <button
                       type="button"
                       disabled={busyId === product.id}
-                      onClick={() => void changeStock(product.id, product.allows_fractional ? "-0.5" : "-1")}
+                      onClick={() => void changeStock(product.id, allowsFractional(product.selling_unit) ? -0.5 : -1)}
                       className="h-8 w-8 rounded-full border border-[#E5E7EB]"
                     >
                       −
                     </button>
                     <span>
-                      {product.stock} {t(sellingUnitTranslationKey(product.selling_unit, "gp"))}
+                      {product.stock_quantity} {t(sellingUnitTranslationKey(product.selling_unit, "gp"))}
                     </span>
                     <button
                       type="button"
                       disabled={busyId === product.id}
-                      onClick={() => void changeStock(product.id, product.allows_fractional ? "0.5" : "1")}
+                      onClick={() => void changeStock(product.id, allowsFractional(product.selling_unit) ? 0.5 : 1)}
                       className="h-8 w-8 rounded-full bg-[#0B8F45] text-white"
                     >
                       +
@@ -81,9 +82,9 @@ export default function GroceryPartnerInventory() {
                 </td>
                 <td className="px-4 py-3">{t(sellingUnitTranslationKey(product.selling_unit, "gp"))}</td>
                 <td className="px-4 py-3">
-                  {product.currency} {product.price_per_unit}/{t(sellingUnitTranslationKey(product.selling_unit, "gp")).toLowerCase()}
+                  {product.price_display || `${product.currency ?? ""} ${product.price}`}
                 </td>
-                <td className="px-4 py-3">{t(partnerStatusTranslationKey(product.partner_status))}</td>
+                <td className="px-4 py-3">{t(partnerStatusTranslationKey(partnerStatus(product)))}</td>
               </tr>
             ))}
           </tbody>
@@ -98,7 +99,7 @@ export default function GroceryPartnerInventory() {
             {(history.data ?? []).slice(0, 20).map((row) => (
               <li key={row.id} className="flex justify-between gap-3 border-b border-[#E5E7EB] pb-2">
                 <span>
-                  {row.product_name}: {row.previous_quantity} → {row.new_quantity} ({t(stockReasonTranslationKey(row.reason))})
+                  {row.product}: {row.previous_quantity} → {row.new_quantity} ({t(stockReasonTranslationKey(row.reason))})
                 </span>
                 <span className="text-[#6B7280]">{new Date(row.created_at).toLocaleString()}</span>
               </li>

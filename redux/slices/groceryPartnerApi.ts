@@ -118,7 +118,8 @@ export const groceryPartnerApi = createApi({
       }),
     }),
     getGroceryOrders: builder.query<GroceryOrder[], void>({
-      query: () => "/orders/",
+      // /api/v1/partner/orders/ only admits restaurant partners; grocery stores have their own list.
+      query: () => `${baseAPI}/api/v1/groceries/partner/orders/`,
       transformResponse: (response: GroceryOrder[] | { results?: GroceryOrder[] }) => unwrapList(response),
       providesTags: ["GroceryOrders"],
     }),

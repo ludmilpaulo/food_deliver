@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useGetGroceryPartnerOrdersQuery } from "./groceryPartnerApi";
+import { useGetGroceryOrdersQuery } from "@/redux/slices/groceryPartnerApi";
 import { useTranslation } from "@/hooks/useTranslation";
 import { groceryOrderStatusTranslationKey } from "@/utils/groceryUnits";
 import PageSpinner from "@/components/ui/PageSpinner";
@@ -12,8 +12,8 @@ const STATUSES = ["", "new", "accepted", "preparing", "ready", "packed", "courie
 export default function GroceryPartnerOrders() {
   const { t } = useTranslation();
   const [status, setStatus] = useState("");
-  const { data, isFetching, isError, refetch } = useGetGroceryPartnerOrdersQuery(status || undefined);
-  const orders = data ?? [];
+  const { data, isFetching, isError, refetch } = useGetGroceryOrdersQuery();
+  const orders = (data ?? []).filter((order) => !status || (order.grocery_status || "new") === status);
   const pending = !isError && (isFetching || data === undefined);
 
   return (
@@ -48,12 +48,16 @@ export default function GroceryPartnerOrders() {
               className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#E5E7EB] bg-white p-4 hover:border-[#0B8F45]"
             >
               <div>
-                <p className="font-semibold">{order.number}</p>
-                <p className="text-sm text-[#6B7280]">{order.customer} · {order.items} {t("gpItems").toLowerCase()}</p>
+                <p className="font-semibold">#{order.id}</p>
+                <p className="text-sm text-[#6B7280]">
+                  {order.customer?.name || "—"} · {order.order_details.length} {t("gpItems").toLowerCase()}
+                </p>
               </div>
               <div className="text-right">
                 <p className="font-bold">{order.total}</p>
-                <p className="text-xs font-semibold uppercase text-[#0B8F45]">{t(groceryOrderStatusTranslationKey(order.status))}</p>
+                <p className="text-xs font-semibold uppercase text-[#0B8F45]">
+                  {t(groceryOrderStatusTranslationKey(order.grocery_status || "new"))}
+                </p>
               </div>
             </Link>
           ))}

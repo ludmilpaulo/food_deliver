@@ -2,8 +2,11 @@ const UNIT_SUFFIX: Record<string, string> = {
   item: "UnitItem",
   kg: "UnitKg",
   g: "UnitG",
+  gram: "UnitG",
   l: "UnitL",
+  litre: "UnitL",
   ml: "UnitMl",
+  millilitre: "UnitMl",
   pack: "UnitPack",
   box: "UnitBox",
   bottle: "UnitBottle",
@@ -74,9 +77,11 @@ const PAYMENT_STATUS_KEYS: Record<string, string> = {
 
 const DISCOUNT_TYPE_KEYS: Record<string, string> = {
   percent: "gpDiscountPercent",
+  percentage: "gpDiscountPercent",
   fixed: "gpDiscountFixed",
   bogo: "gpDiscountBogo",
   multi: "gpDiscountMulti",
+  multibuy: "gpDiscountMulti",
   weekly: "gpDiscountWeekly",
 };
 
@@ -138,4 +143,17 @@ export function groceryCategoryTranslationKey(slug?: string | null): string {
 
 export function grocerySubcategoryTranslationKey(name?: string | null): string {
   return SUBCATEGORY_KEYS[(name || "").trim().toLowerCase()] ?? "gpSubcategory";
+}
+
+type Translate = (key: string, fallback?: string) => string;
+
+/** Translated category name, or the API name when there is no translation for it. */
+export function groceryCategoryLabel(t: Translate, slug: string | null | undefined, name: string): string {
+  const key = CATEGORY_KEYS[(slug || "").toLowerCase()];
+  return key ? t(key, name) : name;
+}
+
+export function grocerySubcategoryLabel(t: Translate, name: string): string {
+  const key = SUBCATEGORY_KEYS[name.trim().toLowerCase()];
+  return key ? t(key, name) : name;
 }

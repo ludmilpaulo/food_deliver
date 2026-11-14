@@ -44,6 +44,23 @@ export function groceryStatusLabel(status?: string): string {
   return labels[status || ""] || status || "New";
 }
 
+const WEIGHT_UNITS = new Set(["kg", "gram", "litre", "millilitre"]);
+
+export function allowsFractional(unit?: string): boolean {
+  return WEIGHT_UNITS.has((unit || "").toLowerCase());
+}
+
+export function partnerStatus(product: {
+  is_active: boolean;
+  approval_status: string;
+  inventory_status: string;
+}): string {
+  if (!product.is_active) return "inactive";
+  if (product.approval_status === "draft") return "draft";
+  if (product.approval_status && product.approval_status !== "approved") return "pending_approval";
+  return product.inventory_status;
+}
+
 export function inventoryLabel(status?: string): string {
   if (status === "low_stock") return "Low Stock";
   if (status === "out_of_stock") return "Out of Stock";

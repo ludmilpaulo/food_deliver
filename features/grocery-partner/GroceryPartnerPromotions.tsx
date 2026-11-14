@@ -2,21 +2,21 @@
 
 import { FormEvent, useState } from "react";
 import {
-  useCreateGroceryPartnerPromotionMutation,
-  useGetGroceryPartnerProductsQuery,
-  useGetGroceryPartnerPromotionsQuery,
-} from "./groceryPartnerApi";
+  useCreateGroceryPromotionMutation,
+  useGetGroceryProductsQuery,
+  useGetGroceryPromotionsQuery,
+} from "@/redux/slices/groceryPartnerApi";
 import { useTranslation } from "@/hooks/useTranslation";
 import PageSpinner from "@/components/ui/PageSpinner";
 import { groceryDiscountTypeTranslationKey } from "@/utils/groceryUnits";
 
 export default function GroceryPartnerPromotions() {
   const { t } = useTranslation();
-  const { data, isFetching } = useGetGroceryPartnerPromotionsQuery();
-  const products = useGetGroceryPartnerProductsQuery();
-  const [createPromo] = useCreateGroceryPartnerPromotionMutation();
+  const { data, isFetching } = useGetGroceryPromotionsQuery();
+  const products = useGetGroceryProductsQuery();
+  const [createPromo] = useCreateGroceryPromotionMutation();
   const [title, setTitle] = useState("");
-  const [discountType, setDiscountType] = useState("percent");
+  const [discountType, setDiscountType] = useState("percentage");
   const [value, setValue] = useState("");
   const [productId, setProductId] = useState("");
   const [start, setStart] = useState("");
@@ -27,10 +27,10 @@ export default function GroceryPartnerPromotions() {
     await createPromo({
       title,
       discount_type: discountType,
-      discount_value: value,
+      discount_value: Number(value),
       product: productId ? Number(productId) : null,
-      start_at: start,
-      end_at: end,
+      start_date: start,
+      end_date: end,
       is_active: true,
     }).unwrap();
     setTitle("");
@@ -43,10 +43,10 @@ export default function GroceryPartnerPromotions() {
       <form onSubmit={onSubmit} className="grid gap-3 rounded-2xl border border-[#E5E7EB] bg-white p-5 md:grid-cols-2">
         <input required value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("gpCreatePromotion")} className="rounded-xl border border-[#E5E7EB] px-3 py-2" />
         <select value={discountType} onChange={(e) => setDiscountType(e.target.value)} className="rounded-xl border border-[#E5E7EB] px-3 py-2">
-          <option value="percent">{t("gpDiscountPercent")}</option>
+          <option value="percentage">{t("gpDiscountPercent")}</option>
           <option value="fixed">{t("gpDiscountFixed")}</option>
           <option value="bogo">{t("gpDiscountBogo")}</option>
-          <option value="multi">{t("gpDiscountMulti")}</option>
+          <option value="multibuy">{t("gpDiscountMulti")}</option>
           <option value="weekly">{t("gpDiscountWeekly")}</option>
         </select>
         <input required value={value} onChange={(e) => setValue(e.target.value)} placeholder={t("gpPricePer")} className="rounded-xl border border-[#E5E7EB] px-3 py-2" />

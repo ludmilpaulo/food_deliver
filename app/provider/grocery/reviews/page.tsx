@@ -1,11 +1,11 @@
 "use client";
 
-import { useGetGroceryPartnerReviewsQuery } from "@/features/grocery-partner/groceryPartnerApi";
+import { useGetGroceryReviewsQuery } from "@/redux/slices/groceryPartnerApi";
 import { useTranslation } from "@/hooks/useTranslation";
 
 export default function Page() {
   const { t } = useTranslation();
-  const { data = [] } = useGetGroceryPartnerReviewsQuery();
+  const { data = [] } = useGetGroceryReviewsQuery();
   return (
     <div>
       <h1 className="mb-4 text-2xl font-bold">{t("gpReviews")}</h1>
@@ -15,7 +15,7 @@ export default function Page() {
         <ul className="space-y-2">
           {data.map((row) => (
             <li key={row.id} className="rounded-2xl border border-[#E5E7EB] bg-white p-4">
-              <p className="font-semibold">{row.product_name} · {row.rating}/5</p>
+              <p className="font-semibold">{row.product} · {row.rating}/5</p>
               <p className="text-sm text-[#6B7280]">{row.comment}</p>
             </li>
           ))}
